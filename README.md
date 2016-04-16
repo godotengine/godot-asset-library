@@ -1,0 +1,2 @@
+# addonlib
+Addonlib for Godot
