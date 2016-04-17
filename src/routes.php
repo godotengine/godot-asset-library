@@ -2,83 +2,103 @@
 // Routes
 
 
-//get all categories
+// Initializes the connection by sending all categories available
 $app->get('/configure', function ($request, $response, $args) {
-  global $db;
-  $output = array();
-  $result = $db->query("SELECT * FROM as_categories ORDER BY id");
-  while ($row = $result->fetch_assoc()) {
-    $output[] = $row;
-  }
-  echo '{
-   	"categories":';
-  echo json_encode($output);
-  echo '}';
-  return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
+  $query = $this->queries['category']['list'];
+  $query->execute();
+  return $response->withJson([
+    'categories' => $query->fetchAll(),
+  ], 200);
 });
 
-// search
+// Searches through the list of assets
 $app->get('/search', function ($request, $response, $args) {
-  global $db;
-  $sort = $db->real_escape_string($_GET['sort']);
-  $orderby = "";
-  if(!isset($_GET['filter'])) {
-    $filter = "";
-  } else {
-    $filter = $db->real_escape_string($_GET['filter']);
+  $params = $request->getQueryParams();
+  $query = $this->queries['asset']['search'];
+
+  $category = '%';
+  $filter = '%';
+  $order_column = 'title';
+  $page_size = 10;
+  $max_page_size = 10;
+  $page_offset = 0;
+  if(isset($params['category'])) {
+    $category = $params['category'];
   }
-  if(!isset($_GET['category'])) {
-    $category = "%";
-  } else {
-    $category = $db->real_escape_string($_GET['category']);
+  if(isset($params['filter'])) {
+    $filter = "%{$params['filter']}%";
   }
-  if($sort == "rating") {
-    $orderby = "rating";
+  if(isset($params['max_results'])) {
+    $page_size = min(abs((int) $params['max_results']), $max_page_size);
   }
-  else if ($sort == "downloads") {
-    $oderby = "title";
+  if(isset($params['page'])) {
+    $page_offset = abs((int) $params['page']) * $page_size;
+  } elseif(isset($params['offset'])) {
+    $page_offset = abs((int) $params['offset']);
   }
-  else if ($sort == "name") {
-    $oderby = "title";
+  if(isset($params['sort'])) {
+    $column_mapping = [
+      'rating' => 'rating',
+      'cost' => 'cost',
+      'name' => 'title',
+      // TODO: downloads, updated
+    ];
+    if(isset($column_mapping[$params['sort']])) {
+      $order_column = $column_mapping[$params['sort']];
+    }
   }
-  else if ($sort == "cost") {
-    $oderby = "cost";
-  }
-  else if ($sort == "updated") {
-    $oderby = "title";
-  } else {
-    $orderby = "title";
-  }
-  $output = array();
-  $result = $db->query("SELECT * FROM as_assets WHERE category_id LIKE '$category' AND (title LIKE '%$filter%' OR cost LIKE '%$filter%' OR author LIKE '%$filter%') ORDER BY '$orderby'");
-  while ($row = $result->fetch_assoc()) {
-    $output[] = $row;
-  }
-  echo '{
-    "result":';
-  echo json_encode($output);
-  echo '}';
-  return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
+
+  $query->bindValue(':category', $category, PDO::PARAM_INT);
+  $query->bindValue(':filter', $filter);
+  $query->bindValue(':order', $order_column);
+  $query->bindValue(':page_size', $page_size, PDO::PARAM_INT);
+  $query->bindValue(':skip_count', $page_offset, PDO::PARAM_INT);
+  $query->execute();
+
+  return $response->withJson([
+    'result' => $query->fetchAll(),
+  ], 200);
 });
 
-// get assets
-$app->get('/asset', function ($request, $response, $args) {
-  global $db;
-  $id = $db->real_escape_string($_GET['id']);
-  $result = $db->query("SELECT * FROM as_assets WHERE asset_id=$id");
-  $row = $result->fetch_assoc();
-  $info = $row;
-  $result = $db->query("SELECT * FROM as_asset_previews WHERE asset_id=$id");
-  $previews = array();
-  while ($row = $result->fetch_assoc()) {
-    unset($row['id']);
-    $previews[] = $row;
+// Get information for a single asset
+$app->get('/info', function ($request, $response, $args) {
+  $params = $request->getQueryParams();
+  $query = $this->queries['asset']['get_one'];
+
+  if(!isset($params['id'])) {
+    return $response->withJson([
+      'error' => 'No id parameter present on request!'
+    ], 400);
   }
-  echo '{
-    "info":';
-  echo json_encode($info);
-  echo ',"previews":';
-  echo json_encode($previews);
-  echo '}';
-  return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
+
+  $query->bindValue(':id', (int) $params['id'], PDO::PARAM_INT);
+  $query->execute();
+
+  if($query->rowCount() <= 0) {
+    return $response->withJson([
+      'error' => 'Couldn\'t find any asset with the given id!'
+    ], 400);
+  }
+
+  $output = $query->fetchAll();
+  $asset_info = [];
+  $previews = [];
+
+  foreach ($output as $row) {
+    foreach ($row as $column => $value) {
+      if($value!==null) {
+        if($column==='id') {
+          $previews[] = [];
+        } elseif($column==="type" || $column==="link") {
+            $previews[count($previews) - 1][$column] = $value;
+        } else {
+          $asset_info[$column] = $value;
+        }
+      }
+    }
+  }
+
+  $asset_info['previews'] = $previews;
+
+  return $response->withJson($asset_info, 200);
 });
