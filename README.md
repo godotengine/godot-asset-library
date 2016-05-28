@@ -1,10 +1,12 @@
 # addonlib
 Addonlib for Godot
 
+## Installation
 
-# Hacking
-
-Before starting to play around with the code, you should run the following code in order to protect your password.
+Run the following commands to get a running installation of the project:
 ````bash
-git update-index --assume-unchanged src/settings-local.php
+composer install
+cp src/settings-local-example.php src/settings-local.php
 ````
+
+Now you should proceed to update `src/settings-local.php` with your DB password and session secret.

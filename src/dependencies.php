@@ -40,3 +40,10 @@ $container['queries'] = function ($c) {
   }
   return $queries;
 };
+
+// tokens
+$container['tokens'] = function ($c) {
+  // Token format: <base64-encoded json-encoded data>&<base64-encoded id (composed of raw random bytes)>|<base64-encoded time>&<base64-encoded hmac>
+
+  return require_once __DIR__ . '/helpers/tokens.php';
+};

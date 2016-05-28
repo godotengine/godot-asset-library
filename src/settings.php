@@ -20,5 +20,14 @@ return [
             'user'  => 'user', // Check settings-local.php for those two
             'pass'  => 'pass',
         ],
+
+        // Auth configuration
+        'auth' => [
+            'secret' => 'somerandomstringshouldbeputhere', // Check settings-local.php
+            'tokenExpirationTime' => 3600 * 24 * 7, // week
+            'bcryptOptions' => [
+              'cost' => 12,
+            ],
+        ],
     ],
 ];

@@ -1,23 +1,5 @@
 <?php
-// Routes
-
-
-// Initializes the connection by sending all categories available
-$app->get('/configure', function ($request, $response, $args) {
-  $query = $this->queries['category']['list'];
-  $query->execute();
-
-  if($query->errorCode() != '00000') {
-    $this->logger->error($query->errorCode(), $query->errorInfo());
-      return $response->withJson([
-        'error' => 'An error occured while fetching results from DB!'
-      ], 500);
-  }
-
-  return $response->withJson([
-    'categories' => $query->fetchAll(),
-  ], 200);
-});
+// Asset routes
 
 // Searches through the list of assets
 $app->get('/asset', function ($request, $response, $args) {
@@ -29,7 +11,7 @@ $app->get('/asset', function ($request, $response, $args) {
   $filter = '%';
   $order_column = 'rating';
   $order_direction = 'desc';
-  $page_size = 1;
+  $page_size = 10;
   $max_page_size = 500;
   $page_offset = 0;
   if(isset($params['category'])) {
@@ -71,9 +53,9 @@ $app->get('/asset', function ($request, $response, $args) {
 
   if($query->errorCode() != '00000') {
     $this->logger->error($query->errorCode(), $query->errorInfo());
-      return $response->withJson([
-        'error' => 'An error occured while fetching results from DB!'
-      ], 500);
+    return $response->withJson([
+      'error' => 'An error occured while fetching results from DB!'
+    ], 500);
   }
 
   $query_count->bindValue(':category', $category, PDO::PARAM_INT);
@@ -82,9 +64,9 @@ $app->get('/asset', function ($request, $response, $args) {
 
   if($query_count->errorCode() != '00000') {
     $this->logger->error($query_count->errorCode(), $query_count->errorInfo());
-      return $response->withJson([
-        'error' => 'An error occured while fetching results from DB!'
-      ], 500);
+    return $response->withJson([
+      'error' => 'An error occured while fetching results from DB!'
+    ], 500);
   }
 
   $total_count = $query_count->fetchAll()[0]['count'];
@@ -107,9 +89,9 @@ $app->get('/asset/{id}', function ($request, $response, $args) {
 
   if($query->errorCode() != '00000') {
     $this->logger->error($query->errorCode(), $query->errorInfo());
-      return $response->withJson([
-        'error' => 'An error occured while fetching results from DB!'
-      ], 500);
+    return $response->withJson([
+      'error' => 'An error occured while fetching results from DB!'
+    ], 500);
   }
 
   if($query->rowCount() <= 0) {
