@@ -7,24 +7,22 @@ $app->get('/configure', function ($request, $response, $args) {
   $query = $this->queries['category']['list'];
   $query->execute();
 
-  if($query->errorCode() != '00000') {
-    $this->logger->error($query->errorCode(), $query->errorInfo());
-    return $response->withJson([
-      'error' => 'An error occured while fetching results from DB!'
-    ], 500);
-  }
+  $errorResponse = $this->utils->error_reponse_if_query_bad($response, $query);
+  if($errorResponse) return $errorResponse;
 
   if(isset($request->getQueryParams()['session'])) {
+    $id = openssl_random_pseudo_bytes(16);
     $token = $this->tokens->generate([
-      'session' => openssl_random_pseudo_bytes(16)
+      'session' => base64_encode($id),
     ]);
 
     return $response->withJson([
       'categories' => $query->fetchAll(),
       'token' => $token,
-      'login_url' => $_SERVER['HTTP_HOST'] . dirname($request->getUri()->getBasePath()) . '/html#/login/' . $token,
+      'login_url' => $_SERVER['HTTP_HOST'] . dirname($request->getUri()->getBasePath()) . '/html#/login/' . urlencode($token),
       // ^ TODO: Make those routes actually work
     ], 200);
+
   } else {
     return $response->withJson([
       'categories' => $query->fetchAll(),
@@ -36,31 +34,17 @@ $app->post('/register', function ($request, $response, $args) {
   $body = $request->getParsedBody();
   $query = $this->queries['user']['register'];
   $query_check = $this->queries['user']['get_by_username'];
-  if(!isset($body['username']) || !is_string($body['username']) || strlen($body['username']) < 5) {
-    return $response->withJson([
-      'error' => 'Username is required, provided is not a string, or it is too short!'
-    ], 400);
-  }
-  if(!isset($body['email']) || !is_string($body['email'])) {
-    return $response->withJson([
-      'error' => 'Email is required, or provided is not a string!'
-    ], 400);
-  }
-  if(!isset($body['password']) || !is_string($body['password'])) {
-    return $response->withJson([
-      'error' => 'Password is required, or provided is not a string!'
-    ], 400);
-  }
+
+  $errorResponse = $this->utils->error_reponse_if_missing_or_not_string($response, $body, 'username');
+  $errorResponse = $this->utils->error_reponse_if_missing_or_not_string($errorResponse, $body, 'email');
+  $errorResponse = $this->utils->error_reponse_if_missing_or_not_string($errorResponse, $body, 'password');
+  if($errorResponse) return $errorResponse;
 
   $query_check->bindValue(':username', $body['username']);
   $query_check->execute();
 
-  if($query_check->errorCode() != '00000') {
-    $this->logger->error($query->errorCode(), $query->errorInfo());
-    return $response->withJson([
-      'error' => 'An error occured while checking for existing user in DB!'
-    ], 500);
-  }
+  $errorResponse = $this->utils->error_reponse_if_query_bad($errorResponse, $query_check);
+  if($errorResponse) return $errorResponse;
 
   if($query_check->rowCount() > 0) {
     return $response->withJson([
@@ -68,19 +52,16 @@ $app->post('/register', function ($request, $response, $args) {
     ], 409);
   }
 
+  $password_hash = password_hash($body['password'], PASSWORD_BCRYPT, $this->get('settings')['auth']['bcryptOptions']);
+
   $query->bindValue(':username', $body['username']);
   $query->bindValue(':email', $body['email']); // TODO: Verify email.
-  $password_hash = password_hash($body['password'], PASSWORD_BCRYPT, $this->get('settings')['auth']['bcryptOptions']);
   $query->bindValue(':password_hash', $password_hash);
 
   $query->execute();
 
-  if($query->errorCode() != '00000') {
-    $this->logger->error($query->errorCode(), $query->errorInfo());
-    return $response->withJson([
-      'error' => 'An error occured while adding user to DB!'
-    ], 500);
-  }
+  $errorResponse = $this->utils->error_reponse_if_query_bad($errorResponse, $query);
+  if($errorResponse) return $errorResponse;
 
   return $response->withJson([
     'username' => $body['username'],
@@ -92,38 +73,34 @@ $app->post('/login', function ($request, $response, $args) {
   $body = $request->getParsedBody();
   $query = $this->queries['user']['get_by_username'];
 
-  if(!isset($body['username']) || !is_string($body['username'])) {
-    return $response->withJson([
-      'error' => 'Username is required, or provided is not a string!'
-    ], 400);
-  }
-  if(!isset($body['password']) || !is_string($body['password'])) {
-    return $response->withJson([
-      'error' => 'Password is required, or provided is not a string!'
-    ], 400);
-  }
-
-  if(isset($body['token'])) {
-    $token_data = $this->tokens->validate($body['token']);
-    if(!$token_data) {
-      return $response->withJson([
-        'error' => 'Invalid token supplied'
-      ], 400);
-    }
-    // TODO: Authenticate user session.
-  }
+  $errorResponse = $this->utils->error_reponse_if_missing_or_not_string($response, $body, 'username');
+  $errorResponse = $this->utils->error_reponse_if_missing_or_not_string($errorResponse, $body, 'password');
+  if($errorResponse) return $errorResponse;
 
   $query->bindValue(':username', $body['username']);
   $query->execute();
 
-  if($query->errorCode() != '00000') {
-    $this->logger->error($query->errorCode(), $query->errorInfo());
-    return $response->withJson([
-      'error' => 'An error occured while fetching user from DB!'
-    ], 500);
-  }
+  $errorResponse = $this->utils->error_reponse_if_query_bad($errorResponse, $query);
+  if($errorResponse) return $errorResponse;
 
   $user = $query->fetchAll()[0];
+
+  if(isset($body['token'])) {
+    $token_data = $this->tokens->validate($body['token']);
+
+    if(!$token_data || !isset($token_data["session"])) {
+      return $response->withJson([
+        'error' => 'Invalid token supplied'
+      ], 400);
+    }
+
+    $sesion_query = $queries['user']['set_session_token'];
+    $sesion_query->bindValue(':id', (int) $user['id'], PDO::PARAM_INT);
+    $sesion_query->bindValue(':session_token', $body['token']);
+    $sesion_query->execute();
+    $errorResponse = $this->utils->error_reponse_if_query_bad($errorResponse, $sesion_query);
+    if($errorResponse) return $errorResponse;
+  }
 
   $token = $this->tokens->generate([
     'user_id' => $user['id']
