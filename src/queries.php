@@ -13,7 +13,7 @@ return [
     'list' => 'SELECT category_id as id, category as name FROM `as_categories` ORDER BY category_id',
   ],
   'asset' => [// TODO: use users instead of authors
-    'search' => 'SELECT asset_id, title, username as author, user_id as author_id, category_id, rating, cost, icon_url FROM `as_assets`
+    'search' => 'SELECT asset_id, title, username as author, user_id as author_id, category_id, rating, cost, icon_url, version, version_string FROM `as_assets`
       LEFT JOIN `as_users` USING (user_id)
 
       WHERE accepted<>"UNACCEPTED" AND category_id LIKE :category
@@ -58,18 +58,21 @@ return [
       LEFT JOIN `as_asset_previews` USING (asset_id)
       WHERE asset_id = :id',
 
+
+    'get_one_bare' => 'SELECT * FROM `as_assets` WHERE asset_id = :asset_id',
+
     'submit' => 'INSERT INTO `as_assets`
       SET user_id=:user_id, title=:title, description=:description, category_id=:category_id, cost=:cost,
         version=0, version_string=:version_string, download_url=:download_url, browse_url=:browse_url, icon_url=:icon_url,
         rating=0, accepted="UNACCEPTED"',
 
     'update_details' => 'UPDATE `as_assets`
-      SET title=:title, category_id=:category_id, cost=:cost, description=:description, icon_url=:icon_url
-      WHERE asset_id=:asset_id AND user_id=:user_id',
+      SET title=:title, description=:description, category_id=:category_id, cost=:cost, icon_url=:icon_url
+      WHERE asset_id=:asset_id',
 
     'update_version' => 'UPDATE `as_assets`
       SET version=version+1, version_string=:version_string, download_url=:download_url, browse_url=:browse_url,
         accepted=IF(accepted="UNACCEPTED", accepted, "UPDATED")
-      WHERE asset_id=:asset_id AND user_id=:user_id',
+      WHERE asset_id=:asset_id',
   ],
 ];

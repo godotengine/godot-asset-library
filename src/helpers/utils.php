@@ -8,25 +8,27 @@ class Utils
     $this->c = $c;
   }
 
-  public function error_reponse_if_missing_or_not_string($response, $object, $property)
+  public function error_reponse_if_missing_or_not_string($currentStatus, &$response, $object, $property)
   {
-    if($response && (!isset($object[$property]) || !is_string($object[$property]))) {
-      return $response->withJson([
+    if((!isset($object[$property]) || !is_string($object[$property]))) {
+      $response = $response->withJson([
         'error' => $property . ' is required, and must be a string'
       ], 400);
+      return true;
     }
-    return false;
+    return false || $currentStatus;
   }
 
-  public function error_reponse_if_query_bad($response, $query)
+  public function error_reponse_if_query_bad($currentStatus, &$response, $query)
   {
     if($query->errorCode() != '00000') {
       $this->c->logger->error($query->errorCode(), $query->errorInfo());
-      return $response->withJson([
+      $response = $response->withJson([
         'error' => 'An error occured while executing DB queries'
       ], 500);
+      return true;
     }
-    return false;
+    return false || $currentStatus;
   }
 
   public function get_user_id_from_token_data($token_data)

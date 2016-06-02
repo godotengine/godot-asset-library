@@ -51,15 +51,15 @@ $app->get('/asset', function ($request, $response, $args) {
   $query->bindValue(':skip_count', $page_offset, PDO::PARAM_INT);
   $query->execute();
 
-  $errorResponse = $this->utils->error_reponse_if_query_bad($response, $query);
-  if($errorResponse) return $errorResponse;
+  $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
+  if($error) return $response;
 
   $query_count->bindValue(':category', $category, PDO::PARAM_INT);
   $query_count->bindValue(':filter', $filter, PDO::PARAM_INT);
   $query_count->execute();
 
-  $errorResponse = $this->utils->error_reponse_if_query_bad($response, $query_count);
-  if($errorResponse) return $errorResponse;
+  $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_count);
+  if($error) return $response;
 
   $total_count = $query_count->fetchAll()[0]['count'];
 
@@ -79,8 +79,8 @@ $app->get('/asset/{id}', function ($request, $response, $args) {
   $query->bindValue(':id', (int) $args['id'], PDO::PARAM_INT);
   $query->execute();
 
-  $errorResponse = $this->utils->error_reponse_if_query_bad($response, $query);
-  if($errorResponse) return $errorResponse;
+  $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
+  if($error) return $response;
 
   if($query->rowCount() <= 0) {
     return $response->withJson([
@@ -125,20 +125,21 @@ $app->get('/asset/{id}', function ($request, $response, $args) {
   return $response->withJson($asset_info, 200);
 });
 
+// Submit an asset
 $app->post('/asset', function ($request, $response, $args) {
   $body = $request->getParsedBody();
   $query = $this->queries['asset']['submit'];
 
-  $errorResponse = $this->utils->error_reponse_if_missing_or_not_string($response, $body, 'token');
-  $errorResponse = $this->utils->error_reponse_if_missing_or_not_string($errorResponse, $body, 'title');
-  $errorResponse = $this->utils->error_reponse_if_missing_or_not_string($errorResponse, $body, 'description');
-  $errorResponse = $this->utils->error_reponse_if_missing_or_not_string($errorResponse, $body, 'category_id');
-  $errorResponse = $this->utils->error_reponse_if_missing_or_not_string($errorResponse, $body, 'cost');
-  $errorResponse = $this->utils->error_reponse_if_missing_or_not_string($errorResponse, $body, 'version_string');
-  $errorResponse = $this->utils->error_reponse_if_missing_or_not_string($errorResponse, $body, 'download_url');
-  $errorResponse = $this->utils->error_reponse_if_missing_or_not_string($errorResponse, $body, 'browse_url');
-  $errorResponse = $this->utils->error_reponse_if_missing_or_not_string($errorResponse, $body, 'icon_url');
-  if($errorResponse) return $errorResponse;
+  $error = $this->utils->error_reponse_if_missing_or_not_string(false, $response, $body, 'token');
+  $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'title');
+  $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'description');
+  $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'category_id');
+  $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'cost');
+  $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'version_string');
+  $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'download_url');
+  $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'browse_url');
+  $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'icon_url');
+  if($error) return $response;
 
   $token_data = $this->tokens->validate($body['token']);
   $user_id = $this->utils->get_user_id_from_token_data($token_data);
@@ -159,8 +160,8 @@ $app->post('/asset', function ($request, $response, $args) {
   $query->bindValue(':icon_url', $body["icon_url"]);
   $query->execute();
 
-  $errorResponse = $this->utils->error_reponse_if_query_bad($errorResponse, $query);
-  if($errorResponse) return $errorResponse;
+  $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
+  if($error) return $response;
 
   $id = $this->db->lastInsertId();
 
@@ -168,5 +169,92 @@ $app->post('/asset', function ($request, $response, $args) {
   return $response->withJson([
     'id' => $id,
     'url' => $_SERVER['HTTP_HOST'] . dirname($request->getUri()->getBasePath()) . '/api/asset/' . $id,
+  ], 200);
+});
+
+// Edit an asset
+$app->post('/asset/{id}', function ($request, $response, $args) {
+  $body = $request->getParsedBody();
+  $query_permissions = $this->queries['asset']['get_one_bare'];
+
+  $error = $this->utils->error_reponse_if_missing_or_not_string(false, $response, $body, 'token');
+  if($error) return $response;
+
+  $token_data = $this->tokens->validate($body['token']);
+  $user_id = $this->utils->get_user_id_from_token_data($token_data);
+  if($user_id === false) {
+    return $response->withJson([
+      'error' => 'Invalid token supplied',
+    ], 400);
+  }
+
+  $query_permissions->bindValue(':asset_id', (int) $args['id'], PDO::PARAM_INT);
+  $query_permissions->execute();
+  $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_permissions);
+  if($error) return $response;
+
+  $asset = $query_permissions->fetchAll()[0];
+  if((int) $asset['user_id'] !== (int) $user_id) {
+    // NOTE: If this fails somehow, it is possible that the user will be able to modify all assets.
+    return $response->withJson([
+      'error' => 'You are not authorized to update this asset',
+    ], 403);
+  }
+
+  $updated = false;
+  $updated_version = false;
+
+  if(isset($body['title'])) {
+    $query = $this->queries['asset']['update_details'];
+
+    $error = $this->utils->error_reponse_if_missing_or_not_string(false, $response, $body, 'title');
+    $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'description');
+    $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'category_id');
+    $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'cost');
+    $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'icon_url');
+    if($error) return $response;
+
+    $query->bindValue(':asset_id', (int) $args['id'], PDO::PARAM_INT);
+
+    $query->bindValue(':title', $body['title']);
+    $query->bindValue(':description', $body['description']);
+    $query->bindValue(':category_id', (int) $body['category_id'], PDO::PARAM_INT);
+    $query->bindValue(':cost', $body['cost']);
+    $query->bindValue(':icon_url', $body['icon_url']);
+
+    $query->execute();
+    $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
+    if($error) return $response;
+    if($query->rowCount() > 0) {
+      $updated = true;
+    }
+  }
+
+  if(isset($body['download_url'])) {
+    $query = $this->queries['asset']['update_version'];
+
+    $error = $this->utils->error_reponse_if_missing_or_not_string(false, $response, $body, 'version_string');
+    $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'download_url');
+    $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'browse_url');
+    if($error) return $response;
+
+    $query->bindValue(':asset_id', (int) $args['id'], PDO::PARAM_INT);
+    $query->bindValue(':version_string', $body['version_string']);
+    $query->bindValue(':download_url', $body['download_url']);
+    $query->bindValue(':browse_url', $body['browse_url']);
+
+    $query->execute();
+    $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
+    if($error) return $response;
+    if($query->rowCount() > 0) {
+      $updated = true;
+      $updated_version = true;
+    }
+  }
+
+  return $response->withJson([
+    'id' => $args['id'],
+    'updated' => $updated,
+    'version_changed' => $updated_version
   ], 200);
 });
