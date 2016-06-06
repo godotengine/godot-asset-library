@@ -25,9 +25,15 @@ $container['db'] = function ($c) {
   return $db;
 };
 
+// constants
+$container['constants'] = function ($c) {
+  return require_once __DIR__ . '/constants.php';
+};
+
 // queries
 $container['queries'] = function ($c) {
   $db = $c->db;
+  $constants = $c->constants;
 
   $raw_queries = require_once __DIR__ . '/queries.php';
   $queries = [];

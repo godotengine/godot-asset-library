@@ -2,9 +2,9 @@
 
 return [
   'user' => [
-    'get_one' => 'SELECT user_id as id, username, email, password_hash FROM `as_users` WHERE user_id = :id',
-    'get_by_username' => 'SELECT user_id as id, username, email, password_hash FROM `as_users` WHERE username = :username',
-    'get_by_session_token' => 'SELECT user_id as id, username, email, password_hash FROM `as_users` WHERE session_token = :session_token',
+    'get_one' => 'SELECT user_id as id, username, email, password_hash, is_moderator FROM `as_users` WHERE user_id = :id',
+    'get_by_username' => 'SELECT user_id as id, username, email, password_hash, is_moderator FROM `as_users` WHERE username = :username',
+    'get_by_session_token' => 'SELECT user_id as id, username, email, password_hash, is_moderator FROM `as_users` WHERE session_token = :session_token',
     'set_session_token' => 'UPDATE `as_users` SET session_token = :session_token WHERE user_id = :id',
     'register' => 'INSERT INTO `as_users` SET username = :username, email = :email, password_hash = :password_hash',
     'change_password' => 'INSERT INTO `as_users` SET username = :username, password_hash = :password_hash',
@@ -12,11 +12,11 @@ return [
   'category' => [
     'list' => 'SELECT category_id as id, category as name FROM `as_categories` ORDER BY category_id',
   ],
-  'asset' => [// TODO: use users instead of authors
+  'asset' => [
     'search' => 'SELECT asset_id, title, username as author, user_id as author_id, category_id, rating, cost, icon_url, version, version_string FROM `as_assets`
       LEFT JOIN `as_users` USING (user_id)
 
-      WHERE accepted<>"UNACCEPTED" AND category_id LIKE :category
+      WHERE searchable = TRUE AND category_id LIKE :category
       AND (
         title LIKE :filter
         OR cost LIKE :filter
@@ -52,27 +52,42 @@ return [
         OR username LIKE :filter
       )',
 
-    'get_one' => 'SELECT asset_id, title, username as author, user_id as author_id, version, version_string, category, category_id, rating, cost, description, download_url, browse_url, icon_url, preview_id, type, link, thumbnail, accepted FROM `as_assets`
+    'get_one' => 'SELECT asset_id, title, username as author, user_id as author_id, version, version_string, category, category_id, rating, cost, description, download_url, browse_url, icon_url, preview_id, type, link, thumbnail, searchable FROM `as_assets`
       LEFT JOIN `as_categories` USING (category_id)
       LEFT JOIN `as_users` USING (user_id)
       LEFT JOIN `as_asset_previews` USING (asset_id)
       WHERE asset_id = :id',
 
-
     'get_one_bare' => 'SELECT * FROM `as_assets` WHERE asset_id = :asset_id',
 
-    'submit' => 'INSERT INTO `as_assets`
-      SET user_id=:user_id, title=:title, description=:description, category_id=:category_id, cost=:cost,
-        version=0, version_string=:version_string, download_url=:download_url, browse_url=:browse_url, icon_url=:icon_url,
-        rating=0, accepted="UNACCEPTED"',
+    'apply_creational_edit' => 'INSERT INTO `as_assets`
+      SET title=:title, description=:description, category_id=:category_id, user_id=:user_id,
+      version_string=:version_string, cost=:cost,
+      download_url=:download_url, browse_url=:browse_url, icon_url=:icon_url,
+      version=0, rating=0',
 
-    'update_details' => 'UPDATE `as_assets`
-      SET title=:title, description=:description, category_id=:category_id, cost=:cost, icon_url=:icon_url
+    'apply_edit' => 'UPDATE `as_assets`
+      SET title=COALESCE(:title, title), description=COALESCE(:description, description), category_id=COALESCE(:category_id, category_id),  version_string=COALESCE(:version_string, version_string), cost=COALESCE(:cost, cost),
+      download_url=COALESCE(:download_url, download_url), browse_url=COALESCE(:browse_url, browse_url), icon_url=COALESCE(:icon_url, icon_url),
+      version=version+:update_version
       WHERE asset_id=:asset_id',
+  ],
+  'asset_edit' => [
+    'get_one' => 'SELECT * FROM `as_asset_edits` WHERE edit_id=:edit_id',
+    'get_one_with_status' => 'SELECT * FROM `as_asset_edits` WHERE edit_id=:edit_id AND status=:status',
+    'get_editable_by_asset_id' => 'SELECT * FROM `as_asset_edits` WHERE asset_id=:asset_id AND status=0',
 
-    'update_version' => 'UPDATE `as_assets`
-      SET version=version+1, version_string=:version_string, download_url=:download_url, browse_url=:browse_url,
-        accepted=IF(accepted="UNACCEPTED", accepted, "UPDATED")
-      WHERE asset_id=:asset_id',
+    'submit' => 'INSERT INTO `as_asset_edits`
+      SET asset_id=:asset_id, user_id=:user_id, title=:title, description=:description, category_id=:category_id, version_string=:version_string,
+        cost=:cost, download_url=:download_url, browse_url=:browse_url, icon_url=:icon_url,
+        status=0',
+
+    'update' => 'UPDATE `as_asset_edits`
+      SET title=COALESCE(:title, title), description=COALESCE(:description, description), category_id=COALESCE(:category_id, category_id), version_string=COALESCE(:version_string, version_string), cost=COALESCE(:cost, cost),
+      download_url=COALESCE(:download_url, download_url), browse_url=COALESCE(:browse_url, browse_url), icon_url=COALESCE(:icon_url, icon_url)
+      WHERE edit_id=:edit_id AND status=0',
+
+    'set_asset_id' => 'UPDATE `as_asset_edits` SET asset_id=:asset_id WHERE edit_id=:edit_id',
+    'set_status_and_reason' => 'UPDATE `as_asset_edits` SET status=:status, reason=:reason WHERE edit_id=:edit_id',
   ],
 ];

@@ -7,8 +7,8 @@ $app->get('/configure', function ($request, $response, $args) {
   $query = $this->queries['category']['list'];
   $query->execute();
 
-  $errorResponse = $this->utils->error_reponse_if_query_bad($response, $query);
-  if($errorResponse) return $errorResponse;
+  $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
+  if($error) return $response;
 
   if(isset($request->getQueryParams()['session'])) {
     $id = openssl_random_pseudo_bytes(16);
@@ -35,16 +35,16 @@ $app->post('/register', function ($request, $response, $args) {
   $query = $this->queries['user']['register'];
   $query_check = $this->queries['user']['get_by_username'];
 
-  $errorResponse = $this->utils->error_reponse_if_missing_or_not_string($response, $body, 'username');
-  $errorResponse = $this->utils->error_reponse_if_missing_or_not_string($errorResponse, $body, 'email');
-  $errorResponse = $this->utils->error_reponse_if_missing_or_not_string($errorResponse, $body, 'password');
-  if($errorResponse) return $errorResponse;
+  $error = $this->utils->error_reponse_if_missing_or_not_string(false, $response, $body, 'username');
+  $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'email');
+  $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'password');
+  if($error) return $response;
 
   $query_check->bindValue(':username', $body['username']);
   $query_check->execute();
 
-  $errorResponse = $this->utils->error_reponse_if_query_bad($errorResponse, $query_check);
-  if($errorResponse) return $errorResponse;
+  $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_check);
+  if($error) return $response;
 
   if($query_check->rowCount() > 0) {
     return $response->withJson([
@@ -60,8 +60,8 @@ $app->post('/register', function ($request, $response, $args) {
 
   $query->execute();
 
-  $errorResponse = $this->utils->error_reponse_if_query_bad($errorResponse, $query);
-  if($errorResponse) return $errorResponse;
+  $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
+  if($error) return $response;
 
   return $response->withJson([
     'username' => $body['username'],
@@ -73,15 +73,15 @@ $app->post('/login', function ($request, $response, $args) {
   $body = $request->getParsedBody();
   $query = $this->queries['user']['get_by_username'];
 
-  $errorResponse = $this->utils->error_reponse_if_missing_or_not_string($response, $body, 'username');
-  $errorResponse = $this->utils->error_reponse_if_missing_or_not_string($errorResponse, $body, 'password');
-  if($errorResponse) return $errorResponse;
+  $error = $this->utils->error_reponse_if_missing_or_not_string(false, $response, $body, 'username');
+  $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'password');
+  if($error) return $response;
 
   $query->bindValue(':username', $body['username']);
   $query->execute();
 
-  $errorResponse = $this->utils->error_reponse_if_query_bad($errorResponse, $query);
-  if($errorResponse) return $errorResponse;
+  $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
+  if($error) return $response;
 
   $user = $query->fetchAll()[0];
 
@@ -98,8 +98,8 @@ $app->post('/login', function ($request, $response, $args) {
     $sesion_query->bindValue(':id', (int) $user['id'], PDO::PARAM_INT);
     $sesion_query->bindValue(':session_token', $body['token']);
     $sesion_query->execute();
-    $errorResponse = $this->utils->error_reponse_if_query_bad($errorResponse, $sesion_query);
-    if($errorResponse) return $errorResponse;
+    $error = $this->utils->error_reponse_if_query_bad(false, $response, $sesion_query);
+    if($error) return $response;
   }
 
   $token = $this->tokens->generate([

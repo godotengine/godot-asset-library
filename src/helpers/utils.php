@@ -10,17 +10,23 @@ class Utils
 
   public function error_reponse_if_missing_or_not_string($currentStatus, &$response, $object, $property)
   {
+    if($currentStatus) {
+      return true;
+    }
     if((!isset($object[$property]) || !is_string($object[$property]))) {
       $response = $response->withJson([
         'error' => $property . ' is required, and must be a string'
       ], 400);
       return true;
     }
-    return false || $currentStatus;
+    return false;
   }
 
   public function error_reponse_if_query_bad($currentStatus, &$response, $query)
   {
+    if($currentStatus) {
+      return true;
+    }
     if($query->errorCode() != '00000') {
       $this->c->logger->error($query->errorCode(), $query->errorInfo());
       $response = $response->withJson([
@@ -28,7 +34,21 @@ class Utils
       ], 500);
       return true;
     }
-    return false || $currentStatus;
+    return false;
+  }
+
+  public function error_reponse_if_query_no_results($currentStatus, &$response, $query)
+  {
+    if($currentStatus) {
+      return true;
+    }
+    if($query->rowCount() == 0) {
+      $response = $response->withJson([
+        'error' => 'DB returned no results'
+      ], 400);
+      return true;
+    }
+    return false;
   }
 
   public function get_user_id_from_token_data($token_data)
