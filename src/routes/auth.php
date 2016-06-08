@@ -4,7 +4,16 @@
 
 // Initializes the connection by sending all categories available
 $app->get('/configure', function ($request, $response, $args) {
+  $params = $request->getQueryParams();
+
+  $category_type = $this->constants['category_type']['addon'];
+
+  if(isset($params['type']) && isset($this->constants['category_type'][$params['type']])) {
+    $category_type = $this->constants['category_type'][$params['type']];
+  }
+
   $query = $this->queries['category']['list'];
+  $query->bindValue(':category_type', $category_type);
   $query->execute();
 
   $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);

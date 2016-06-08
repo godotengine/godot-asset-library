@@ -16,6 +16,10 @@ return $constants = [
     'accepted' => 2,
     'rejected' => 3,
   ]),
+  'category_type' => double_map([
+    'addon' => 0,
+    'project' => 1,
+  ]),
   'user_type' => double_map([
     'normal' => 0,
     'moderator' => 50,

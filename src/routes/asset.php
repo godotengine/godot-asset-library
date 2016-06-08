@@ -4,10 +4,9 @@
 // Searches through the list of assets
 $app->get('/asset', function ($request, $response, $args) {
   $params = $request->getQueryParams();
-  $query = $this->queries['asset']['search'];
-  $query_count = $this->queries['asset']['search_count'];
 
   $category = '%';
+  $category_type = $this->constants['category_type']['addon'];
   $filter = '%';
   $order_column = 'rating';
   $order_direction = 'desc';
@@ -15,7 +14,10 @@ $app->get('/asset', function ($request, $response, $args) {
   $max_page_size = 500;
   $page_offset = 0;
   if(isset($params['category'])) {
-    $category = $params['category'];
+    $category = (int) $params['category'];
+  }
+  if(isset($params['type']) && isset($this->constants['category_type'][$params['type']])) {
+    $category_type = $this->constants['category_type'][$params['type']];
   }
   if(isset($params['filter'])) {
     $filter = '%'.preg_replace('/[[:punct:]]+/', '%', $params['filter']).'%';
@@ -44,7 +46,9 @@ $app->get('/asset', function ($request, $response, $args) {
     $order_direction = 'asc';
   }
 
-  $query->bindValue(':category', $category, PDO::PARAM_INT);
+  $query = $this->queries['asset']['search'];
+  $query->bindValue(':category', $category);
+  $query->bindValue(':category_type', $category_type, PDO::PARAM_INT);
   $query->bindValue(':filter', $filter);
   $query->bindValue(':order', $order_column);
   $query->bindValue(':order_direction', $order_direction);
@@ -55,7 +59,9 @@ $app->get('/asset', function ($request, $response, $args) {
   $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
   if($error) return $response;
 
+  $query_count = $this->queries['asset']['search_count'];
   $query_count->bindValue(':category', $category, PDO::PARAM_INT);
+  $query_count->bindValue(':category_type', $category_type, PDO::PARAM_INT);
   $query_count->bindValue(':filter', $filter, PDO::PARAM_INT);
   $query_count->execute();
 
@@ -64,8 +70,10 @@ $app->get('/asset', function ($request, $response, $args) {
 
   $total_count = $query_count->fetchAll()[0]['count'];
 
+  $assets = $query->fetchAll();
+
   return $response->withJson([
-    'result' => $query->fetchAll(),
+    'result' => $assets,
     'page' => floor($page_offset / $page_size),
     'pages' => ceil($total_count / $page_size),
     'page_length' => $page_size,
@@ -100,8 +108,8 @@ $app->get('/asset/{id}', function ($request, $response, $args) {
           $previews[] = [];
         } elseif($column==="type" || $column==="link" || $column==="thumbnail") {
             $previews[count($previews) - 1][$column] = $value;
-        } elseif($column==="accepted") {
-          $asset_info["accepted"] = ($value != "UNACCEPTED");
+        } elseif($column==="category_type") {
+          $asset_info["type"] = $this->constants['category_type'][(int) $value];
         } else {
           $asset_info[$column] = $value;
         }

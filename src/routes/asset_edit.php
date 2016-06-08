@@ -281,10 +281,9 @@ $app->post('/asset/edit/{id}/review', function ($request, $response, $args) {
   $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
   if($error) return $response;
 
-  return $response->withJson([
-    'id' => $args['id'],
-    'in_review' => true,
-  ], 200);
+  $asset_edit['status'] = 'in_review'; // Prepare to send
+
+  return $response->withJson($asset_edit, 200);
 });
 
 

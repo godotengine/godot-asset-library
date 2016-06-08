@@ -10,13 +10,14 @@ return [
     'change_password' => 'INSERT INTO `as_users` SET username = :username, password_hash = :password_hash',
   ],
   'category' => [
-    'list' => 'SELECT category_id as id, category as name FROM `as_categories` ORDER BY category_id',
+    'list' => 'SELECT category_id as id, category as name FROM `as_categories` WHERE category_type = :category_type ORDER BY category_id',
   ],
   'asset' => [
     'search' => 'SELECT asset_id, title, username as author, user_id as author_id, category_id, rating, cost, icon_url, version, version_string FROM `as_assets`
       LEFT JOIN `as_users` USING (user_id)
+      LEFT JOIN `as_categories` USING (category_id)
 
-      WHERE searchable = TRUE AND category_id LIKE :category
+      WHERE searchable = TRUE AND category_id LIKE :category AND category_type = :category_type
       AND (
         title LIKE :filter
         OR cost LIKE :filter
@@ -47,14 +48,15 @@ return [
 
     'search_count' => 'SELECT count(*) as count FROM `as_assets`
       LEFT JOIN `as_users` USING (user_id)
-      WHERE category_id LIKE :category
+      LEFT JOIN `as_categories` USING (category_id)
+      WHERE searchable = TRUE AND category_id LIKE :category AND category_type = :category_type
       AND (
         title LIKE :filter
         OR cost LIKE :filter
         OR username LIKE :filter
       )',
 
-    'get_one' => 'SELECT asset_id, title, username as author, user_id as author_id, version, version_string, category, category_id, rating, cost, description, download_url, browse_url, icon_url, preview_id, `as_asset_previews`.type, link, thumbnail, searchable FROM `as_assets`
+    'get_one' => 'SELECT asset_id, category_type, title, username as author, user_id as author_id, version, version_string, category, category_id, rating, cost, description, download_url, browse_url, icon_url, preview_id, `as_asset_previews`.type, link, thumbnail, searchable FROM `as_assets`
       LEFT JOIN `as_categories` USING (category_id)
       LEFT JOIN `as_users` USING (user_id)
       LEFT JOIN `as_asset_previews` USING (asset_id)
@@ -66,7 +68,7 @@ return [
       SET title=:title, description=:description, category_id=:category_id, user_id=:user_id,
       version_string=:version_string, cost=:cost,
       download_url=:download_url, browse_url=:browse_url, icon_url=:icon_url,
-      version=0+:update_version, rating=0',
+      version=0+:update_version, rating=0, searchable=TRUE',
 
     'apply_edit' => 'UPDATE `as_assets`
       SET title=COALESCE(:title, title), description=COALESCE(:description, description), category_id=COALESCE(:category_id, category_id),  version_string=COALESCE(:version_string, version_string), cost=COALESCE(:cost, cost),
