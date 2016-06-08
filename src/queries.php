@@ -2,9 +2,9 @@
 
 return [
   'user' => [
-    'get_one' => 'SELECT user_id as id, username, email, password_hash, is_moderator FROM `as_users` WHERE user_id = :id',
-    'get_by_username' => 'SELECT user_id as id, username, email, password_hash, is_moderator FROM `as_users` WHERE username = :username',
-    'get_by_session_token' => 'SELECT user_id as id, username, email, password_hash, is_moderator FROM `as_users` WHERE session_token = :session_token',
+    'get_one' => 'SELECT user_id as id, username, email, password_hash, type FROM `as_users` WHERE user_id = :id',
+    'get_by_username' => 'SELECT user_id as id, username, email, password_hash, type FROM `as_users` WHERE username = :username',
+    'get_by_session_token' => 'SELECT user_id as id, username, email, password_hash, type FROM `as_users` WHERE session_token = :session_token',
     'set_session_token' => 'UPDATE `as_users` SET session_token = :session_token WHERE user_id = :id',
     'register' => 'INSERT INTO `as_users` SET username = :username, email = :email, password_hash = :password_hash',
     'change_password' => 'INSERT INTO `as_users` SET username = :username, password_hash = :password_hash',
@@ -30,6 +30,7 @@ return [
           WHEN :order = "rating" THEN rating
           WHEN :order = "cost" THEN cost
           WHEN :order = "title" THEN title
+          WHEN :order = "modify_date" THEN modify_date
         END
       END ASC,
       CASE
@@ -38,6 +39,7 @@ return [
           WHEN :order = "rating" THEN rating
           WHEN :order = "cost" THEN cost
           WHEN :order = "title" THEN title
+          WHEN :order = "modify_date" THEN modify_date
         END
       END DESC
 
@@ -52,7 +54,7 @@ return [
         OR username LIKE :filter
       )',
 
-    'get_one' => 'SELECT asset_id, title, username as author, user_id as author_id, version, version_string, category, category_id, rating, cost, description, download_url, browse_url, icon_url, preview_id, type, link, thumbnail, searchable FROM `as_assets`
+    'get_one' => 'SELECT asset_id, title, username as author, user_id as author_id, version, version_string, category, category_id, rating, cost, description, download_url, browse_url, icon_url, preview_id, `as_asset_previews`.type, link, thumbnail, searchable FROM `as_assets`
       LEFT JOIN `as_categories` USING (category_id)
       LEFT JOIN `as_users` USING (user_id)
       LEFT JOIN `as_asset_previews` USING (asset_id)
@@ -64,7 +66,7 @@ return [
       SET title=:title, description=:description, category_id=:category_id, user_id=:user_id,
       version_string=:version_string, cost=:cost,
       download_url=:download_url, browse_url=:browse_url, icon_url=:icon_url,
-      version=0, rating=0',
+      version=0+:update_version, rating=0',
 
     'apply_edit' => 'UPDATE `as_assets`
       SET title=COALESCE(:title, title), description=COALESCE(:description, description), category_id=COALESCE(:category_id, category_id),  version_string=COALESCE(:version_string, version_string), cost=COALESCE(:cost, cost),

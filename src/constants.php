@@ -18,7 +18,8 @@ return $constants = [
   ]),
   'user_type' => double_map([
     'normal' => 0,
-    'moderator' => 1,
+    'moderator' => 50,
+    'admin' => 100,
   ]),
   'asset_edit_fields' => [
     'title', 'description', 'category_id',

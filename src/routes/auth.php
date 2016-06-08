@@ -88,17 +88,17 @@ $app->post('/login', function ($request, $response, $args) {
   if(isset($body['token'])) {
     $token_data = $this->tokens->validate($body['token']);
 
-    if(!$token_data || !isset($token_data["session"])) {
+    if(!$token_data || !isset($token_data->session)) {
       return $response->withJson([
         'error' => 'Invalid token supplied'
       ], 400);
     }
 
-    $sesion_query = $queries['user']['set_session_token'];
-    $sesion_query->bindValue(':id', (int) $user['id'], PDO::PARAM_INT);
-    $sesion_query->bindValue(':session_token', $body['token']);
-    $sesion_query->execute();
-    $error = $this->utils->error_reponse_if_query_bad(false, $response, $sesion_query);
+    $query_session = $this->queries['user']['set_session_token'];
+    $query_session->bindValue(':id', (int) $user['id'], PDO::PARAM_INT);
+    $query_session->bindValue(':session_token', $token_data->session);
+    $query_session->execute();
+    $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_session);
     if($error) return $response;
   }
 

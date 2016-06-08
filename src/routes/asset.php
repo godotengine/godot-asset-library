@@ -33,7 +33,8 @@ $app->get('/asset', function ($request, $response, $args) {
       'rating' => 'rating',
       'cost' => 'cost',
       'name' => 'title',
-      // TODO: downloads, updated
+      'updated' => 'modify_date'
+      // TODO: downloads
     ];
     if(isset($column_mapping[$params['sort']])) {
       $order_column = $column_mapping[$params['sort']];
