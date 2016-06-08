@@ -6,6 +6,7 @@ Addonlib for Godot
 Run the following commands to get a running installation of the project:
 ````bash
 composer install
+bower install
 cp src/settings-local-example.php src/settings-local.php
 ````
 

@@ -1,0 +1,19 @@
+{
+  "name": "godot-addonlib",
+  "homepage": "https://github.com/godotengine/asset-library",
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "3",
+    "blueimp-file-upload": "jquery-file-upload#^9.12.3"
+  }
+}

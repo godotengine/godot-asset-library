@@ -1,3 +1,5 @@
 vendor/**
 logs/**
 src/settings-local.php
+
+bower_componenets/**
