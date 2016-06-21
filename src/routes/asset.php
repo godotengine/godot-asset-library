@@ -59,7 +59,6 @@ $app->get('/asset', function ($request, $response, $args) {
     $support_levels = [0, 1, 2]; // Testing + Community + Official
   }
   $support_levels = implode('|', $support_levels);
-  
 
   $query = $this->queries['asset']['search'];
   $query->bindValue(':category', $category);

@@ -165,6 +165,7 @@ $app->post('/asset/edit/{id}/accept', function ($request, $response, $args) {
   $error = $this->utils->ensure_logged_in(false, $response, $body, $user_id);
   $error = $this->utils->get_user_for_id($error, $response, $user_id, $user);
   $error = $this->utils->error_reponse_if_not_user_has_level($error, $response, $user, 'moderator');
+  $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'hash');
   if($error) return $response;
 
   // Get the edit
@@ -217,6 +218,7 @@ $app->post('/asset/edit/{id}/accept', function ($request, $response, $args) {
     }
   }
   $query->bindValue(':update_version', (int) $update_version, PDO::PARAM_INT);
+  $query->bindValue(':download_hash', $body['hash']);
 
   // Run
   $query->execute();

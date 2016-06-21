@@ -58,7 +58,7 @@ return [
         OR username LIKE :filter
       )',
 
-    'get_one' => 'SELECT asset_id, category_type, title, username as author, user_id as author_id, version, version_string, category, category_id, rating, cost, description, support_level, download_url, browse_url, icon_url, preview_id, `as_asset_previews`.type, link, thumbnail, searchable FROM `as_assets`
+    'get_one' => 'SELECT asset_id, category_type, title, username as author, user_id as author_id, version, version_string, category, category_id, rating, cost, description, support_level, download_url, download_hash, browse_url, icon_url, preview_id, `as_asset_previews`.type, link, thumbnail, searchable FROM `as_assets`
       LEFT JOIN `as_categories` USING (category_id)
       LEFT JOIN `as_users` USING (user_id)
       LEFT JOIN `as_asset_previews` USING (asset_id)
@@ -69,15 +69,15 @@ return [
     'apply_creational_edit' => 'INSERT INTO `as_assets`
       SET title=:title, description=:description, category_id=:category_id, user_id=:user_id,
       version_string=:version_string, cost=:cost,
-      download_url=:download_url, browse_url=:browse_url, icon_url=:icon_url,
+      download_url=:download_url, download_hash=:download_hash, browse_url=:browse_url, icon_url=:icon_url,
       version=0+:update_version, rating=0, searchable=TRUE',
 
     'apply_edit' => 'UPDATE `as_assets`
       SET title=COALESCE(:title, title), description=COALESCE(:description, description), category_id=COALESCE(:category_id, category_id),  version_string=COALESCE(:version_string, version_string), cost=COALESCE(:cost, cost),
-      download_url=COALESCE(:download_url, download_url), browse_url=COALESCE(:browse_url, browse_url), icon_url=COALESCE(:icon_url, icon_url),
+      download_url=COALESCE(:download_url, download_url), download_hash=:download_hash, browse_url=COALESCE(:browse_url, browse_url), icon_url=COALESCE(:icon_url, icon_url),
       version=version+:update_version
       WHERE asset_id=:asset_id',
-    
+
     'set_support_level' => 'UPDATE `as_assets`
       SET support_level=:support_level
       WHERE asset_id=:asset_id'
