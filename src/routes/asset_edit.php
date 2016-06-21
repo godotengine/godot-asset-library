@@ -294,6 +294,7 @@ $app->post('/asset/edit/{id}/reject', function ($request, $response, $args) {
   $error = $this->utils->ensure_logged_in(false, $response, $body, $user_id);
   $error = $this->utils->get_user_for_id($error, $response, $user_id, $user);
   $error = $this->utils->error_reponse_if_not_user_has_level($error, $response, $user, 'moderator');
+  $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'reason');
   if($error) return $response;
 
   $query = $this->queries['asset_edit']['set_status_and_reason'];

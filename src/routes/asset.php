@@ -13,11 +13,20 @@ $app->get('/asset', function ($request, $response, $args) {
   $page_size = 10;
   $max_page_size = 500;
   $page_offset = 0;
+  $support_levels = [];
   if(isset($params['category'])) {
     $category = (int) $params['category'];
   }
   if(isset($params['type']) && isset($this->constants['category_type'][$params['type']])) {
-    $category_type = $this->constants['category_type'][$params['type']];
+    $category_type = (int) $this->constants['category_type'][$params['type']];
+  }
+  if(isset($params['support'])) { // Expects the param like `community+testing`
+    $support_levels = [];
+    foreach(explode(' ', $params['support']) as $key => $value) { // `+` is changed to ` ` automatically
+      if(isset($this->constants['support_level'][$value])) {
+        array_push($support_levels, (int) $this->constants['support_level'][$value]);
+      }
+    }
   }
   if(isset($params['filter'])) {
     $filter = '%'.preg_replace('/[[:punct:]]+/', '%', $params['filter']).'%';
@@ -46,9 +55,16 @@ $app->get('/asset', function ($request, $response, $args) {
     $order_direction = 'asc';
   }
 
+  if(count($support_levels) === 0) {
+    $support_levels = [0, 1, 2]; // Testing + Community + Official
+  }
+  $support_levels = implode('|', $support_levels);
+  
+
   $query = $this->queries['asset']['search'];
   $query->bindValue(':category', $category);
   $query->bindValue(':category_type', $category_type, PDO::PARAM_INT);
+  $query->bindValue(':support_levels_regex', $support_levels);
   $query->bindValue(':filter', $filter);
   $query->bindValue(':order', $order_column);
   $query->bindValue(':order_direction', $order_direction);
@@ -62,6 +78,7 @@ $app->get('/asset', function ($request, $response, $args) {
   $query_count = $this->queries['asset']['search_count'];
   $query_count->bindValue(':category', $category, PDO::PARAM_INT);
   $query_count->bindValue(':category_type', $category_type, PDO::PARAM_INT);
+  $query_count->bindValue(':support_levels_regex', $support_levels);
   $query_count->bindValue(':filter', $filter, PDO::PARAM_INT);
   $query_count->execute();
 
@@ -71,6 +88,12 @@ $app->get('/asset', function ($request, $response, $args) {
   $total_count = $query_count->fetchAll()[0]['count'];
 
   $assets = $query->fetchAll();
+
+  $context = $this;
+  $assets = array_map(function($asset) use($context) {
+    $asset["support_level"] = $context->constants['support_level'][(int) $asset['support_level']];
+    return $asset;
+  }, $assets);
 
   return $response->withJson([
     'result' => $assets,
@@ -110,6 +133,8 @@ $app->get('/asset/{id}', function ($request, $response, $args) {
             $previews[count($previews) - 1][$column] = $value;
         } elseif($column==="category_type") {
           $asset_info["type"] = $this->constants['category_type'][(int) $value];
+        } elseif($column==="support_level") {
+          $asset_info["support_level"] = $this->constants['support_level'][(int) $value];
         } else {
           $asset_info[$column] = $value;
         }
@@ -132,4 +157,40 @@ $app->get('/asset/{id}', function ($request, $response, $args) {
   $asset_info['previews'] = $previews;
 
   return $response->withJson($asset_info, 200);
+});
+
+// Change support level of an asset
+$app->post('/asset/{id}/support_level', function ($request, $response, $args) {
+  $body = $request->getParsedBody();
+
+  $error = $this->utils->ensure_logged_in(false, $response, $body, $user_id);
+  $error = $this->utils->get_user_for_id($error, $response, $user_id, $user);
+  $error = $this->utils->error_reponse_if_not_user_has_level($error, $response, $user, 'moderator');
+  $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'support_level');
+  if($error) return $response;
+  if(!isset($this->constants['support_level'][$body['support_level']])) {
+    $numeric_value_keys = [];
+    foreach ($this->constants['support_level'] as $key => $value) {
+      if((int) $value === $value) {
+        array_push($numeric_value_keys, $key);
+      }
+    }
+    return $response->withJson([
+      'error' => 'Invalid support level submitted, allowed are \'' . implode('\', \'', $numeric_value_keys) . '\'',
+    ]);
+  }
+
+  $query = $this->queries['asset']['set_support_level'];
+
+  $query->bindValue(':asset_id', (int) $args['id'], PDO::PARAM_INT);
+  $query->bindValue(':support_level', (int) $this->constants['support_level'][$body['support_level']], PDO::PARAM_INT);
+
+  $query->execute();
+
+  $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
+  if($error) return $response;
+
+  return $response->withJson([
+    'changed' => true,
+  ], 200);
 });

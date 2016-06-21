@@ -20,6 +20,11 @@ return $constants = [
     'addon' => 0,
     'project' => 1,
   ]),
+  'support_level' => double_map([
+    'testing' => 0,
+    'community' => 1,
+    'official' => 2
+  ]),
   'user_type' => double_map([
     'normal' => 0,
     'moderator' => 50,

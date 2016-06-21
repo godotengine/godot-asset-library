@@ -13,11 +13,12 @@ return [
     'list' => 'SELECT category_id as id, category as name FROM `as_categories` WHERE category_type = :category_type ORDER BY category_id',
   ],
   'asset' => [
-    'search' => 'SELECT asset_id, title, username as author, user_id as author_id, category_id, rating, cost, icon_url, version, version_string FROM `as_assets`
+    'search' => 'SELECT asset_id, title, username as author, user_id as author_id, category_id, rating, cost, support_level, icon_url, version, version_string FROM `as_assets`
       LEFT JOIN `as_users` USING (user_id)
       LEFT JOIN `as_categories` USING (category_id)
 
       WHERE searchable = TRUE AND category_id LIKE :category AND category_type = :category_type
+      AND support_level RLIKE :support_levels_regex
       AND (
         title LIKE :filter
         OR cost LIKE :filter
@@ -50,13 +51,14 @@ return [
       LEFT JOIN `as_users` USING (user_id)
       LEFT JOIN `as_categories` USING (category_id)
       WHERE searchable = TRUE AND category_id LIKE :category AND category_type = :category_type
+      AND support_level RLIKE :support_levels_regex
       AND (
         title LIKE :filter
         OR cost LIKE :filter
         OR username LIKE :filter
       )',
 
-    'get_one' => 'SELECT asset_id, category_type, title, username as author, user_id as author_id, version, version_string, category, category_id, rating, cost, description, download_url, browse_url, icon_url, preview_id, `as_asset_previews`.type, link, thumbnail, searchable FROM `as_assets`
+    'get_one' => 'SELECT asset_id, category_type, title, username as author, user_id as author_id, version, version_string, category, category_id, rating, cost, description, support_level, download_url, browse_url, icon_url, preview_id, `as_asset_previews`.type, link, thumbnail, searchable FROM `as_assets`
       LEFT JOIN `as_categories` USING (category_id)
       LEFT JOIN `as_users` USING (user_id)
       LEFT JOIN `as_asset_previews` USING (asset_id)
@@ -75,6 +77,10 @@ return [
       download_url=COALESCE(:download_url, download_url), browse_url=COALESCE(:browse_url, browse_url), icon_url=COALESCE(:icon_url, icon_url),
       version=version+:update_version
       WHERE asset_id=:asset_id',
+    
+    'set_support_level' => 'UPDATE `as_assets`
+      SET support_level=:support_level
+      WHERE asset_id=:asset_id'
   ],
   'asset_edit' => [
     'get_one' => 'SELECT * FROM `as_asset_edits` WHERE edit_id=:edit_id',
