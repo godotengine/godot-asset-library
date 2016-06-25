@@ -1,0 +1,27 @@
+<?php include("_header.phtml") ?>
+<?php foreach($result as $i => $asset): ?>
+<div class="row">
+  <div class="col-12">
+    <div class="media">
+      <div class="media-left">
+        <a href="#">
+          <img class="media-object" src="<?php echo htmlspecialchars($asset['icon_url']) ?>" alt="<?php echo htmlspecialchars($asset['title']) ?>'s icon'" width=80 height=80>
+        </a>
+      </div>
+      <div class="media-body">
+        <h4 class="media-heading">
+          <?php echo htmlspecialchars($asset['title']) ?>
+          <small>(by <?php echo htmlspecialchars($asset['author']) ?>)</small>
+          <span class="label label-<?php echo htmlspecialchars([
+            'official' => 'success',
+            'community' => 'info',
+            'testing' => 'default',
+          ][$asset['support_level']]) ?>"><?php echo htmlspecialchars($asset['support_level']) ?></span>
+        </h4>
+        ...
+      </div>
+    </div>
+  </div>
+</div>
+<?php endforeach ?>
+<?php include("_footer.phtml") ?>

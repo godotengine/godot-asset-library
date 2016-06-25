@@ -1,6 +1,7 @@
 <?php
 return [
     'settings' => [
+        'determineRouteBeforeAppMiddleware' => true,
         'displayErrorDetails' => true, // set to false in production
 
         // Renderer settings
