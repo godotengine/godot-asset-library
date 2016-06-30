@@ -27,7 +27,7 @@ $app->post('/asset', function ($request, $response, $args) {
 
   return $response->withJson([
     'id' => $id,
-    'url' => $_SERVER['HTTP_HOST'] . dirname($request->getUri()->getBasePath()) . '/api/asset/edit/' . $id,
+    'url' => 'asset/edit/' . $id,
   ], 200);
 });
 
@@ -77,7 +77,7 @@ $app->post('/asset/{id}', function ($request, $response, $args) {
 
   return $response->withJson([
     'id' => $id,
-    'url' => $_SERVER['HTTP_HOST'] . dirname($request->getUri()->getBasePath()) . '/api/asset/edit/' . $id,
+    'url' => 'asset/edit/' . $id,
   ], 200);
 });
 
@@ -131,7 +131,7 @@ $app->post('/asset/edit/{id}', function ($request, $response, $args) {
 
   return $response->withJson([
     'id' => $args['id'],
-    'url' => $_SERVER['HTTP_HOST'] . dirname($request->getUri()->getBasePath()) . '/api/asset/edit/' . $args['id'],
+    'url' => 'asset/edit/' . $args['id'],
   ], 200);
 });
 
@@ -242,7 +242,7 @@ $app->post('/asset/edit/{id}/accept', function ($request, $response, $args) {
 
   return $response->withJson([
     'id' => $asset_edit['asset_id'],
-    'url' => $_SERVER['HTTP_HOST'] . dirname($request->getUri()->getBasePath()) . '/api/asset/' . $asset_edit['asset_id'],
+    'url' => 'asset/' . $asset_edit['asset_id'],
   ], 200);
 });
 

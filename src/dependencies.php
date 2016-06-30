@@ -58,3 +58,13 @@ $container['utils'] = function ($c) {
   require_once __DIR__ . '/helpers/utils.php';
   return new Utils($c);
 };
+
+// cookies
+$container['cookies'] = function ($c) {
+  return [
+    'cookie' => function($name, $value) {return Dflydev\FigCookies\Cookie::create($name, $value);},
+    'setCookie' => function($name) {return Dflydev\FigCookies\SetCookie::create($name);},
+    'requestCookies' => new Dflydev\FigCookies\FigRequestCookies,
+    'responseCookies' => new Dflydev\FigCookies\FigResponseCookies,
+  ];
+};

@@ -28,7 +28,7 @@ $app->get('/configure', function ($request, $response, $args) {
     return $response->withJson([
       'categories' => $query->fetchAll(),
       'token' => $token,
-      'login_url' => $_SERVER['HTTP_HOST'] . dirname($request->getUri()->getBasePath()) . '/html#/login/' . urlencode($token),
+      'login_url' => $_SERVER['HTTP_HOST'] . dirname($request->getUri()->getBasePath()) . 'frontend/login#' . urlencode($token),
       // ^ TODO: Make those routes actually work
     ], 200);
 
@@ -74,7 +74,8 @@ $app->post('/register', function ($request, $response, $args) {
 
   return $response->withJson([
     'username' => $body['username'],
-    'registered' => true
+    'registered' => true,
+    'url' => 'login',
   ], 200);
 });
 
@@ -90,6 +91,7 @@ $app->post('/login', function ($request, $response, $args) {
   $query->execute();
 
   $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
+  $error = $this->utils->error_reponse_if_query_no_results(false, $response, $query);
   if($error) return $response;
 
   $user = $query->fetchAll()[0];
@@ -123,3 +125,13 @@ $app->post('/login', function ($request, $response, $args) {
     ], 200);
   }
 });
+
+if(isset($frontend) && $frontend) { // Doesn't work for non-frontend, since we can't unissue tokens -- to logout from api/ just drop the token.
+  $app->get('/logout', function ($request, $response, $args) {
+    return $response->withJson([
+      'authenticated' => false,
+      'token' => '',
+      'url' => 'login',
+    ], 200);
+  });
+}

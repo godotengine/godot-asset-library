@@ -117,4 +117,38 @@ class Utils
     }
     return false;
   }
+
+  public function get_user_from_token_data($currentStatus, &$response, $token_data, &$user)
+  {
+    if($currentStatus) return true;
+    if(!$token_data) {
+      $response = $response->withJson([
+        'error' => 'Invalid token'
+      ], 400);
+      return true;
+    }
+
+    if(isset($token_data->user_id)) {
+      $query = $this->c->queries['user']['get_one'];
+      $query->bindValue(':id', (int) $token_data->user_id, PDO::PARAM_INT);
+    } else if(isset($token_data->session)) {
+      $query = $this->c->queries['user']['get_by_session_token'];
+      $query->bindValue(":session_token", $token_data->session);
+    } else {
+      $response = $response->withJson([
+        'error' => 'Invalid token'
+      ], 400);
+      return true;
+    }
+
+    $query->execute();
+
+    $currentStatus = $this->error_reponse_if_query_bad(false, $response, $query);
+    $currentStatus = $this->error_reponse_if_query_no_results($currentStatus, $response, $query);
+    if($currentStatus) return true;
+
+    $user = $query->fetchAll()[0];
+    return false;
+
+  }
 }

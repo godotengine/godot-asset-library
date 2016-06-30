@@ -2,42 +2,86 @@
 
 if(isset($frontend) && $frontend) {
   $app->add(function ($request, $response, $next) {
+    $cookie = $this->cookies['requestCookies']::get($request, 'token');
+    $body = $request->getParsedBody();
+    if($cookie->getValue() !== null && !isset($body['token'])) {
+      $body['token'] = $cookie->getValue();
+    }
+
+
     $response = $next($request, $response);
     $response->getBody()->rewind();
     $result = json_decode($response->getBody()->getContents(), true);
 
+
+    $static_routes = [
+      '/login' => true,
+      '/register' => true,
+    ];
+    $queryUri = false;
+
     $route = $request->getAttribute('route');
-    if(!$route || !$result) {
+    $path = $request->getUri()->getPath();
+
+    if($route) {
+      $queryUri = $route->getPattern();
+    } else if(isset($static_routes['/' . $path])) {
+      $queryUri = '/' . $path;
+    }
+
+    if($queryUri === false) {
       return $response;
     }
+    $queryUri = $request->getMethod() . ' ' . $queryUri;
 
-    if($request->getMethod() == 'GET') {
+    if(isset($result['authenticated'])) {
+      $result['url'] = 'asset';
+    }
 
-      $parts = explode('/', $route->getPattern());
-      $template_name = '';
-      $pluralize = true;
-      foreach ($parts as $i => $part) {
-        if($part != '') {
-          if($part[0] == '{') {
-            $pluralize = false;
-          } else {
-            if($i != 1) {
-              $template_name .= '_';
-            }
-            $template_name .= $part;
+
+    if(isset($result['url'])) {
+      $response = new \Slim\Http\Response(303);
+      $response = $response->withHeader('Location', dirname($request->getUri()->getBasePath()) . '/frontend/' . $result['url']);
+    } else {
+      $template_names = [
+        //'/configure' => 'configure',
+        'GET /asset' => 'assets',
+        //'/asset/{id}' => 'asset',
+        //'/asset/edit/{id}' => 'asset_edit',
+        //'/register' => 'registered',
+        'GET /login' => 'login',
+        'GET /register' => 'register',
+      ];
+
+      if(isset($template_names[$queryUri])) {
+        $response = new \Slim\Http\Response();
+        $errorResponse = new \Slim\Http\Response();
+        $params = [
+          'data' => $result,
+          'basepath' => dirname($request->getUri()->getBasePath()) . '/frontend',
+          'path' => $path,
+          'params' => $request->getQueryParams(),
+          //'body' => $request->getParsedBody(),
+        ];
+
+        if(isset($body['token'])) {
+          $token = $this->tokens->validate($body['token']);
+          $error = $this->utils->get_user_from_token_data(false, $errorResponse, $token, $user);
+          if(!$error) {
+            $params['user'] = $user;
           }
         }
-      }
-      if($pluralize) {
-        $template_name .= 's';
-      }
 
-      $response = new \Slim\Http\Response();
-
-      return $this->renderer->render($response, $template_name . '.phtml', $result);
-    } else if(isset($result['url'])) {
-      $response = new \Slim\Http\Response(303);
-      return $response->withHeader('Location', $result['url']);
+        $response = $this->renderer->render($response, $template_names[$queryUri] . '.phtml', $params);
+      }
     }
+
+    if(isset($result['token'])) {
+      $response = $this->cookies['responseCookies']::set($response, $this->cookies['setCookie']('token')
+        ->withValue($result['token'])
+        ->withDomain($_SERVER['HTTP_HOST'])
+      );
+    }
+    return $response;
   });
 }

@@ -191,5 +191,6 @@ $app->post('/asset/{id}/support_level', function ($request, $response, $args) {
 
   return $response->withJson([
     'changed' => true,
+    'url' => 'asset/' . $args['id'],
   ], 200);
 });
