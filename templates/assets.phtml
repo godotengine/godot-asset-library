@@ -1,27 +1,32 @@
 <?php include("_header.phtml") ?>
-<?php foreach($result as $i => $asset): ?>
 <div class="row">
-  <div class="col-12">
-    <div class="media">
-      <div class="media-left">
-        <a href="#">
-          <img class="media-object" src="<?php echo htmlspecialchars($asset['icon_url']) ?>" alt="<?php echo htmlspecialchars($asset['title']) ?>'s icon'" width=80 height=80>
-        </a>
-      </div>
-      <div class="media-body">
-        <h4 class="media-heading">
-          <?php echo htmlspecialchars($asset['title']) ?>
-          <small>(by <?php echo htmlspecialchars($asset['author']) ?>)</small>
-          <span class="label label-<?php echo htmlspecialchars([
-            'official' => 'success',
-            'community' => 'info',
-            'testing' => 'default',
-          ][$asset['support_level']]) ?>"><?php echo htmlspecialchars($asset['support_level']) ?></span>
-        </h4>
-        ...
+  <?php foreach($data['result'] as $i => $asset): ?>
+    <div class="col-md-6">
+      <div class="media">
+        <div class="media-left">
+          <a href="<?php echo $basepath . '/asset/' . $asset['asset_id'] ?>">
+            <img class="media-object" src="<?php echo htmlspecialchars($asset['icon_url']) ?>" alt="<?php echo htmlspecialchars($asset['title']) ?>'s icon" width=80 height=80>
+          </a>
+        </div>
+        <div class="media-body">
+          <h4 class="media-heading">
+            <?php echo htmlspecialchars($asset['title']) ?>
+            <small><?php echo htmlspecialchars($asset['version_string']) ?></small>
+            <?php for ($star=1; $star <= 5; $star++) { ?>
+              <i class="glyphicon glyphicon-star<?php if($asset['rating'] < $star) echo '-empty'; ?>"></i>
+            <?php } ?>
+            <span class="label label-primary"><?php echo htmlspecialchars($asset['category']) ?></span>
+            <span class="label label-<?php echo htmlspecialchars([
+              'official' => 'success',
+              'community' => 'info',
+              'testing' => 'default',
+            ][$asset['support_level']]) ?>"><?php echo htmlspecialchars($asset['support_level']) ?></span>
+          </h4>
+
+          <p>Submitted by user <?php echo htmlspecialchars($asset['author']) ?>; <?php echo htmlspecialchars($asset['cost']) ?></p>
+        </div>
       </div>
     </div>
-  </div>
+  <?php endforeach ?>
 </div>
-<?php endforeach ?>
 <?php include("_footer.phtml") ?>
