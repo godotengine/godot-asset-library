@@ -1,0 +1,21 @@
+<?php include("_header.phtml") ?>
+
+<?php if(isset($user)): ?>
+  <div class="alert alert-info" role="alert">Your are already logged in as <?php echo $user['username'] ?></div>
+<?php endif ?>
+
+<form action="<?php echo $basepath ?>/login" method="post">
+  <div class="form-group">
+    <label for="login-form-username">Username</label>
+    <input type="text" name="username" class="form-control" id="login-form-username" placeholder="Username">
+  </div>
+  <div class="form-group">
+    <label for="login-form-password">Password</label>
+    <input type="password" name="password" class="form-control" id="login-form-password" placeholder="Password">
+  </div>
+  <div class="btn-group">
+    <button type="submit" class="btn btn-primary">Login</button>
+    <a href="<?php echo $basepath ?>/register" class="btn btn-default">Register</a>
+  </div>
+</form>
+<?php include("_footer.phtml") ?>
