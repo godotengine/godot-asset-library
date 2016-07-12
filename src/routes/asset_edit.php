@@ -14,8 +14,8 @@ $app->post('/asset', function ($request, $response, $args) {
 
   $error = false;
   foreach ($this->constants['asset_edit_fields'] as $i => $field) {
-    $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'title');
-    $query->bindValue(':' . $field, $body[$field]);
+    $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, $field);
+    if(!$error) $query->bindValue(':' . $field, $body[$field]);
   }
   if($error) return $response;
 
@@ -100,7 +100,6 @@ $app->post('/asset/edit/{id}', function ($request, $response, $args) {
 
   $asset_edit = $query_edit->fetchAll()[0];
 
-  // Error out
   if((int) $asset_edit['user_id'] !== (int) $user_id) {
     return $response->withJson([
       'error' => 'You are not authorized to update this asset edit',
@@ -140,6 +139,7 @@ $app->post('/asset/edit/{id}', function ($request, $response, $args) {
 $app->get('/asset/edit/{id}', function ($request, $response, $args) {
   $body = $request->getParsedBody();
 
+
   $query = $this->queries['asset_edit']['get_one'];
   $query->bindValue(':edit_id', (int) $args['id'], PDO::PARAM_INT);
   $query->execute();
@@ -149,6 +149,20 @@ $app->get('/asset/edit/{id}', function ($request, $response, $args) {
   if($error) return $response;
 
   $asset_edit = $query->fetchAll()[0];
+
+  if($asset_edit['asset_id'] != -1) {
+    $query_asset = $this->queries['asset']['get_one_bare'];
+    $query_asset->bindValue(':asset_id', (int) $asset_edit['asset_id'], PDO::PARAM_INT);
+    $query_asset->execute();
+
+    $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_asset);
+    $error = $this->utils->error_reponse_if_query_no_results($error, $response, $query_asset);
+    if($error) return $response;
+
+    $asset = $query_asset->fetchAll()[0];
+
+    $asset_edit['original'] = $asset;
+  }
 
   if(isset($this->constants['edit_status'][$asset_edit['status']])) {
     $asset_edit['status'] = $this->constants['edit_status'][$asset_edit['status']];

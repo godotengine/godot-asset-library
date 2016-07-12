@@ -1,11 +1,17 @@
 <?php
 
 if(isset($frontend) && $frontend) {
+  $app->get('/', function ($request, $response) {
+    return $response->withJson(['url' => 'asset']);
+  });
+
   $app->add(function ($request, $response, $next) {
     $cookie = $this->cookies['requestCookies']::get($request, 'token');
     $body = $request->getParsedBody();
     if($cookie->getValue() !== null && !isset($body['token'])) {
-      $body['token'] = $cookie->getValue();
+      $cookieValue = (string) $cookie->getValue();
+      $body['token'] = $cookieValue;
+      $request = $request->withParsedBody($body);
     }
 
 
@@ -17,17 +23,18 @@ if(isset($frontend) && $frontend) {
     $static_routes = [
       '/login' => true,
       '/register' => true,
+      '/asset/submit' => true,
     ];
     $queryUri = false;
 
     $route = $request->getAttribute('route');
     $path = $request->getUri()->getPath();
 
-    if($route) {
-      $queryUri = $route->getPattern();
-    } else if(isset($static_routes['/' . $path])) {
+    if(isset($static_routes['/' . $path])) {
       $queryUri = '/' . $path;
-    }
+    } else if($route) {
+      $queryUri = $route->getPattern();
+    } else
 
     if($queryUri === false) {
       return $response;
@@ -46,12 +53,19 @@ if(isset($frontend) && $frontend) {
       $template_names = [
         //'/configure' => 'configure',
         'GET /asset' => 'assets',
-        //'/asset/{id}' => 'asset',
-        //'/asset/edit/{id}' => 'asset_edit',
+        'GET /asset/submit' => 'submit_asset',
+        'GET /asset/{id}' => 'asset',
+        'GET /asset/{id}/edit' => 'edit_asset',
+        'GET /asset/edit/{id}' => 'asset_edit',
         //'/register' => 'registered',
         'GET /login' => 'login',
         'GET /register' => 'register',
+        'ERROR' => 'error',
       ];
+
+      if(isset($result['error']) && !isset($template_names[$queryUri])) {
+        $queryUri = 'ERROR';
+      }
 
       if(isset($template_names[$queryUri])) {
         $response = new \Slim\Http\Response();
@@ -59,8 +73,11 @@ if(isset($frontend) && $frontend) {
         $params = [
           'data' => $result,
           'basepath' => dirname($request->getUri()->getBasePath()) . '/frontend',
+          'bowerpath' => dirname($request->getUri()->getBasePath()) . '/bower_components',
           'path' => $path,
           'params' => $request->getQueryParams(),
+          'categories' => [], // Filled later
+          'constants' => $this->constants,
           //'body' => $request->getParsedBody(),
         ];
 
@@ -70,6 +87,16 @@ if(isset($frontend) && $frontend) {
           if(!$error) {
             $params['user'] = $user;
           }
+        }
+
+        $query_categories = $this->queries['category']['list'];
+        $query_categories->bindValue(':category_type', '%');
+        $query_categories->execute();
+
+        $error = $this->utils->error_reponse_if_query_bad(false, $errorResponse, $query_categories);
+        $error = $this->utils->error_reponse_if_query_no_results($error, $errorResponse, $query_categories);
+        if(!$error) {
+          $params['categories'] = $query_categories->fetchAll();
         }
 
         $response = $this->renderer->render($response, $template_names[$queryUri] . '.phtml', $params);

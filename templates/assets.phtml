@@ -10,7 +10,7 @@
         </div>
         <div class="media-body">
           <h4 class="media-heading">
-            <?php echo htmlspecialchars($asset['title']) ?>
+            <a href="<?php echo $basepath . '/asset/' . $asset['asset_id'] ?>"><?php echo htmlspecialchars($asset['title']) ?></a>
             <small><?php echo htmlspecialchars($asset['version_string']) ?></small>
             <?php for ($star=1; $star <= 5; $star++) { ?>
               <i class="glyphicon glyphicon-star<?php if($asset['rating'] < $star) echo '-empty'; ?>"></i>
@@ -20,7 +20,7 @@
               'official' => 'success',
               'community' => 'info',
               'testing' => 'default',
-            ][$asset['support_level']]) ?>"><?php echo htmlspecialchars($asset['support_level']) ?></span>
+            ][$asset['support_level']]) ?>"><?php echo htmlspecialchars(ucfirst($asset['support_level'])) ?></span>
           </h4>
 
           <p>Submitted by user <?php echo htmlspecialchars($asset['author']) ?>; <?php echo htmlspecialchars($asset['cost']) ?></p>

@@ -96,8 +96,8 @@ $app->post('/login', function ($request, $response, $args) {
 
   $user = $query->fetchAll()[0];
 
-  if(isset($body['token'])) {
-    $token_data = $this->tokens->validate($body['token']);
+  if(isset($body['authorize_token'])) {
+    $token_data = $this->tokens->validate($body['authorize_token']);
 
     if(!$token_data || !isset($token_data->session)) {
       return $response->withJson([

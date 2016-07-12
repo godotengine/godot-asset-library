@@ -1,0 +1,95 @@
+<?php if(!isset($_asset_values)) {
+	$_asset_values = [];
+}
+$_asset_values = array_merge([
+	'title' => '',
+	'category_id' => '0',
+	'version_string' => '',
+	'download_url' => '',
+	'browse_url' => '',
+	'icon_url' => '',
+	'description' => '',
+	'cost' => '',
+], $_asset_values);
+?>
+<div class="form-group">
+		<label class="col-md-4 control-label" for="title">Asset Name</label>
+		<div class="col-md-5">
+				<input id="title" name="title" type="text" placeholder="Asset Name" class="form-control input-md" required="" value="<?php echo $_asset_values['title'] ?>">
+				<span class="help-block">Set the name of your asset</span>
+		</div>
+</div>
+
+<div class="form-group">
+		<label class="col-md-4 control-label" for="category">Category</label>
+		<div class="col-md-5">
+				<select id="category" name="category_id" class="form-control">
+						<?php foreach($categories as $key => $category) { ?>
+							<option value="<?php echo $category['id'] ?>" <?php if($category['id'] == $_asset_values['category_id']) echo 'selected=""'; ?>>
+								<?php echo $category['name'] ?>
+							</option>
+						<?php } ?>
+				</select>
+		</div>
+</div>
+
+<div class="form-group">
+		<label class="col-md-4 control-label" for="version">Version</label>
+		<div class="col-md-5">
+				<input id="version" name="version_string" type="text" placeholder="Version" class="form-control input-md" required="" value="<?php echo $_asset_values['version_string'] ?>">
+				<span class="help-block">Set the version of your asset</span>
+		</div>
+</div>
+
+<div class="form-group">
+		<label class="col-md-4 control-label" for="download">Download URL</label>
+		<div class="col-md-5">
+				<input id="download" name="download_url" type="text" placeholder="Download URL" class="form-control input-md" required="" value="<?php echo $_asset_values['download_url'] ?>">
+				<span class="help-block">Set the url to download the asset (directly as a .zip). Should be similar to <code>https://github.com/&lt;user&gt;/&lt;project&gt;/archive/&lt;tag&gt;.zip</code></span>
+		</div>
+</div>
+
+<div class="form-group">
+		<label class="col-md-4 control-label" for="browse">Browse URL</label>
+		<div class="col-md-5">
+				<input id="browse" name="browse_url" type="text" placeholder="Browse URL" class="form-control input-md" required="" value="<?php echo $_asset_values['browse_url'] ?>">
+				<span class="help-block">Set the url to browse the asset's files (webpage). Should be similar to <code>https://github.com/&lt;user&gt;/&lt;project&gt;/</code></span>
+		</div>
+</div>
+
+<div class="form-group">
+		<label class="col-md-4 control-label" for="icon">Icon URL</label>
+		<div class="col-md-5">
+				<input id="icon" name="icon_url" type="text" placeholder="Icon URL" class="form-control input-md" required="" value="<?php echo $_asset_values['icon_url'] ?>">
+				<span class="help-block">Set the url to the asset's icon (png or jpg image)</span>
+		</div>
+</div>
+
+<div class="form-group">
+		<label class="col-md-4 control-label" for="license">License</label>
+		<div class="col-md-5">
+				<select id="license" name="cost" class="form-control">
+					<?php $licenses = ['MIT' => 'MIT', 'GPLv3' => 'GPL v3', 'GPLv2' => 'GPL v2', 'CC0' => 'CC0'] ?>
+					<?php foreach($licenses as $id => $name) { ?>
+						<option value="<?php echo $id ?>" <?php if($id == $_asset_values['cost']) echo 'selected=""'; ?>>
+							<?php echo $name ?>
+						</option>
+					<?php } ?>
+				</select>
+		</div>
+</div>
+
+<div class="form-group">
+		<label class="col-md-4 control-label" for="description">Description</label>
+		<div class="col-md-5">
+				<textarea class="form-control" id="description" name="description" rows="7"><?php echo htmlspecialchars($_asset_values['description']) ?></textarea>
+		</div>
+</div>
+
+<div class="form-group">
+		<label class="col-md-4 control-label" for="youtube">Youtube Link</label>
+		<div class="col-md-5">
+				<input id="youtube" name="youtube" type="text" placeholder="Youtube Link" class="form-control input-md">
+				<span class="help-block">Set the youtube link demonstrating your asset</span>
+		</div>
+</div>

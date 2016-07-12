@@ -1,0 +1,74 @@
+<?php include("_header.phtml") ?>
+<?php $field_names = [
+  'title' => 'Title',
+  'description' => 'Description',
+  'category_id' => 'Category',
+  'version_string' => 'Version String',
+  'cost' => 'License',
+  'download_url' => 'Download Url',
+  'browse_url' => 'Browse Url',
+  'icon_url' => 'Icon Url',
+] ?>
+<?php function output_field($data, $name) { ?>
+  <?php if (strpos($name, 'url') !== false) { ?>
+    <a href="<?php echo $data ?>"><?php echo $data ?></a>
+    <?php if ($name == 'icon_url') { ?>
+      <br><img src="<?php echo $data ?>" width="80" height="80"></a>
+    <?php }?>
+  <?php } else { ?>
+    <?php echo $data ?>
+  <?php } ?>
+<?php } ?>
+<table class="table table-bordered">
+  <tbody>
+    <tr>
+      <th>Property</th>
+      <?php if(isset($data['original'])) { ?>
+        <th style="min-width: 50%" class="text-center">Old</th>
+      <?php } ?>
+      <th style="min-width: 50%" class="text-center">New</th>
+    </tr>
+    <?php foreach($field_names as $field => $name) { ?>
+      <tr>
+        <td>
+          <?php echo $name ?>
+        </td>
+        <?php if(isset($data['original']) && ($data[$field] == null || $data[$field] == $data['original'][$field])) { ?>
+
+          <td colspan="2" class="text-center active">
+            <?php output_field($data['original'][$field], $field) ?>
+          </td>
+
+        <?php } else { ?>
+          <?php if(isset($data['original'])) { ?>
+
+            <td class="text-right danger">
+              <?php output_field($data['original'][$field], $field) ?>
+            </td>
+
+          <?php } ?>
+
+          <td class="text-left success">
+            <?php output_field($data[$field], $field) ?>
+          </td>
+
+        <?php } ?>
+      </tr>
+    <?php } ?>
+  </tbody>
+</table>
+<?php if(isset($user)) { ?>
+  <?php if($user['type'] >= 100) { ?>
+    <form class="form-inline" style="display: inline-block" action="<?php echo $basepath ?>/asset/edit/<?php echo $data['edit_id']; ?>/accept" method="post">
+      <button type="submit" class="btn btn-success">Accept</button>
+    </form>
+    <form class="form-inline" style="display: inline-block" action="<?php echo $basepath ?>/asset/edit/<?php echo $data['edit_id']; ?>/reject" method="post">
+      <div class="form-group">
+        <button type="submit" class="btn btn-danger">Reject</button>
+        <label class="control-label" for="reason">Reason:</label>
+        <input type="text" class="form-control" id="reason" name="reason" rows="3"></textarea>
+      </div>
+    </form>
+  <?php } ?>
+<?php } ?>
+<?php include("_footer.phtml") ?>

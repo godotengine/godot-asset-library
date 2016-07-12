@@ -19,6 +19,7 @@ return $constants = [
   'category_type' => double_map([
     'addon' => 0,
     'project' => 1,
+    'any' => '%'
   ]),
   'support_level' => double_map([
     'testing' => 0,

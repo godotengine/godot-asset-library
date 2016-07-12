@@ -18,7 +18,7 @@ $app->get('/asset', function ($request, $response, $args) {
     $category = (int) $params['category'];
   }
   if(isset($params['type']) && isset($this->constants['category_type'][$params['type']])) {
-    $category_type = (int) $this->constants['category_type'][$params['type']];
+    $category_type = $this->constants['category_type'][$params['type']];
   }
   if(isset($params['support'])) { // Expects the param like `community+testing`
     $support_levels = [];
@@ -104,7 +104,7 @@ $app->get('/asset', function ($request, $response, $args) {
 });
 
 // Get information for a single asset
-$app->get('/asset/{id}', function ($request, $response, $args) {
+$get_asset = function ($request, $response, $args) {
   $query = $this->queries['asset']['get_one'];
 
   $query->bindValue(':id', (int) $args['id'], PDO::PARAM_INT);
@@ -156,7 +156,12 @@ $app->get('/asset/{id}', function ($request, $response, $args) {
   $asset_info['previews'] = $previews;
 
   return $response->withJson($asset_info, 200);
-});
+};
+// Binding to multiple routes
+$app->get('/asset/{id}', $get_asset);
+if(isset($frontend) && $frontend) {
+  $app->get('/asset/{id}/edit', $get_asset);
+}
 
 // Change support level of an asset
 $app->post('/asset/{id}/support_level', function ($request, $response, $args) {

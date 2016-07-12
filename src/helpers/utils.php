@@ -18,6 +18,7 @@ class Utils
     if($user_id === false) {
       $response = $response->withJson([
         'error' => 'Invalid token supplied',
+        'url' => 'login'
       ], 400);
       return true;
     }
@@ -59,7 +60,7 @@ class Utils
   {
     if($currentStatus) return true;
 
-    if((!isset($object[$property]) || !is_string($object[$property]))) {
+    if(!isset($object[$property]) || !is_string($object[$property])) {
       $response = $response->withJson([
         'error' => $property . ' is required, and must be a string'
       ], 400);

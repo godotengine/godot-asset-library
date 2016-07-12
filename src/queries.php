@@ -10,14 +10,14 @@ return [
     'change_password' => 'INSERT INTO `as_users` SET username = :username, password_hash = :password_hash',
   ],
   'category' => [
-    'list' => 'SELECT category_id as id, category as name FROM `as_categories` WHERE category_type = :category_type ORDER BY category_id',
+    'list' => 'SELECT category_id as id, category as name FROM `as_categories` WHERE category_type LIKE :category_type ORDER BY category_id',
   ],
   'asset' => [
     'search' => 'SELECT asset_id, title, username as author, user_id as author_id, category, category_id, rating, cost, support_level, icon_url, version, version_string FROM `as_assets`
       LEFT JOIN `as_users` USING (user_id)
       LEFT JOIN `as_categories` USING (category_id)
 
-      WHERE searchable = TRUE AND category_id LIKE :category AND category_type = :category_type
+      WHERE searchable = TRUE AND category_id LIKE :category AND category_type LIKE :category_type
       AND support_level RLIKE :support_levels_regex
       AND (
         title LIKE :filter

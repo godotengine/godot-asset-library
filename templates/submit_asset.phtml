@@ -1,0 +1,19 @@
+<?php include("_header.phtml") ?>
+<form class="form-horizontal" action="<?php echo $basepath ?>/asset" method="post">
+		<fieldset>
+
+				<!-- Form Name -->
+				<legend>Submit Asset</legend>
+
+				<?php include("_asset_fields.phtml") ?>
+
+				<div class="form-group">
+						<label class="col-md-4 control-label" for="submit"></label>
+						<div class="col-md-4">
+								<button id="submit" class="btn btn-primary">Submit</button>
+						</div>
+				</div>
+
+		</fieldset>
+</form>
+<?php include("_footer.phtml") ?>

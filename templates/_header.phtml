@@ -9,7 +9,7 @@
   <title>Godot Addonlib</title>
 
   <!-- Bootstrap -->
-  <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="<?php echo $bowerpath ?>/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -49,11 +49,13 @@
 
           <?php make_nav_link('Feed', 'feed') ?>
           <?php make_nav_link('My Assets') ?>
-          <?php make_nav_link('New Asset') ?>
 
           <?php if(isset($user)) { ?>
-            <?php make_nav_link('Moderate') ?>
+            <?php if($user['type'] >= 100) { ?>
+              <?php make_nav_link('Moderate') ?>
+            <?php } ?>
             <li class="seperator"></li>
+            <?php make_nav_link('Submit Asset', 'asset/submit') ?>
             <?php make_nav_link('Logout (' . $user['username'] . ')', 'logout') ?>
           <?php } else { ?>
             <?php make_nav_link('Login/Register', 'login') ?>

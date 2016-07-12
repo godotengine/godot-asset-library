@@ -38,6 +38,7 @@ class Tokens
     $token_signature = base64_decode($token_parts[2]);
 
     $token_payload = $token_parts[0] . '&' . $token_parts[1];
+
     if($token_signature !== $this->sign_token($token_payload) || time() > $token_time + $this->c->settings['auth']['tokenExpirationTime']) {
       return false;
     }
