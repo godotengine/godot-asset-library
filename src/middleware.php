@@ -57,6 +57,7 @@ if(isset($frontend) && $frontend) {
         'GET /asset/{id}' => 'asset',
         'GET /asset/{id}/edit' => 'edit_asset',
         'GET /asset/edit/{id}' => 'asset_edit',
+        'GET /asset/edit/{id}/edit' => 'edit_asset_edit',
         //'/register' => 'registered',
         'GET /login' => 'login',
         'GET /register' => 'register',

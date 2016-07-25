@@ -16,15 +16,20 @@ return $constants = [
     'accepted' => 2,
     'rejected' => 3,
   ]),
+  'edit_preview_operation' => double_map([
+    'insert' => 0,
+    'remove' => 1,
+    'update' => 2,
+  ]),
   'category_type' => double_map([
     'addon' => 0,
     'project' => 1,
-    'any' => '%'
+    'any' => '%',
   ]),
   'support_level' => double_map([
     'testing' => 0,
     'community' => 1,
-    'official' => 2
+    'official' => 2,
   ]),
   'user_type' => double_map([
     'normal' => 0,
@@ -35,5 +40,8 @@ return $constants = [
     'title', 'description', 'category_id',
     'version_string', 'cost',
     'download_url', 'browse_url', 'icon_url',
+  ],
+  'asset_edit_preview_fields' => [
+    'type', 'link', 'thumbnail',
   ]
 ];

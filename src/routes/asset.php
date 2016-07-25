@@ -127,7 +127,7 @@ $get_asset = function ($request, $response, $args) {
     foreach ($row as $column => $value) {
       if($value!==null) {
         if($column==='preview_id') {
-          $previews[] = [];
+          $previews[] = ['preview_id' => $value];
         } elseif($column==="type" || $column==="link" || $column==="thumbnail") {
             $previews[count($previews) - 1][$column] = $value;
         } elseif($column==="category_type") {

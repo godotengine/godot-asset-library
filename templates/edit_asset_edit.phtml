@@ -1,0 +1,27 @@
+<?php include("_header.phtml") ?>
+<?php $_asset_values = $data ?>
+<form class="form-horizontal" action="<?php echo $basepath ?>/asset/edit/<?php echo $data['edit_id']; ?>" method="post">
+		<fieldset>
+				<!-- Form Name -->
+				<legend>
+					Revise edit
+					<a class="btn btn-default btn-sm" href="<?php echo $basepath ?>/asset/edit/<?php echo $data['edit_id'] ?>">
+						Back
+					</a>
+				</legend>
+
+				<?php include("_asset_fields.phtml") ?>
+
+				<div class="form-group">
+						<label class="col-md-4 control-label" for="submit"></label>
+						<div class="col-md-4">
+								<button id="submit" class="btn btn-primary">Revise edit</button>
+								<a class="btn btn-default" href="<?php echo $basepath ?>/asset/edit/<?php echo $data['edit_id'] ?>">
+									Cancel
+								</a>
+						</div>
+				</div>
+
+		</fieldset>
+</form>
+<?php include("_footer.phtml") ?>

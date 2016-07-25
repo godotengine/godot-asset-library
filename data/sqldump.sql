@@ -5,6 +5,7 @@ SET time_zone = '+00:00';
 SET foreign_key_checks = 0;
 SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
+DROP TABLE IF EXISTS `as_assets`;
 CREATE TABLE `as_assets` (
   `asset_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL DEFAULT '0',
@@ -13,19 +14,20 @@ CREATE TABLE `as_assets` (
   `category_id` int(11) NOT NULL DEFAULT '6',
   `version` int(11) NOT NULL,
   `version_string` varchar(20) NOT NULL,
-  `support_level` tinyint(4) NOT NULL,
   `cost` varchar(25) NOT NULL DEFAULT 'GPLv3',
   `rating` int(11) NOT NULL DEFAULT '1',
-  `download_hash` varchar(64) NOT NULL,
+  `support_level` tinyint(4) NOT NULL,
   `download_url` varchar(1024) NOT NULL,
+  `download_hash` text NOT NULL,
   `browse_url` varchar(1024) NOT NULL,
   `icon_url` varchar(1024) NOT NULL,
   `searchable` tinyint(1) NOT NULL DEFAULT '0',
-  `modify_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `modify_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`asset_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
+DROP TABLE IF EXISTS `as_asset_edits`;
 CREATE TABLE `as_asset_edits` (
   `edit_id` int(11) NOT NULL AUTO_INCREMENT,
   `asset_id` int(11) NOT NULL,
@@ -40,14 +42,31 @@ CREATE TABLE `as_asset_edits` (
   `icon_url` varchar(1024) DEFAULT NULL,
   `status` tinyint(4) NOT NULL DEFAULT '0',
   `reason` text NOT NULL,
-  `submit_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `modify_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `submit_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `modify_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`edit_id`),
   KEY `asset_id` (`asset_id`),
   KEY `status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
+DROP TABLE IF EXISTS `as_asset_edit_previews`;
+CREATE TABLE `as_asset_edit_previews` (
+  `edit_preview_id` int(11) NOT NULL AUTO_INCREMENT,
+  `edit_id` int(11) NOT NULL,
+  `preview_id` int(11) NOT NULL,
+  `type` enum('image','video') DEFAULT NULL,
+  `link` varchar(1024) DEFAULT NULL,
+  `thumbnail` varchar(1024) DEFAULT NULL,
+  `operation` tinyint(4) NOT NULL,
+  PRIMARY KEY (`edit_preview_id`),
+  KEY `asset_id` (`edit_id`),
+  KEY `type` (`type`),
+  KEY `preview_id` (`preview_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `as_asset_previews`;
 CREATE TABLE `as_asset_previews` (
   `preview_id` int(11) NOT NULL AUTO_INCREMENT,
   `asset_id` int(11) NOT NULL,
@@ -60,6 +79,7 @@ CREATE TABLE `as_asset_previews` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
+DROP TABLE IF EXISTS `as_categories`;
 CREATE TABLE `as_categories` (
   `category_id` int(11) NOT NULL AUTO_INCREMENT,
   `category` varchar(25) NOT NULL,
@@ -80,6 +100,7 @@ INSERT INTO `as_categories` (`category_id`, `category`, `category_type`) VALUES
 (9,	'Projects',	1),
 (10,	'Demos',	1);
 
+DROP TABLE IF EXISTS `as_users`;
 CREATE TABLE `as_users` (
   `user_id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(100) NOT NULL,
@@ -93,4 +114,4 @@ CREATE TABLE `as_users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
--- 2016-06-21 19:14:52
+-- 2016-07-25 18:15:07

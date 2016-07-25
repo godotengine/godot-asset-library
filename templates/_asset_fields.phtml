@@ -10,6 +10,7 @@ $_asset_values = array_merge([
 	'icon_url' => '',
 	'description' => '',
 	'cost' => '',
+	'previews' => [],
 ], $_asset_values);
 ?>
 <div class="form-group">
@@ -86,10 +87,90 @@ $_asset_values = array_merge([
 		</div>
 </div>
 
-<div class="form-group">
-		<label class="col-md-4 control-label" for="youtube">Youtube Link</label>
-		<div class="col-md-5">
-				<input id="youtube" name="youtube" type="text" placeholder="Youtube Link" class="form-control input-md">
-				<span class="help-block">Set the youtube link demonstrating your asset</span>
+<?php for ($i=0; $i < count($_asset_values['previews']) + 3; $i++) {
+	if($i < count($_asset_values['previews'])) $preview = $_asset_values['previews'][$i];
+	else $preview = ['type' => 'image', 'link' => '', 'thumbnail' => '']
+	?>
+	<div class="panel panel-default">
+		<div class="panel-heading form-inline">
+			<div class="text-center">
+				<span class="panel-title">
+					<?php if($i < count($_asset_values['previews'])) {
+						if(isset($preview['edit_preview_id'])) {
+							echo 'Revise ' . $preview['operation'] . ' operation';
+						} else {
+							echo 'Update original preview';
+						}
+					} else {
+						echo 'Add preview';
+					} ?>
+				</span>
+
+				<?php if($i < count($_asset_values['previews'])) { ?>
+					<?php if(isset($preview['edit_preview_id'])) { // Existing edit ?>
+
+						<input type="hidden" name="previews[<?php echo $i ?>][edit_preview_id]" value="<?php echo $preview['edit_preview_id'] ?>">
+						<input type="hidden" name="previews[<?php echo $i ?>][enabled]" value="true">
+						<label>
+							<input type="checkbox" name="previews[<?php echo $i ?>][remove]" value="true">
+							Cancel edit
+						</label>
+
+					<?php } else { // From base asset ?>
+						<input type="hidden" name="previews[<?php echo $i ?>][preview_id]" value="<?php echo $preview['preview_id'] ?>">
+						<label>
+							<input type="checkbox" name="previews[<?php echo $i ?>][enabled]" value="true">
+							Enable
+						</label>
+						<label>
+							<input type="radio" name="previews[<?php echo $i ?>][operation]" value="update" checked="">
+							Update
+						</label>
+						<label>
+							<input type="radio" name="previews[<?php echo $i ?>][operation]" value="remove">
+							Remove
+						</label>
+
+					<?php } ?>
+				<?php } else { ?>
+					<input type="hidden" name="previews[<?php echo $i ?>][operation]" value="insert">
+					<label>
+						<input type="checkbox" name="previews[<?php echo $i ?>][enabled]" value="true">
+						Enable
+					</label>
+				<?php } ?>
+			</div>
+	</div>
+
+		<div class="panel-body">
+			<div class="form-group">
+					<label class="col-md-4 control-label" for="previews[<?php echo $i ?>][type]">Type</label>
+					<div class="col-md-5">
+							<select id="license" name="previews[<?php echo $i ?>][type]" class="form-control">
+								<?php $types = ['image' => 'Image', 'video' => 'Video'] ?>
+								<?php foreach($types as $id => $name) { ?>
+									<option value="<?php echo $id ?>" <?php if($id == $preview['type']) echo 'selected=""'; ?>>
+										<?php echo $name ?>
+									</option>
+								<?php } ?>
+							</select>
+					</div>
+			</div>
+
+			<div class="form-group">
+				<label class="control-label col-md-4" for="previews[<?php echo $i ?>][link]">Image/Youtube Link</label>
+				<div class="col-md-5">
+					<input id="youtube-<?php echo $i ?>" name="previews[<?php echo $i ?>][link]" type="text" placeholder="Image/Youtube Link" class="form-control input-md" value="<?php echo $preview['link'] ?>">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="control-label col-md-4" for="previews[<?php echo $i ?>][thumbnail]">Link to thumbnail (To be removed)</label>
+				<div class="col-md-5">
+					<input id="youtube-<?php echo $i ?>" name="previews[<?php echo $i ?>][thumbnail]" type="text" placeholder="Image Link" class="form-control input-md" value="<?php echo $preview['thumbnail'] ?>">
+				</div>
+			</div>
+
 		</div>
-</div>
+	</div>
+<?php } ?>

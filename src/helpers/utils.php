@@ -60,7 +60,7 @@ class Utils
   {
     if($currentStatus) return true;
 
-    if(!isset($object[$property]) || !is_string($object[$property])) {
+    if(!isset($object[$property]) || !is_string($object[$property]) || $object[$property] == "") {
       $response = $response->withJson([
         'error' => $property . ' is required, and must be a string'
       ], 400);

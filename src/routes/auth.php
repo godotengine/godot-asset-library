@@ -123,6 +123,11 @@ $app->post('/login', function ($request, $response, $args) {
       'token' => $token,
       'authenticated' => true,
     ], 200);
+  } else {
+    return $response->withJson([
+      'authenticated' => false,
+      'url' => 'login',
+    ], 403);
   }
 });
 

@@ -78,12 +78,31 @@ return [
       version=version+:update_version
       WHERE asset_id=:asset_id',
 
+    'apply_preview_edit_insert' => 'INSERT INTO `as_asset_previews`
+      SET asset_id=:asset_id, type=:type, link=:link, thumbnail=:thumbnail',
+    'apply_preview_edit_remove' => 'DELETE FROM `as_asset_previews`
+      WHERE preview_id=:preview_id',
+    'apply_preview_edit_update' => 'UPDATE `as_asset_previews`
+      SET type=COALESCE(:type, type), link=COALESCE(:link, link), thumbnail=COALESCE(:thumbnail, thumbnail)
+      WHERE preview_id=:preview_id',
+
     'set_support_level' => 'UPDATE `as_assets`
       SET support_level=:support_level
       WHERE asset_id=:asset_id'
   ],
   'asset_edit' => [
-    'get_one' => 'SELECT * FROM `as_asset_edits` WHERE edit_id=:edit_id',
+    'get_one' => 'SELECT edit_id, `as_asset_edits`.asset_id, user_id, title, description, category_id, version_string,
+      cost, download_url, browse_url, icon_url, status,
+      edit_preview_id, `as_asset_previews`.preview_id, `as_asset_edit_previews`.type, `as_asset_edit_previews`.link, `as_asset_edit_previews`.thumbnail, `as_asset_edit_previews`.operation,
+      `as_asset_previews`.type AS orig_type, `as_asset_previews`.link AS orig_link, `as_asset_previews`.thumbnail AS orig_thumbnail,
+      unedited_previews.preview_id AS unedited_preview_id, unedited_previews.type AS unedited_type, unedited_previews.link AS unedited_link, unedited_previews.thumbnail AS unedited_thumbnail
+      FROM `as_asset_edits`
+      LEFT JOIN `as_asset_edit_previews` USING (edit_id)
+      LEFT JOIN `as_asset_previews` USING (preview_id)
+      LEFT JOIN `as_asset_previews` AS unedited_previews ON `as_asset_edits`.asset_id = unedited_previews.asset_id
+      WHERE edit_id=:edit_id',
+
+    'get_one_bare' => 'SELECT * FROM `as_asset_edits` WHERE edit_id=:edit_id',
     'get_one_with_status' => 'SELECT * FROM `as_asset_edits` WHERE edit_id=:edit_id AND status=:status',
     'get_editable_by_asset_id' => 'SELECT * FROM `as_asset_edits` WHERE asset_id=:asset_id AND status=0',
 
@@ -96,6 +115,14 @@ return [
       SET title=COALESCE(:title, title), description=COALESCE(:description, description), category_id=COALESCE(:category_id, category_id), version_string=COALESCE(:version_string, version_string), cost=COALESCE(:cost, cost),
       download_url=COALESCE(:download_url, download_url), browse_url=COALESCE(:browse_url, browse_url), icon_url=COALESCE(:icon_url, icon_url)
       WHERE edit_id=:edit_id AND status=0',
+
+    'add_preview' => 'INSERT INTO `as_asset_edit_previews`
+      SET edit_id=:edit_id, preview_id=:preview_id, type=:type, link=:link, thumbnail=:thumbnail, operation=:operation',
+    'update_preview' => 'UPDATE `as_asset_edit_previews`
+      SET type=COALESCE(:type, type), link=COALESCE(:link, link), thumbnail=COALESCE(:thumbnail, thumbnail)
+      WHERE edit_id=:edit_id AND edit_preview_id=:edit_preview_id',
+    'remove_preview' => 'DELETE FROM `as_asset_edit_previews`
+      WHERE edit_id=:edit_id AND edit_preview_id=:edit_preview_id',
 
     'set_asset_id' => 'UPDATE `as_asset_edits` SET asset_id=:asset_id WHERE edit_id=:edit_id',
     'set_status_and_reason' => 'UPDATE `as_asset_edits` SET status=:status, reason=:reason WHERE edit_id=:edit_id',
