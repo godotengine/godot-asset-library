@@ -1,5 +1,6 @@
-# addonlib
-Addonlib for Godot
+# Godot's Asset Library
+
+REST API and frontend for Godot Engine's [official asset library](https://godotengine.org/asset-library).
 
 ## Installation
 
