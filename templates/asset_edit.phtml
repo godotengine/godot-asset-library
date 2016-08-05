@@ -14,7 +14,8 @@ $preview_field_names = [
   'link' => 'Image/Video URL',
   'thumbnail' => 'Thumbnail',
 ]; ?>
-<?php function output_field($data, $name) { $data = htmlspecialchars($data);?>
+
+<?php function output_field($data, $name, $categories = []) { $data = htmlspecialchars($data);?>
   <?php if (strpos($name, 'url') !== false || strpos($name, 'link') !== false || strpos($name, 'thumbnail') !== false) { ?>
     <a href="<?php echo $data ?>"><?php echo $data ?></a>
     <?php if ($name == 'icon_url') { ?>
@@ -26,10 +27,13 @@ $preview_field_names = [
     <?php if ($name == 'preview_thumbnail') { ?>
       <br><img src="<?php echo $data ?>" style="max-height:345px"></a>
     <?php }?>
+  <?php } elseif($name == 'category_id') { ?>
+    <?php echo $categories[$data]['name'] ?>
   <?php } else { ?>
     <?php echo $data ?>
   <?php } ?>
 <?php } ?>
+
 <h1>
   <?php if(isset($data['original'])) { ?>
     Edit of asset
@@ -42,9 +46,11 @@ $preview_field_names = [
     <?php echo ucfirst(str_replace('_', ' ', $data['status'])) ?>
   </span>
 </h1>
-<?php if($data['user_id'] == $user['id'] && $data['status'] == 'new') { ?>
+
+<?php if(isset($user) && $data['user_id'] == $user['id'] && $data['status'] == 'new') { ?>
   <a class="btn btn-success" href="<?php echo $basepath ?>/asset/edit/<?php echo $data['edit_id'] ?>/edit">Revise</a>
 <?php } ?>
+
 <table class="table table-bordered">
   <tbody>
     <tr>
@@ -62,20 +68,20 @@ $preview_field_names = [
         <?php if(isset($data['original']) && ($data[$field] == null || $data[$field] == $data['original'][$field])) { ?>
 
           <td colspan="2" class="text-center active">
-            <?php output_field($data['original'][$field], $field) ?>
+            <?php output_field($data['original'][$field], $field, $categories) ?>
           </td>
 
         <?php } else { ?>
           <?php if(isset($data['original'])) { ?>
 
             <td class="text-right danger">
-              <?php output_field($data['original'][$field], $field) ?>
+              <?php output_field($data['original'][$field], $field, $categories) ?>
             </td>
 
           <?php } ?>
 
           <td class="text-left success">
-            <?php output_field($data[$field], $field) ?>
+            <?php output_field($data[$field], $field, $categories) ?>
           </td>
 
         <?php } ?>
@@ -96,7 +102,7 @@ $preview_field_names = [
           <?php if(isset($preview['original']) && $preview['operation'] != "remove" && ($preview[$field] === null || $preview[$field] === $preview['original'][$field])) { ?>
 
             <td colspan="2" class="text-center active">
-              <?php output_field($preview['original'][$field], 'preview_' . $field) ?>
+              <?php output_field($preview['original'][$field], 'preview_' . $field, $categories) ?>
             </td>
 
           <?php } else { ?>
@@ -104,20 +110,20 @@ $preview_field_names = [
 
               <?php if($preview['operation'] == "remove") { ?>
                 <td class="text-center danger" colspan="2">
-                  <?php output_field($preview['original'][$field], 'preview_' . $field) ?>
+                  <?php output_field($preview['original'][$field], 'preview_' . $field, $categories) ?>
                 </td>
               <?php } else { ?>
                 <td class="text-right danger">
-                  <?php output_field($preview['original'][$field], 'preview_' . $field) ?>
+                  <?php output_field($preview['original'][$field], 'preview_' . $field, $categories) ?>
                 </td>
                 <td class="text-left success">
-                  <?php output_field($preview[$field], 'preview_' . $field) ?>
+                  <?php output_field($preview[$field], 'preview_' . $field, $categories) ?>
                 </td>
               <?php } ?>
 
             <?php } else { ?>
               <td class="text-center success" colspan="2">
-                <?php output_field($preview[$field], 'preview_' . $field) ?>
+                <?php output_field($preview[$field], 'preview_' . $field, $categories) ?>
               </td>
             <?php } ?>
 

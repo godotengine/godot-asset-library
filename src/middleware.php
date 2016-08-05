@@ -52,12 +52,16 @@ if(isset($frontend) && $frontend) {
     } else {
       $template_names = [
         //'/configure' => 'configure',
+        'GET /user/feed' => 'feed',
+
         'GET /asset' => 'assets',
         'GET /asset/submit' => 'submit_asset',
-        'GET /asset/{id}' => 'asset',
-        'GET /asset/{id}/edit' => 'edit_asset',
-        'GET /asset/edit/{id}' => 'asset_edit',
-        'GET /asset/edit/{id}/edit' => 'edit_asset_edit',
+        'GET /asset/{id:[0-9]+}' => 'asset',
+        'GET /asset/{id:[0-9]+}/edit' => 'edit_asset',
+
+        'GET /asset/edit' => 'asset_edits',
+        'GET /asset/edit/{id:[0-9]+}' => 'asset_edit',
+        'GET /asset/edit/{id:[0-9]+}/edit' => 'edit_asset_edit',
         //'/register' => 'registered',
         'GET /login' => 'login',
         'GET /register' => 'register',

@@ -111,6 +111,88 @@ function _add_previews_to_edit($c, $error, &$response, $edit_id, $previews, $req
   return $error;
 }
 
+$app->get('/asset/edit', function ($request, $response, $args) {
+
+  // Enable if needed (for now, transparent to all) [Also change request to post]
+  // $error = $this->utils->ensure_logged_in(false, $response, $body, $user_id);
+  // $error = $this->utils->get_user_for_id($error, $response, $user_id, $user);
+  // $error = $this->utils->error_reponse_if_not_user_has_level($error, $response, $user, 'moderator');
+  // if($error) return $response;
+
+  $params = $request->getQueryParams();
+
+  $asset_id = '%';
+  $filter = '%';
+  $statuses = [];
+  $page_size = 10;
+  $max_page_size = 500;
+  $page_offset = 0;
+  if(isset($params['asset'])) {
+    $asset_id = (int) $params['asset'];
+  }
+  if(isset($params['status'])) { // Expects the param like `new+in_review`
+    foreach(explode(' ', $params['status']) as $key => $value) { // `+` is changed to ` ` automatically
+      if(isset($this->constants['edit_status'][$value])) {
+        array_push($statuses, (int) $this->constants['edit_status'][$value]);
+      }
+    }
+  }
+  if(isset($params['filter'])) {
+    $filter = '%'.preg_replace('/[[:punct:]]+/', '%', $params['filter']).'%';
+  }
+  if(isset($params['max_results'])) {
+    $page_size = min(abs((int) $params['max_results']), $max_page_size);
+  }
+  if(isset($params['page'])) {
+    $page_offset = abs((int) $params['page']) * $page_size;
+  } elseif(isset($params['offset'])) {
+    $page_offset = abs((int) $params['offset']);
+  }
+
+  if(count($statuses) === 0) {
+    $statuses = [0, 1]; // New + In Review
+  }
+  $statuses = implode('|', $statuses);
+
+  $query = $this->queries['asset_edit']['search'];
+  $query->bindValue(':filter', $filter);
+  $query->bindValue(':asset_id', $asset_id);
+  $query->bindValue(':statuses_regex', $statuses);
+  $query->bindValue(':page_size', $page_size, PDO::PARAM_INT);
+  $query->bindValue(':skip_count', $page_offset, PDO::PARAM_INT);
+  $query->execute();
+
+  $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
+  if($error) return $response;
+
+  $query_count = $this->queries['asset_edit']['search_count'];
+  $query_count->bindValue(':filter', $filter);
+  $query_count->bindValue(':asset_id', $asset_id);
+  $query_count->bindValue(':statuses_regex', $statuses);
+  $query_count->execute();
+
+  $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_count);
+  if($error) return $response;
+
+  $total_count = $query_count->fetchAll()[0]['count'];
+
+  $asset_edits = $query->fetchAll();
+
+  $context = $this;
+  $asset_edits = array_map(function($asset_edit) use($context) {
+    $asset_edit['status'] = $context->constants['edit_status'][(int) $asset_edit['status']];
+    $asset_edit['support_level'] = $context->constants['support_level'][(int) $asset_edit['support_level']];
+    return $asset_edit;
+  }, $asset_edits);
+
+  return $response->withJson([
+    'result' => $asset_edits,
+    'page' => floor($page_offset / $page_size),
+    'pages' => ceil($total_count / $page_size),
+    'page_length' => $page_size,
+    'total_items' => (int) $total_count,
+  ], 200);
+});
 
 // Get an edit
 $get_edit = function ($request, $response, $args) {
@@ -125,6 +207,7 @@ $get_edit = function ($request, $response, $args) {
   $output = $query->fetchAll();
 
   $previews = [];
+  $previews_last_i = null;
   $unedited_previews = [];
   $unedited_previews_last_i = null;
   $asset_edit = [];
@@ -134,13 +217,14 @@ $get_edit = function ($request, $response, $args) {
     foreach ($row as $column => $value) {
       if($value!==null) {
         if($column==='edit_preview_id') {
-          $previews[] = ['edit_preview_id' => $value];
+          $previews[$value] = ['edit_preview_id' => $value];
+          $previews_last_i = $value;
         } elseif($column==='preview_id' || $column==='type' || $column==='link' || $column==='thumbnail') {
-          $previews[count($previews) - 1][$column] = $value;
+          $previews[$previews_last_i][$column] = $value;
         } elseif($column==='operation') {
-          $previews[count($previews) - 1][$column] = $this->constants['edit_preview_operation'][(int) $value];
+          $previews[$previews_last_i][$column] = $this->constants['edit_preview_operation'][(int) $value];
         } elseif($column==='orig_type' || $column==='orig_link' || $column==='orig_thumbnail') {
-          $previews[count($previews) - 1]['original'][substr($column, strlen('orig_'))] = $value;
+          $previews[$previews_last_i]['original'][substr($column, strlen('orig_'))] = $value;
         }
         elseif($column==='unedited_preview_id') {
           $unedited_previews[$value] = ['preview_id' => $value];
@@ -184,9 +268,9 @@ $get_edit = function ($request, $response, $args) {
 };
 
 // Binding to multiple routes
-$app->get('/asset/edit/{id}', $get_edit);
+$app->get('/asset/edit/{id:[0-9]+}', $get_edit);
 if(isset($frontend) && $frontend) {
-  $app->get('/asset/edit/{id}/edit', $get_edit);
+  $app->get('/asset/edit/{id:[0-9]+}/edit', $get_edit);
 }
 
 // Submit an asset
@@ -201,7 +285,7 @@ $app->post('/asset', function ($request, $response, $args) {
 
 
 // Edit an existing asset
-$app->post('/asset/{id}', function ($request, $response, $args) {
+$app->post('/asset/{id:[0-9]+}', function ($request, $response, $args) {
   $body = $request->getParsedBody();
 
   $error = $this->utils->ensure_logged_in(false, $response, $body, $user_id);
@@ -228,7 +312,7 @@ $app->post('/asset/{id}', function ($request, $response, $args) {
 
 
 // Edit an existing edit
-$app->post('/asset/edit/{id}', function ($request, $response, $args) {
+$app->post('/asset/edit/{id:[0-9]+}', function ($request, $response, $args) {
   $body = $request->getParsedBody();
 
   $error = $this->utils->ensure_logged_in(false, $response, $body, $user_id);
@@ -281,7 +365,7 @@ $app->post('/asset/edit/{id}', function ($request, $response, $args) {
 
 
 // Accept an edit
-$app->post('/asset/edit/{id}/accept', function ($request, $response, $args) {
+$app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $args) {
   $body = $request->getParsedBody();
 
   $error = $this->utils->ensure_logged_in(false, $response, $body, $user_id);
@@ -291,7 +375,7 @@ $app->post('/asset/edit/{id}/accept', function ($request, $response, $args) {
   if($error) return $response;
 
   // Get the edit
-  $query_edit = $this->queries['asset_edit']['get_one_bare'];
+  $query_edit = $this->queries['asset_edit']['get_one'];
   $query_edit->bindValue(':edit_id', (int) $args['id'], PDO::PARAM_INT);
   $query_edit->execute();
 
@@ -312,7 +396,7 @@ $app->post('/asset/edit/{id}/accept', function ($request, $response, $args) {
 
   $query_status->bindValue(':edit_id', (int) $args['id'], PDO::PARAM_INT);
   $query_status->bindValue(':status', (int) $this->constants['edit_status']['accepted'], PDO::PARAM_INT);
-  $query_status->bindValue(':reason', "");
+  $query_status->bindValue(':reason', '');
 
   $query_status->execute();
   $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_status);
@@ -361,19 +445,24 @@ $app->post('/asset/edit/{id}/accept', function ($request, $response, $args) {
 
     $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_update_id);
     if($error) return $response;
+    $query_update_id->closeCursor();
   }
 
+  $previews_processed = [];
   foreach($asset_edit_previews as $i => $preview) {
-    if(!isset($preview['edit_preview_id']) || $preview['edit_preview_id'] == null) continue;
+    if(!isset($preview['edit_preview_id']) || $preview['edit_preview_id'] == null || isset($previews_processed[$preview['edit_preview_id']])) {
+      continue;
+    }
+    $previews_processed[$preview['edit_preview_id']] = true;
     $operation = $this->constants['edit_preview_operation'][$preview['operation']];
     $query_apply_preview = $this->queries['asset']['apply_preview_edit_' . $operation];
 
     if($operation == 'insert') {
-      $query_apply_preview->bindValue(':asset_id', (int) $asset_edit['asset_id']);
+      $query_apply_preview->bindValue(':asset_id', (int) $preview['asset_id']);
     }
 
     if($operation == 'remove' || $operation == 'update') {
-      $query_apply_preview->bindValue(':preview_id', (int) $asset_edit['preview_id']);
+      $query_apply_preview->bindValue(':preview_id', (int) $preview['preview_id']);
     }
 
     if($operation == 'insert' || $operation == 'update') {
@@ -398,7 +487,7 @@ $app->post('/asset/edit/{id}/accept', function ($request, $response, $args) {
 });
 
 // Review an edit
-$app->post('/asset/edit/{id}/review', function ($request, $response, $args) {
+$app->post('/asset/edit/{id:[0-9]+}/review', function ($request, $response, $args) {
   $body = $request->getParsedBody();
 
   $error = $this->utils->ensure_logged_in(false, $response, $body, $user_id);
@@ -427,7 +516,7 @@ $app->post('/asset/edit/{id}/review', function ($request, $response, $args) {
 
   $query->bindValue(':edit_id', (int) $args['id'], PDO::PARAM_INT);
   $query->bindValue(':status', (int) $this->constants['edit_status']['in_review'], PDO::PARAM_INT);
-  $query->bindValue(':reason', "");
+  $query->bindValue(':reason', '');
 
   $query->execute();
 
@@ -442,7 +531,7 @@ $app->post('/asset/edit/{id}/review', function ($request, $response, $args) {
 
 
 // Reject an edit
-$app->post('/asset/edit/{id}/reject', function ($request, $response, $args) {
+$app->post('/asset/edit/{id:[0-9]+}/reject', function ($request, $response, $args) {
   $body = $request->getParsedBody();
 
   $error = $this->utils->ensure_logged_in(false, $response, $body, $user_id);

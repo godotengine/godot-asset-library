@@ -1,0 +1,30 @@
+<?php include("_header.phtml") ?>
+<?php foreach($data['events'] as $i => $event) { ?>
+  <div class="media"> <!-- TODO: Get real feed from @alketii -->
+    <div class="media-left">
+
+      <i class="glyphicon glyphicon-<?php echo [
+        'new' => 'unchecked',
+        'in_review' => 'check',
+        'rejected' => 'remove',
+        'accepted' => 'ok'][$event['status']]
+      ?> text-<?php
+        echo ['new' => 'default', 'in_review' => 'primary', 'rejected' => 'danger', 'accepted' => 'success'][$event['status']]
+      ?>" style="font-size:30px"></i>
+      <!-- <a href="<?php echo $basepath . '/asset/edit/' . $event['edit_id'] ?>">
+        <img class="media-object" src="<?php echo htmlspecialchars($event['icon_url']) ?>" alt="<?php echo htmlspecialchars($event['title']) ?>'s icon" width=80 height=80>
+      </a> -->
+    </div>
+    <div class="media-body">
+      <h4 class="media-heading">
+        <span><?php echo ($event['asset_id'] == -1 ? "Create " : "Edit ") ?></span>
+        <a href="<?php echo $basepath . '/asset/edit/' . $event['edit_id'] ?>"><?php echo '"' . htmlspecialchars($event['title']) . '"' ?></a>
+        <span class="label label-<?php
+        echo ['new' => 'info', 'in_review' => 'primary', 'rejected' => 'danger', 'accepted' => 'success'][$event['status']]
+        ?>"><?php echo ucfirst(str_replace('_', ' ', $event['status'])) ?></span>
+      </h4>
+      <?php if($event['reason']) echo 'Reason: ' . $event['reason'] ?>
+    </div>
+  </div>
+<?php } ?>
+<?php include("_footer.phtml") ?>

@@ -8,6 +8,11 @@ return [
     'set_session_token' => 'UPDATE `as_users` SET session_token = :session_token WHERE user_id = :id',
     'register' => 'INSERT INTO `as_users` SET username = :username, email = :email, password_hash = :password_hash',
     'change_password' => 'INSERT INTO `as_users` SET username = :username, password_hash = :password_hash',
+    'list_edit_events' => 'SELECT edit_id, asset_id, title, category, version_string, icon_url, status, reason FROM `as_asset_edits`
+      LEFT JOIN `as_categories` USING (category_id)
+      WHERE user_id = :user_id
+      ORDER BY modify_date DESC
+      LIMIT :page_size OFFSET :skip_count',
   ],
   'category' => [
     'list' => 'SELECT category_id as id, category as name FROM `as_categories` WHERE category_type LIKE :category_type ORDER BY category_id',
@@ -50,7 +55,7 @@ return [
     'search_count' => 'SELECT count(*) as count FROM `as_assets`
       LEFT JOIN `as_users` USING (user_id)
       LEFT JOIN `as_categories` USING (category_id)
-      WHERE searchable = TRUE AND category_id LIKE :category AND category_type = :category_type
+      WHERE searchable = TRUE AND category_id LIKE :category AND category_type LIKE :category_type
       AND support_level RLIKE :support_levels_regex
       AND (
         title LIKE :filter
@@ -95,8 +100,9 @@ return [
       cost, download_url, browse_url, icon_url, status,
       edit_preview_id, `as_asset_previews`.preview_id, `as_asset_edit_previews`.type, `as_asset_edit_previews`.link, `as_asset_edit_previews`.thumbnail, `as_asset_edit_previews`.operation,
       `as_asset_previews`.type AS orig_type, `as_asset_previews`.link AS orig_link, `as_asset_previews`.thumbnail AS orig_thumbnail,
-      unedited_previews.preview_id AS unedited_preview_id, unedited_previews.type AS unedited_type, unedited_previews.link AS unedited_link, unedited_previews.thumbnail AS unedited_thumbnail
+      unedited_previews.preview_id AS unedited_preview_id, unedited_previews.type AS unedited_type, unedited_previews.link AS unedited_link, unedited_previews.thumbnail AS unedited_thumbnail, username AS author
       FROM `as_asset_edits`
+      LEFT JOIN `as_users` USING (user_id)
       LEFT JOIN `as_asset_edit_previews` USING (edit_id)
       LEFT JOIN `as_asset_previews` USING (preview_id)
       LEFT JOIN `as_asset_previews` AS unedited_previews ON `as_asset_edits`.asset_id = unedited_previews.asset_id
@@ -105,6 +111,32 @@ return [
     'get_one_bare' => 'SELECT * FROM `as_asset_edits` WHERE edit_id=:edit_id',
     'get_one_with_status' => 'SELECT * FROM `as_asset_edits` WHERE edit_id=:edit_id AND status=:status',
     'get_editable_by_asset_id' => 'SELECT * FROM `as_asset_edits` WHERE asset_id=:asset_id AND status=0',
+
+    'search' => 'SELECT `as_asset_edits`.edit_id, `as_asset_edits`.asset_id, `as_asset_edits`.user_id, `as_asset_edits`.title, `as_asset_edits`.description, category, `as_asset_edits`.version_string, `as_asset_edits`.cost, `as_asset_edits`.download_url, `as_asset_edits`.browse_url, `as_asset_edits`.icon_url, `as_assets`.support_level, status, username AS author FROM `as_asset_edits`
+      LEFT JOIN `as_users` USING (user_id)
+      LEFT JOIN `as_categories` USING (category_id)
+      LEFT JOIN `as_assets` USING (asset_id)
+      WHERE
+        status RLIKE :statuses_regex
+        AND asset_id LIKE :asset_id
+        AND (
+          `as_asset_edits`.title LIKE :filter
+          OR `as_assets`.title LIKE :filter
+          OR username LIKE :filter
+        )
+      ORDER BY `as_asset_edits`.modify_date DESC
+      LIMIT :page_size OFFSET :skip_count',
+
+    'search_count' => 'SELECT count(*) AS count FROM `as_asset_edits`
+      LEFT JOIN `as_users` USING (user_id)
+      WHERE
+        status RLIKE :statuses_regex
+        AND asset_id LIKE :asset_id
+        AND (
+          title LIKE :filter
+          OR username LIKE :filter
+        )
+      ',
 
     'submit' => 'INSERT INTO `as_asset_edits`
       SET asset_id=:asset_id, user_id=:user_id, title=:title, description=:description, category_id=:category_id, version_string=:version_string,

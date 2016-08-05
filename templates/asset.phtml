@@ -35,6 +35,9 @@
           <i class="glyphicon glyphicon-pencil"></i> Edit
         </a>
       <?php } ?>
+      <a class="btn btn-warning" href="<?php echo $basepath ?>/asset/edit?asset=<?php echo $data['asset_id'] ?>&amp;status=accepted+rejected">
+        <i class="glyphicon glyphicon-list"></i> Recent Edits
+      </a>
     </p>
     <p class="text-muted">Sha256 Hash: <code><?php echo $data['download_hash'] ?></code></p>
     <hr/>

@@ -47,12 +47,12 @@
         </ul>
         <ul class="nav navbar-nav navbar-right">
 
-          <?php make_nav_link('Feed', 'feed') ?>
+          <?php make_nav_link('Feed', 'user/feed') ?>
           <?php make_nav_link('My Assets') ?>
 
           <?php if(isset($user)) { ?>
             <?php if($user['type'] >= 100) { ?>
-              <?php make_nav_link('Moderate') ?>
+              <?php make_nav_link('Moderate', 'asset/edit') ?>
             <?php } ?>
             <li class="seperator"></li>
             <?php make_nav_link('Submit Asset', 'asset/submit') ?>

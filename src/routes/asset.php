@@ -2,18 +2,22 @@
 // Asset routes
 
 // Searches through the list of assets
-$app->get('/asset', function ($request, $response, $args) {
+$app->get('/asset', function ($request, $response, $args) { global $frontend;
   $params = $request->getQueryParams();
 
   $category = '%';
-  $category_type = $this->constants['category_type']['addon'];
+  if(isset($frontend) && $frontend) {
+    $category_type = $this->constants['category_type']['any'];
+  } else {
+    $category_type = $this->constants['category_type']['addon'];
+  }
   $filter = '%';
   $order_column = 'rating';
   $order_direction = 'desc';
+  $support_levels = [];
   $page_size = 10;
   $max_page_size = 500;
   $page_offset = 0;
-  $support_levels = [];
   if(isset($params['category'])) {
     $category = (int) $params['category'];
   }
@@ -78,7 +82,7 @@ $app->get('/asset', function ($request, $response, $args) {
   $query_count->bindValue(':category', $category, PDO::PARAM_INT);
   $query_count->bindValue(':category_type', $category_type, PDO::PARAM_INT);
   $query_count->bindValue(':support_levels_regex', $support_levels);
-  $query_count->bindValue(':filter', $filter, PDO::PARAM_INT);
+  $query_count->bindValue(':filter', $filter);
   $query_count->execute();
 
   $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_count);
@@ -158,13 +162,13 @@ $get_asset = function ($request, $response, $args) {
   return $response->withJson($asset_info, 200);
 };
 // Binding to multiple routes
-$app->get('/asset/{id}', $get_asset);
+$app->get('/asset/{id:[0-9]+}', $get_asset);
 if(isset($frontend) && $frontend) {
-  $app->get('/asset/{id}/edit', $get_asset);
+  $app->get('/asset/{id:[0-9]+}/edit', $get_asset);
 }
 
 // Change support level of an asset
-$app->post('/asset/{id}/support_level', function ($request, $response, $args) {
+$app->post('/asset/{id:[0-9]+}/support_level', function ($request, $response, $args) {
   $body = $request->getParsedBody();
 
   $error = $this->utils->ensure_logged_in(false, $response, $body, $user_id);

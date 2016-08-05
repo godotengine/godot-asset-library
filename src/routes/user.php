@@ -1,0 +1,48 @@
+<?php
+
+// Feed
+$get_feed = function ($request, $response, $args) {
+  $body = $request->getParsedBody();
+
+  $error = $this->utils->ensure_logged_in(false, $response, $body, $user_id);
+  if($error) return $response;
+
+  $page_size = 40;
+  $max_page_size = 500;
+  $page_offset = 0;
+  if(isset($params['max_results'])) {
+    $page_size = min(abs((int) $params['max_results']), $max_page_size);
+  }
+  if(isset($params['page'])) {
+    $page_offset = abs((int) $params['page']) * $page_size;
+  } elseif(isset($params['offset'])) {
+    $page_offset = abs((int) $params['offset']);
+  }
+
+  $query = $this->queries['user']['list_edit_events'];
+  $query->bindValue(':user_id', (int) $user_id, PDO::PARAM_INT);
+  $query->bindValue(':page_size', $page_size, PDO::PARAM_INT);
+  $query->bindValue(':skip_count', $page_offset, PDO::PARAM_INT);
+  $query->execute();
+
+  $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
+  if($error) return $response;
+
+  $events = $query->fetchAll();
+
+  $context = $this;
+  $events = array_map(function($event) use($context) {
+    $event['status'] = $context->constants['edit_status'][(int) $event['status']];
+    return $event;
+  }, $events);
+
+  return $response->withJson([
+    'events' => $events,
+  ], 200);
+};
+
+// Binding to multiple routes
+$app->post('/user/feed', $get_feed);
+if(isset($frontend) && $frontend) {
+	$app->get('/user/feed', $get_feed);
+}
