@@ -12,6 +12,7 @@ $app->get('/asset', function ($request, $response, $args) { global $frontend;
     $category_type = $this->constants['category_type']['addon'];
   }
   $filter = '%';
+  $username = '%';
   $order_column = 'rating';
   $order_direction = 'desc';
   $support_levels = [];
@@ -34,6 +35,9 @@ $app->get('/asset', function ($request, $response, $args) { global $frontend;
   }
   if(isset($params['filter'])) {
     $filter = '%'.preg_replace('/[[:punct:]]+/', '%', $params['filter']).'%';
+  }
+  if(isset($params['user'])) {
+    $username = $params['user'];
   }
   if(isset($params['max_results'])) {
     $page_size = min(abs((int) $params['max_results']), $max_page_size);
@@ -69,6 +73,7 @@ $app->get('/asset', function ($request, $response, $args) { global $frontend;
   $query->bindValue(':category_type', $category_type, PDO::PARAM_INT);
   $query->bindValue(':support_levels_regex', $support_levels);
   $query->bindValue(':filter', $filter);
+  $query->bindValue(':username', $username);
   $query->bindValue(':order', $order_column);
   $query->bindValue(':order_direction', $order_direction);
   $query->bindValue(':page_size', $page_size, PDO::PARAM_INT);
@@ -83,6 +88,7 @@ $app->get('/asset', function ($request, $response, $args) { global $frontend;
   $query_count->bindValue(':category_type', $category_type, PDO::PARAM_INT);
   $query_count->bindValue(':support_levels_regex', $support_levels);
   $query_count->bindValue(':filter', $filter);
+  $query_count->bindValue(':username', $username);
   $query_count->execute();
 
   $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_count);

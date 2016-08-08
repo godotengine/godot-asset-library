@@ -31,7 +31,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="#">Godot Asset Library</a>
+        <a class="navbar-brand" href="/asset-library/frontend">Godot Asset Library</a>
       </div>
 
       <?php global $gPaths; $gPaths = [$basepath, $path]; function make_nav_link($name, $link='#') { global $gPaths; ?>
@@ -46,11 +46,9 @@
           <?php make_nav_link('Assets', 'asset') ?>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-
-          <?php make_nav_link('Feed', 'user/feed') ?>
-          <?php make_nav_link('My Assets') ?>
-
           <?php if(isset($user)) { ?>
+            <?php make_nav_link('Feed', 'user/feed') ?>
+            <?php make_nav_link('My Assets', 'asset?user=' . htmlspecialchars(urlencode($user['username']))) ?>
             <?php if($user['type'] >= 100) { ?>
               <?php make_nav_link('Moderate', 'asset/edit') ?>
             <?php } ?>
