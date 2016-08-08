@@ -1,5 +1,5 @@
 <?php include("_header.phtml") ?>
-<?php $_asset_values = $data ?>
+<?php $_asset_values = array_merge($data['original'], array_filter($data, function($value){return $value !== null;})) ?>
 <form class="form-horizontal" action="<?php echo $basepath ?>/asset/edit/<?php echo $data['edit_id']; ?>" method="post">
 		<fieldset>
 				<!-- Form Name -->

@@ -5,9 +5,22 @@ function _submit_asset_edit($c, $response, $body, $user_id, $asset_id=-1) {
   $query = $c->queries['asset_edit']['submit'];
   $query->bindValue(':user_id', $user_id, PDO::PARAM_INT);
   $query->bindValue(':asset_id', $asset_id, PDO::PARAM_INT);
+  if($asset_id == -1) {
+    $error = _insert_asset_edit_fields($c, false, $response, $query, $body, true);
+    if($error) return $response;
+  } else {
+    $query_asset = $this->queries['asset']['get_one_bare'];
+    $query_asset->bindValue(':asset_id', (int) $args['id'], PDO::PARAM_INT);
+    $query_asset->execute();
 
-  $error = _insert_asset_edit_fields($c, false, $response, $query, $body, $asset_id==-1);
-  if($error) return $response;
+    $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_asset);
+    if($error) return $response;
+
+    $asset = $query_asset->fetchAll()[0];
+
+    $error = _insert_asset_edit_fields($c, false, $response, $query, $body, false, $asset);
+    if($error) return $response;
+  }
 
   $query->execute();
   $error = $c->utils->error_reponse_if_query_bad(false, $response, $query);
@@ -26,12 +39,12 @@ function _submit_asset_edit($c, $response, $body, $user_id, $asset_id=-1) {
   ], 200);
 }
 
-function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $required=false) {
+function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $required=false, $bare_asset=null) {
   if($error) return true;
 
   foreach ($c->constants['asset_edit_fields'] as $i => $field) {
     if(!$required) {
-      if(isset($body[$field])) {
+      if(isset($body[$field]) && ($bare_asset === null || $bare_asset[$field] != $body[$field])) {
         $query->bindValue(':' . $field, $body[$field]);
       } else {
         $query->bindValue(':' . $field, null, PDO::PARAM_NULL);
@@ -237,7 +250,7 @@ $get_edit = function ($request, $response, $args) {
         } else {
           $asset_edit[$column] = $value;
         }
-      } elseif($column!=='edit_preview_id' && $column!=='preview_id' && $column!=='type' && $column!=='link' && $column!=='thumbnail' && $column!=='operation') {
+      } elseif($column!=='edit_preview_id' && $column!=='preview_id' && $column!=='type' && $column!=='link' && $column!=='thumbnail' && $column!=='operation' && $column!=='orig_type' && $column!=='orig_link' && $column!=='orig_thumbnail') {
         $asset_edit[$column] = $value;
       }
     }
@@ -345,7 +358,16 @@ $app->post('/asset/edit/{id:[0-9]+}', function ($request, $response, $args) {
   $query = $this->queries['asset_edit']['update'];
   $query->bindValue(':edit_id', (int) $args['id'], PDO::PARAM_INT);
 
-  $error = _insert_asset_edit_fields($this, false, $response, $query, $body, false);
+  $query_asset = $this->queries['asset']['get_one_bare'];
+  $query_asset->bindValue(':asset_id', (int) $asset_edit['asset_id'], PDO::PARAM_INT);
+  $query_asset->execute();
+
+  $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_asset);
+  if($error) return $response;
+
+  $asset = $query_asset->fetchAll()[0];
+
+  $error = _insert_asset_edit_fields($this, false, $response, $query, $body, false, $asset);
   if($error) return $response;
 
   $query->execute();
@@ -371,7 +393,6 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
   $error = $this->utils->ensure_logged_in(false, $response, $body, $user_id);
   $error = $this->utils->get_user_for_id($error, $response, $user_id, $user);
   $error = $this->utils->error_reponse_if_not_user_has_level($error, $response, $user, 'moderator');
-  $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'hash');
   if($error) return $response;
 
   // Get the edit
@@ -424,8 +445,14 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
       $query->bindValue(':' . $field, null, PDO::PARAM_NULL);
     }
   }
-  $query->bindValue(':update_version', (int) $update_version, PDO::PARAM_INT);
-  $query->bindValue(':download_hash', $body['hash']);
+  if($update_version) {
+    $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'hash');
+    $query->bindValue(':update_version', 1, PDO::PARAM_INT);
+    $query->bindValue(':download_hash', $body['hash']);
+  } else {
+    $query->bindValue(':update_version', 0, PDO::PARAM_INT);
+    $query->bindValue(':download_hash', null, PDO::PARAM_NULL);
+  }
 
   // Run
   $query->execute();

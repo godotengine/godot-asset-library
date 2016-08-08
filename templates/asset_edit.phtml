@@ -65,7 +65,7 @@ $preview_field_names = [
         <td>
           <?php echo $name ?>
         </td>
-        <?php if(isset($data['original']) && ($data[$field] == null || $data[$field] == $data['original'][$field])) { ?>
+        <?php if(isset($data['original']) && $data[$field] == null) { ?>
 
           <td colspan="2" class="text-center active">
             <?php output_field($data['original'][$field], $field, $categories) ?>
