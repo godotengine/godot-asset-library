@@ -6,7 +6,7 @@
 return [
     'settings' => [
         'db' => [
-            'dsn'   => 'mysql:dbname=addonlib;host=127.0.0.1',
+            'dsn'   => 'mysql:dbname=asset-library;host=127.0.0.1',
             'user'  => 'user',
             'pass'  => 'password',
         ],
