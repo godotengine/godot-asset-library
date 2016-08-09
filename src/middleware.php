@@ -48,7 +48,7 @@ if(isset($frontend) && $frontend) {
 
     if(isset($result['url'])) {
       $response = new \Slim\Http\Response(303);
-      $response = $response->withHeader('Location', dirname($request->getUri()->getBasePath()) . '/frontend/' . $result['url']);
+      $response = $response->withHeader('Location', $request->getUri()->getBasePath() . '/' . $result['url']);
     } else {
       $template_names = [
         //'/configure' => 'configure',
@@ -77,8 +77,8 @@ if(isset($frontend) && $frontend) {
         $errorResponse = new \Slim\Http\Response();
         $params = [
           'data' => $result,
-          'basepath' => dirname($request->getUri()->getBasePath()) . '/frontend',
-          'bowerpath' => dirname($request->getUri()->getBasePath()) . '/bower_components',
+          'basepath' => $request->getUri()->getBasePath(). '',
+          'bowerpath' => $request->getUri()->getBasePath() . '/bower_components',
           'path' => $path,
           'params' => $request->getQueryParams(),
           'categories' => [], // Filled later

@@ -1,5 +1,5 @@
 vendor/**
-logs/**
+logs/**/*.log
 src/settings-local.php
 
 **/bower_components/**

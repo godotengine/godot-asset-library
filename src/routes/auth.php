@@ -3,7 +3,7 @@
 
 
 // Initializes the connection by sending all categories available
-$app->get('/configure', function ($request, $response, $args) {
+$app->get('/configure', function ($request, $response, $args) { global $frontend;
   $params = $request->getQueryParams();
 
   $category_type = $this->constants['category_type']['addon'];
@@ -28,7 +28,9 @@ $app->get('/configure', function ($request, $response, $args) {
     return $response->withJson([
       'categories' => $query->fetchAll(),
       'token' => $token,
-      'login_url' => $_SERVER['HTTP_HOST'] . dirname($request->getUri()->getBasePath()) . 'frontend/login#' . urlencode($token),
+      'login_url' => $_SERVER['HTTP_HOST'] .
+        (isset($frontend) && $frontend ? dirname($request->getUri()->getBasePath()) : $request->getUri()->getBasePath()) .
+        '/login#' . urlencode($token),
       // ^ TODO: Make those routes actually work
     ], 200);
 
