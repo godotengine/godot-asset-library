@@ -9,11 +9,11 @@ function _submit_asset_edit($c, $response, $body, $user_id, $asset_id=-1) {
     $error = _insert_asset_edit_fields($c, false, $response, $query, $body, true);
     if($error) return $response;
   } else {
-    $query_asset = $this->queries['asset']['get_one_bare'];
-    $query_asset->bindValue(':asset_id', (int) $args['id'], PDO::PARAM_INT);
+    $query_asset = $c->queries['asset']['get_one_bare'];
+    $query_asset->bindValue(':asset_id', (int) $asset_id, PDO::PARAM_INT);
     $query_asset->execute();
 
-    $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_asset);
+    $error = $c->utils->error_reponse_if_query_bad(false, $response, $query_asset);
     if($error) return $response;
 
     $asset = $query_asset->fetchAll()[0];
@@ -45,6 +45,8 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
   foreach ($c->constants['asset_edit_fields'] as $i => $field) {
     if(!$required) {
       if(isset($body[$field]) && ($bare_asset === null || $bare_asset[$field] != $body[$field])) {
+        $query->bindValue(':' . $field, $body[$field]);
+      } elseif(!isset($body[$field]) && $bare_asset !== null) {
         $query->bindValue(':' . $field, $body[$field]);
       } else {
         $query->bindValue(':' . $field, null, PDO::PARAM_NULL);
