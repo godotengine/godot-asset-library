@@ -20,7 +20,7 @@
 
     <p class="text-muted">Submitted by user <?php echo htmlspecialchars($data['author']) ?>; <?php echo htmlspecialchars($data['cost']) ?></p>
     <p>
-      <?php echo $data['description'] ?>
+      <?php echo nl2br(htmlspecialchars($data['description']), false) ?>
     </p>
     <hr/>
     <p>
