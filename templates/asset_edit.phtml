@@ -49,7 +49,7 @@ $preview_field_names = [
   </span>
 </h1>
 
-<?php if(isset($user) && $data['user_id'] == $user['id'] && $data['status'] == 'new') { ?>
+<?php if(isset($user) && $data['user_id'] == $user['user_id'] && $data['status'] == 'new') { ?>
   <div class="form-group">
     <a class="btn btn-success" href="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>/edit">Revise</a>
   </div>

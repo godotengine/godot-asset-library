@@ -177,8 +177,7 @@ if(isset($frontend) && $frontend) {
 $app->post('/asset/{id:[0-9]+}/support_level', function ($request, $response, $args) {
   $body = $request->getParsedBody();
 
-  $error = $this->utils->ensure_logged_in(false, $response, $body, $user_id);
-  $error = $this->utils->get_user_for_id($error, $response, $user_id, $user);
+  $error = $this->utils->ensure_logged_in(false, $response, $body, $user);
   $error = $this->utils->error_reponse_if_not_user_has_level($error, $response, $user, 'moderator');
   $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'support_level');
   if($error) return $response;

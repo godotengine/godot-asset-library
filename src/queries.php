@@ -2,9 +2,9 @@
 
 return [
   'user' => [
-    'get_one' => 'SELECT user_id as id, username, email, password_hash, type FROM `as_users` WHERE user_id = :id',
-    'get_by_username' => 'SELECT user_id as id, username, email, password_hash, type FROM `as_users` WHERE username = :username',
-    'get_by_session_token' => 'SELECT user_id as id, username, email, password_hash, type FROM `as_users` WHERE session_token = :session_token',
+    'get_one' => 'SELECT user_id, username, email, password_hash, type FROM `as_users` WHERE user_id = :id',
+    'get_by_username' => 'SELECT user_id, username, email, password_hash, type FROM `as_users` WHERE username = :username',
+    'get_by_session_token' => 'SELECT user_id, username, email, password_hash, type FROM `as_users` WHERE session_token = :session_token',
     'set_session_token' => 'UPDATE `as_users` SET session_token = :session_token WHERE user_id = :id',
     'register' => 'INSERT INTO `as_users` SET username = :username, email = :email, password_hash = :password_hash',
     'change_password' => 'INSERT INTO `as_users` SET username = :username, password_hash = :password_hash',

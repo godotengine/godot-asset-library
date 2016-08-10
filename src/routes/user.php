@@ -4,7 +4,7 @@
 $get_feed = function ($request, $response, $args) {
   $body = $request->getParsedBody();
 
-  $error = $this->utils->ensure_logged_in(false, $response, $body, $user_id);
+  $error = $this->utils->ensure_logged_in(false, $response, $body, $user);
   if($error) return $response;
 
   $page_size = 40;
@@ -20,7 +20,7 @@ $get_feed = function ($request, $response, $args) {
   }
 
   $query = $this->queries['user']['list_edit_events'];
-  $query->bindValue(':user_id', (int) $user_id, PDO::PARAM_INT);
+  $query->bindValue(':user_id', (int) $user['user_id'], PDO::PARAM_INT);
   $query->bindValue(':page_size', $page_size, PDO::PARAM_INT);
   $query->bindValue(':skip_count', $page_offset, PDO::PARAM_INT);
   $query->execute();

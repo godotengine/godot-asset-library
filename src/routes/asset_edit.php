@@ -129,8 +129,7 @@ function _add_previews_to_edit($c, $error, &$response, $edit_id, $previews, $req
 $app->get('/asset/edit', function ($request, $response, $args) {
 
   // Enable if needed (for now, transparent to all) [Also change request to post]
-  // $error = $this->utils->ensure_logged_in(false, $response, $body, $user_id);
-  // $error = $this->utils->get_user_for_id($error, $response, $user_id, $user);
+  // $error = $this->utils->ensure_logged_in(false, $response, $body, $user);
   // $error = $this->utils->error_reponse_if_not_user_has_level($error, $response, $user, 'moderator');
   // if($error) return $response;
 
@@ -292,10 +291,10 @@ if(isset($frontend) && $frontend) {
 $app->post('/asset', function ($request, $response, $args) {
   $body = $request->getParsedBody();
 
-  $error = $this->utils->ensure_logged_in(false, $response, $body, $user_id);
+  $error = $this->utils->ensure_logged_in(false, $response, $body, $user);
   if($error) return $response;
 
-  return _submit_asset_edit($this, $response, $body, $user_id, -1);
+  return _submit_asset_edit($this, $response, $body, $user['user_id'], -1);
 });
 
 
@@ -303,7 +302,7 @@ $app->post('/asset', function ($request, $response, $args) {
 $app->post('/asset/{id:[0-9]+}', function ($request, $response, $args) {
   $body = $request->getParsedBody();
 
-  $error = $this->utils->ensure_logged_in(false, $response, $body, $user_id);
+  $error = $this->utils->ensure_logged_in(false, $response, $body, $user);
   if($error) return $response;
 
   // Ensure the author is editing the asset
@@ -316,13 +315,12 @@ $app->post('/asset/{id:[0-9]+}', function ($request, $response, $args) {
 
   $asset = $query_asset->fetchAll()[0];
 
-  if((int) $asset['user_id'] !== (int) $user_id) {
-    return $response->withJson([
-      'error' => 'You are not authorized to update this asset',
-    ], 403);
+  if((int) $asset['user_id'] !== (int) $user['user_id']) {
+    $error = $this->utils->error_reponse_if_not_user_has_level($error, $response, $user, 'editor', 'You are not authorized to update this asset');
+    if($error) return $response;
   }
 
-  return _submit_asset_edit($this, $response, $body, $user_id, (int) $args['id']);
+  return _submit_asset_edit($this, $response, $body, $user['user_id'], (int) $args['id']);
 });
 
 
@@ -330,7 +328,7 @@ $app->post('/asset/{id:[0-9]+}', function ($request, $response, $args) {
 $app->post('/asset/edit/{id:[0-9]+}', function ($request, $response, $args) {
   $body = $request->getParsedBody();
 
-  $error = $this->utils->ensure_logged_in(false, $response, $body, $user_id);
+  $error = $this->utils->ensure_logged_in(false, $response, $body, $user);
   if($error) return $response;
 
   // Fetch the edit to check the user id
@@ -344,7 +342,7 @@ $app->post('/asset/edit/{id:[0-9]+}', function ($request, $response, $args) {
 
   $asset_edit = $query_edit->fetchAll()[0];
 
-  if((int) $asset_edit['user_id'] !== (int) $user_id) {
+  if((int) $asset_edit['user_id'] !== (int) $user['user_id']) {
     return $response->withJson([
       'error' => 'You are not authorized to update this asset edit',
     ], 403);
@@ -392,8 +390,7 @@ $app->post('/asset/edit/{id:[0-9]+}', function ($request, $response, $args) {
 $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $args) {
   $body = $request->getParsedBody();
 
-  $error = $this->utils->ensure_logged_in(false, $response, $body, $user_id);
-  $error = $this->utils->get_user_for_id($error, $response, $user_id, $user);
+  $error = $this->utils->ensure_logged_in(false, $response, $body, $user);
   $error = $this->utils->error_reponse_if_not_user_has_level($error, $response, $user, 'moderator', 'You are not authorized to accept this asset edit');
   if($error) return $response;
 
@@ -414,18 +411,6 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
     ], 403);
   }
 
-  // Update the status to prevent race conditions
-  $query_status = $this->queries['asset_edit']['set_status_and_reason'];
-
-  $query_status->bindValue(':edit_id', (int) $args['id'], PDO::PARAM_INT);
-  $query_status->bindValue(':status', (int) $this->constants['edit_status']['accepted'], PDO::PARAM_INT);
-  $query_status->bindValue(':reason', '');
-
-  $query_status->execute();
-  $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_status);
-  $error = $this->utils->error_reponse_if_query_no_results(false, $response, $query_status); // Ensure that something was actually changed
-  if($error) return $response;
-
   // Start building the query
   $query = null;
 
@@ -442,11 +427,12 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
   foreach ($this->constants['asset_edit_fields'] as $i => $field) {
     if(isset($asset_edit[$field]) && $asset_edit[$field] !== null) {
       $query->bindValue(':' . $field, $asset_edit[$field]);
-      $update_version = $update_version || ($field === 'download_url' || $field === 'browse_url' || $field === 'version_string');
+      $update_version = $update_version || ($field === 'download_url' || $field === 'version_string');
     } else {
       $query->bindValue(':' . $field, null, PDO::PARAM_NULL);
     }
   }
+
   if($update_version) {
     $error = $this->utils->error_reponse_if_missing_or_not_string(false, $response, $body, 'hash');
     if($error) return $response;
@@ -458,6 +444,18 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
     $query->bindValue(':update_version', 0, PDO::PARAM_INT);
     $query->bindValue(':download_hash', null, PDO::PARAM_NULL);
   }
+
+  // Update the status to prevent race conditions
+  $query_status = $this->queries['asset_edit']['set_status_and_reason'];
+
+  $query_status->bindValue(':edit_id', (int) $args['id'], PDO::PARAM_INT);
+  $query_status->bindValue(':status', (int) $this->constants['edit_status']['accepted'], PDO::PARAM_INT);
+  $query_status->bindValue(':reason', '');
+
+  $query_status->execute();
+  $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_status);
+  $error = $this->utils->error_reponse_if_query_no_results(false, $response, $query_status); // Important: Ensure that something was actually changed
+  if($error) return $response;
 
   // Run
   $query->execute();
@@ -522,8 +520,7 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
 $app->post('/asset/edit/{id:[0-9]+}/review', function ($request, $response, $args) {
   $body = $request->getParsedBody();
 
-  $error = $this->utils->ensure_logged_in(false, $response, $body, $user_id);
-  $error = $this->utils->get_user_for_id($error, $response, $user_id, $user);
+  $error = $this->utils->ensure_logged_in(false, $response, $body, $user);
   $error = $this->utils->error_reponse_if_not_user_has_level($error, $response, $user, 'moderator', 'You are not authorized to put in review this asset edit');
   if($error) return $response;
 
@@ -566,8 +563,7 @@ $app->post('/asset/edit/{id:[0-9]+}/review', function ($request, $response, $arg
 $app->post('/asset/edit/{id:[0-9]+}/reject', function ($request, $response, $args) {
   $body = $request->getParsedBody();
 
-  $error = $this->utils->ensure_logged_in(false, $response, $body, $user_id);
-  $error = $this->utils->get_user_for_id($error, $response, $user_id, $user);
+  $error = $this->utils->ensure_logged_in(false, $response, $body, $user);
   $error = $this->utils->error_reponse_if_not_user_has_level($error, $response, $user, 'moderator', 'You are not authorized to reject this asset edit');
   $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'reason');
   if($error) return $response;

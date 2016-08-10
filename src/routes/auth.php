@@ -117,7 +117,7 @@ $app->post('/login', function ($request, $response, $args) {
   }
 
   $query_session = $this->queries['user']['set_session_token'];
-  $query_session->bindValue(':id', (int) $user['id'], PDO::PARAM_INT);
+  $query_session->bindValue(':id', (int) $user['user_id'], PDO::PARAM_INT);
   $query_session->bindValue(':session_token', $session_id);
   $query_session->execute();
   $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_session);

@@ -46,7 +46,8 @@ if(isset($frontend) && $frontend) {
     if($route) {
       $result = json_decode($response->getBody()->getContents(), true);
       if($result === null) {
-        $result = ['error' => 'Can\'t decode api response - ' . $response->getBody()->getContents()];
+        return $response;
+        //$result = ['error' => 'Can\'t decode api response - ' . $response->getBody()->getContents()];
       }
     } else {
       $result = [];
@@ -113,7 +114,10 @@ if(isset($frontend) && $frontend) {
         $error = $this->utils->error_reponse_if_query_bad(false, $errorResponse, $query_categories);
         $error = $this->utils->error_reponse_if_query_no_results($error, $errorResponse, $query_categories);
         if(!$error) {
-          $params['categories'] = $query_categories->fetchAll();
+          $categories = $query_categories->fetchAll();
+          foreach ($categories as $key => $value) {
+            $params['categories'][$value['id']] = $value;
+          }
         }
 
         $response = $this->renderer->render($response, $template_names[$queryUri] . '.phtml', $params);

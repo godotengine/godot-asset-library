@@ -33,6 +33,7 @@ return $constants = [
   ]),
   'user_type' => double_map([
     'normal' => 0,
+    'editor' => 25,
     'moderator' => 50,
     'admin' => 100,
   ]),
