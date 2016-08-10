@@ -3,27 +3,22 @@
   <div class="media"> <!-- TODO: Get real feed from @alketii -->
     <div class="media-left">
 
-      <i class="glyphicon glyphicon-<?php echo [
-        'new' => 'unchecked',
-        'in_review' => 'check',
-        'rejected' => 'remove',
-        'accepted' => 'ok'][$event['status']]
-      ?> text-<?php
-        echo ['new' => 'default', 'in_review' => 'primary', 'rejected' => 'danger', 'accepted' => 'success'][$event['status']]
+      <i class="glyphicon glyphicon-<?php echo raw([
+        'new' => 'unchecked text-default',
+        'in_review' => 'check text-primary',
+        'rejected' => 'remove text-danger',
+        'accepted' => 'ok text-success'][$event['status']])
       ?>" style="font-size:30px"></i>
-      <!-- <a href="<?php echo $basepath . '/asset/edit/' . $event['edit_id'] ?>">
-        <img class="media-object" src="<?php echo htmlspecialchars($event['icon_url']) ?>" alt="<?php echo htmlspecialchars($event['title']) ?>'s icon" width=80 height=80>
-      </a> -->
     </div>
     <div class="media-body">
       <h4 class="media-heading">
-        <span><?php echo ($event['asset_id'] == -1 ? "Create " : "Edit ") ?></span>
-        <a href="<?php echo $basepath . '/asset/edit/' . $event['edit_id'] ?>"><?php echo '"' . htmlspecialchars($event['title']) . '"' ?></a>
+        <span><?php echo ($event['asset_id'] == -1 ? 'Create ' : 'Edit ') ?></span>
+        <a href="<?php echo raw($basepath) . '/asset/edit/' . url($event['edit_id']) ?>">"<?php echo esc($event['title']) ?>"</a>
         <span class="label label-<?php
-        echo ['new' => 'info', 'in_review' => 'primary', 'rejected' => 'danger', 'accepted' => 'success'][$event['status']]
-        ?>"><?php echo ucfirst(str_replace('_', ' ', $event['status'])) ?></span>
+        echo raw(['new' => 'info', 'in_review' => 'primary', 'rejected' => 'danger', 'accepted' => 'success'][$event['status']])
+        ?>"><?php echo raw(ucfirst(str_replace('_', ' ', $event['status']))) ?></span>
       </h4>
-      <?php if($event['reason']) echo 'Reason: ' . $event['reason'] ?>
+      <?php if($event['reason']) echo 'Reason: ' . esc($event['reason']) ?>
     </div>
   </div>
 <?php } ?>

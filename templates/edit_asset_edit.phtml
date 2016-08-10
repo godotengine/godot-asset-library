@@ -4,12 +4,12 @@
 } else {
 	$_asset_values = $data;
 } ?>
-<form class="form-horizontal" action="<?php echo $basepath ?>/asset/edit/<?php echo $data['edit_id']; ?>" method="post">
+<form class="form-horizontal" action="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>" method="post">
 		<fieldset>
 				<!-- Form Name -->
 				<legend>
 					Revise edit
-					<a class="btn btn-default btn-sm" href="<?php echo $basepath ?>/asset/edit/<?php echo $data['edit_id'] ?>">
+					<a class="btn btn-default btn-sm" href="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>">
 						Back
 					</a>
 				</legend>
@@ -20,7 +20,7 @@
 						<label class="col-md-4 control-label" for="submit"></label>
 						<div class="col-md-4">
 								<button id="submit" class="btn btn-primary">Revise edit</button>
-								<a class="btn btn-default" href="<?php echo $basepath ?>/asset/edit/<?php echo $data['edit_id'] ?>">
+								<a class="btn btn-default" href="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>">
 									Cancel
 								</a>
 						</div>

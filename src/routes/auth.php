@@ -59,7 +59,7 @@ $app->post('/register', function ($request, $response, $args) {
 
   if($query_check->rowCount() > 0) {
     return $response->withJson([
-      'error' => 'Username already taken!',
+      'error' => 'Username already taken.',
     ], 409);
   }
 
@@ -93,7 +93,7 @@ $app->post('/login', function ($request, $response, $args) {
   $query->execute();
 
   $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
-  $error = $this->utils->error_reponse_if_query_no_results(false, $response, $query);
+  $error = $this->utils->error_reponse_if_query_no_results(false, $response, $query, 'No such username: ' . $body['username']);
   if($error) return $response;
 
   $user = $query->fetchAll()[0];
@@ -128,6 +128,7 @@ $app->post('/login', function ($request, $response, $args) {
   } else {
     return $response->withJson([
       'authenticated' => false,
+      'error' => 'Password doesn\'t match',
       'url' => 'login',
     ], 403);
   }

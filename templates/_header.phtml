@@ -1,3 +1,14 @@
+<?php // Utils
+  function esc($param) {
+    return htmlspecialchars($param);
+  }
+  function url($param) {
+    return htmlspecialchars(urlencode($param));
+  }
+  function raw($param) {
+    return $param;
+  }
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,7 +20,7 @@
   <title>Godot Asset Library</title>
 
   <!-- Bootstrap -->
-  <link href="<?php echo $bowerpath ?>/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="<?php echo raw($bowerpath) ?>/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -31,12 +42,13 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="<?php echo $basepath ?>">Godot Asset Library</a>
+        <a class="navbar-brand" href="<?php echo raw($basepath) ?>">Godot Asset Library</a>
       </div>
 
-      <?php global $gPaths; $gPaths = [$basepath, $path]; function make_nav_link($name, $link='#') { global $gPaths; ?>
+      <?php global $gPaths; $gPaths = [$basepath, $path];
+      function make_nav_link($name, $link='#') { global $gPaths; ?>
         <li <?php if($gPaths[1] == $link) echo 'class="active"' ?>>
-          <a href="<?php echo $gPaths[0] ?>/<?php echo $link ?>"><?php echo $name ?></a>
+          <a href="<?php echo raw($gPaths[0]) . '/' . raw($link) ?>"><?php echo esc($name) ?></a>
         </li>
       <?php } ?>
 
@@ -48,13 +60,13 @@
         <ul class="nav navbar-nav navbar-right">
           <?php if(isset($user)) { ?>
             <?php make_nav_link('Feed', 'user/feed') ?>
-            <?php make_nav_link('My Assets', 'asset?user=' . htmlspecialchars(urlencode($user['username']))) ?>
+            <?php make_nav_link('My Assets', 'asset?user=' . url($user['username'])) ?>
             <?php if($user['type'] >= 100) { ?>
               <?php make_nav_link('Moderate', 'asset/edit') ?>
             <?php } ?>
             <li class="seperator"></li>
             <?php make_nav_link('Submit Asset', 'asset/submit') ?>
-            <?php make_nav_link('Logout (' . $user['username'] . ')', 'logout') ?>
+            <?php make_nav_link('Logout (' . esc($user['username']) . ')', 'logout') ?>
           <?php } else { ?>
             <?php make_nav_link('Login/Register', 'login') ?>
           <?php } ?>

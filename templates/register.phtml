@@ -1,5 +1,14 @@
 <?php include("_header.phtml") ?>
-<form action="<?php echo $basepath ?>/register" method="post">
+
+<?php if(isset($user)): ?>
+  <div class="alert alert-info" role="alert">Your are already logged in as <?php echo esc($user['username']) ?></div>
+<?php endif ?>
+
+<?php if(isset($data['error'])): ?>
+  <div class="alert alert-danger" role="alert"><b>Error: </b> <?php echo esc($data['error']) ?></div>
+<?php endif ?>
+
+<form action="<?php echo raw($basepath) ?>/register" method="post">
   <div class="form-group">
     <label for="login-form-username">Username</label>
     <input type="text" name="username" class="form-control" id="login-form-username" placeholder="Username">
@@ -14,7 +23,7 @@
   </div>
   <div class="btn-group">
     <button type="submit" class="btn btn-primary">Register</button>
-    <a href="<?php echo $basepath ?>/login" class="btn btn-default">Login</a>
+    <a href="<?php echo raw($basepath) ?>/login" class="btn btn-default">Login</a>
   </div>
 </form>
 <?php include("_footer.phtml") ?>

@@ -1,56 +1,56 @@
 <?php include("_header.phtml") ?>
 <div class="media">
   <div class="media-left">
-    <img class="media-object" src="<?php echo htmlspecialchars($data['icon_url']) ?>" alt="<?php echo htmlspecialchars($data['title']) ?>'s icon" width="80" height="80">
+    <img class="media-object" src="<?php echo esc($data['icon_url']) ?>" alt="<?php echo esc($data['title']) ?>'s icon" width="80" height="80">
   </div>
   <div class="media-body">
     <h4 class="media-heading">
-      <?php echo htmlspecialchars($data['title']) ?>
-      <small><?php echo htmlspecialchars($data['version_string']) ?></small>
+      <?php echo esc($data['title']) ?>
+      <small><?php echo esc($data['version_string']) ?></small>
       <?php for ($star=1; $star <= 5; $star++) { ?>
         <i class="glyphicon glyphicon-star<?php if($data['rating'] < $star) echo '-empty'; ?>"></i>
       <?php } ?>
-      <span class="label label-primary"><?php echo htmlspecialchars($data['category']) ?></span>
-      <span class="label label-<?php echo htmlspecialchars([
+      <span class="label label-primary"><?php echo esc($data['category']) ?></span>
+      <span class="label label-<?php echo raw([
         'official' => 'success',
         'community' => 'info',
         'testing' => 'default',
-      ][$data['support_level']]) ?>"><?php echo htmlspecialchars(ucfirst($data['support_level'])) ?></span>
+      ][$data['support_level']]) ?>"><?php echo esc(ucfirst($data['support_level'])) ?></span>
     </h4>
 
-    <p class="text-muted">Submitted by user <?php echo htmlspecialchars($data['author']) ?>; <?php echo htmlspecialchars($data['cost']) ?></p>
+    <p class="text-muted">Submitted by user <?php echo esc($data['author']) ?>; <?php echo esc($data['cost']) ?></p>
     <p>
-      <?php echo nl2br(htmlspecialchars($data['description']), false) ?>
+      <?php echo nl2br(esc($data['description']), false) ?>
     </p>
     <hr/>
     <p>
-      <a class="btn btn-default" href="<?php echo $data['browse_url'] ?>">
+      <a class="btn btn-default" href="<?php echo esc($data['browse_url']) ?>">
         <i class="glyphicon glyphicon-folder-open"></i> View files
       </a>
-      <a class="btn btn-primary" href="<?php echo $data['download_url'] ?>">
+      <a class="btn btn-primary" href="<?php echo esc($data['download_url']) ?>">
         <i class="glyphicon glyphicon-download"></i> Download
       </a>
       <?php if(isset($user)) { ?>
-        <a class="btn btn-success" href="<?php echo $basepath ?>/asset/<?php echo $data['asset_id'] ?>/edit">
+        <a class="btn btn-success" href="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/edit">
           <i class="glyphicon glyphicon-pencil"></i> Edit
         </a>
       <?php } ?>
-      <a class="btn btn-warning" href="<?php echo $basepath ?>/asset/edit?asset=<?php echo $data['asset_id'] ?>&amp;status=accepted+rejected">
+      <a class="btn btn-warning" href="<?php echo raw($basepath) ?>/asset/edit?asset=<?php echo url($data['asset_id']) ?>&amp;status=accepted+rejected">
         <i class="glyphicon glyphicon-list"></i> Recent Edits
       </a>
     </p>
-    <p class="text-muted">Sha256 Hash: <code><?php echo $data['download_hash'] ?></code></p>
+    <p class="text-muted">Sha256 Hash: <code><?php echo esc($data['download_hash']) ?></code></p>
     <hr/>
   </div>
 </div>
 <div class="row">
   <?php foreach($data['previews'] as $key => $preview) { ?>
     <div class="col-xs-6 col-md-4 col-lg-3 text-center">
-      <a href="<?php echo $preview['link'] ?>" target="_blank" class="thumbnail">
+      <a href="<?php echo esc($preview['link']) ?>" target="_blank" class="thumbnail">
         <?php if($preview['type'] == 'image') { ?>
-          <img src="<?php echo $preview['link'] ?>" width="100%"/>
+          <img src="<?php echo esc($preview['link']) ?>" width="100%"/>
         <?php } else { ?>
-            <img src="<?php echo $preview['thumbnail'] ?>" width="100%"/>
+            <img src="<?php echo esc($preview['thumbnail']) ?>" width="100%"/>
             <div class="btn btn-primary btn-lg" style="position: absolute; top: 50%; left: 50%; transform:translate(-50%,-50%); opacity: 0.8;">
               <i class="glyphicon glyphicon-play" style="font-size:2em"></i>
             </div>

@@ -15,40 +15,47 @@ $preview_field_names = [
   'thumbnail' => 'Thumbnail',
 ]; ?>
 
-<?php function output_field($data, $name, $categories = []) { $data = htmlspecialchars($data);?>
+<?php function output_field($data, $name, $categories = []) { ?>
   <?php if (strpos($name, 'url') !== false || strpos($name, 'link') !== false || strpos($name, 'thumbnail') !== false) { ?>
-    <a href="<?php echo $data ?>"><?php echo $data ?></a>
+    <a href="<?php echo esc($data) ?>"><?php echo esc($data) ?></a>
     <?php if ($name == 'icon_url') { ?>
-      <br><img src="<?php echo $data ?>" width="80" height="80"></a>
+      <br><img src="<?php echo esc($data) ?>" width="80" height="80"></a>
     <?php }?>
     <?php if ($name == 'preview_link') { ?>
-      <br><img src="<?php echo $data ?>" style="max-height:80px"></a>
+      <br><img src="<?php echo esc($data) ?>" style="max-height:80px"></a>
     <?php }?>
     <?php if ($name == 'preview_thumbnail') { ?>
-      <br><img src="<?php echo $data ?>" style="max-height:345px"></a>
+      <br><img src="<?php echo esc($data) ?>" style="max-height:345px"></a>
     <?php }?>
   <?php } elseif($name == 'category_id') { ?>
-    <?php echo $categories[$data]['name'] ?>
+    <?php echo raw($categories[$data]['name']) ?>
+  <?php } elseif($name == 'description') { ?>
+    <?php echo nl2br(esc($data)) ?>
   <?php } else { ?>
-    <?php echo $data ?>
+    <?php echo esc($data) ?>
   <?php } ?>
 <?php } ?>
 
 <h1>
   <?php if(isset($data['original'])) { ?>
     Edit of asset
-    <a href="<?php echo $basepath ?>/asset/<?php echo $data['asset_id'] ?>">"<?php echo $data['original']['title'] ?>"</a>
+    <a href="<?php echo raw($basepath) ?>/asset/<?php echo raw($data['asset_id']) ?>">"<?php echo esc($data['original']['title']) ?>"</a>
   <?php } else { ?>
     Creation of asset
-    <a href="<?php echo $basepath ?>/asset/<?php echo $data['asset_id'] ?>">"<?php echo $data['title'] ?>"</a>
+    <a href="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>">"<?php echo esc($data['title']) ?>"</a>
   <?php } ?>
-  <span class="label label-<?php echo ['new' => 'info', 'in_review' => 'primary', 'rejected' => 'danger', 'accepted' => 'success'][$data['status']] ?>">
-    <?php echo ucfirst(str_replace('_', ' ', $data['status'])) ?>
+  <span class="label label-<?php echo raw(['new' => 'info', 'in_review' => 'primary', 'rejected' => 'danger', 'accepted' => 'success'][$data['status']]) ?>">
+    <?php echo raw(ucfirst(str_replace('_', ' ', $data['status']))) ?>
   </span>
 </h1>
 
 <?php if(isset($user) && $data['user_id'] == $user['id'] && $data['status'] == 'new') { ?>
-  <a class="btn btn-success" href="<?php echo $basepath ?>/asset/edit/<?php echo $data['edit_id'] ?>/edit">Revise</a>
+  <div class="form-group">
+    <a class="btn btn-success" href="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>/edit">Revise</a>
+  </div>
+  <div class="alert alert-info" role="alert">
+      This asset is currently pending approval by our moderators. <!--You will be notified by email when decision is made.-->
+  </div>
 <?php } ?>
 
 <table class="table table-bordered">
@@ -63,7 +70,7 @@ $preview_field_names = [
     <?php foreach($field_names as $field => $name) { ?>
       <tr>
         <td>
-          <?php echo $name ?>
+          <?php echo raw($name) ?>
         </td>
         <?php if(isset($data['original']) && $data[$field] == null) { ?>
 
@@ -97,7 +104,7 @@ $preview_field_names = [
       <?php foreach($preview_field_names as $field => $name) { ?>
         <tr>
           <td>
-            <?php echo $name ?>
+            <?php echo raw($name) ?>
           </td>
           <?php if(isset($preview['original']) && $preview['operation'] != "remove" && ($preview[$field] === null || $preview[$field] === $preview['original'][$field])) { ?>
 
@@ -136,11 +143,11 @@ $preview_field_names = [
 <?php if(isset($user)) { ?>
   <?php if($user['type'] >= 50) { ?>
     <?php if($data['status'] == 'new') { ?>
-      <form class="form-inline" action="<?php echo $basepath ?>/asset/edit/<?php echo $data['edit_id']; ?>/review" method="post">
+      <form class="form-inline" action="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>/review" method="post">
         <button type="submit" class="btn btn-primary">Put in queue</button>
       </form>
     <?php } elseif($data['status'] == 'in_review') { ?>
-      <form class="form-inline" action="<?php echo $basepath ?>/asset/edit/<?php echo $data['edit_id']; ?>/accept" method="post">
+      <form class="form-inline" action="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>/accept" method="post">
         <div class="form-group panel">
           <button type="submit" class="btn btn-success">Accept</button>
           <label class="control-label" for="hash">Hash:</label>
@@ -148,7 +155,7 @@ $preview_field_names = [
         </div>
       </form>
 
-      <form class="form-inline" action="<?php echo $basepath ?>/asset/edit/<?php echo $data['edit_id']; ?>/reject" method="post">
+      <form class="form-inline" action="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>/reject" method="post">
         <div class="form-group panel">
           <button type="submit" class="btn btn-danger">Reject</button>
           <label class="control-label" for="reason">Reason:</label>

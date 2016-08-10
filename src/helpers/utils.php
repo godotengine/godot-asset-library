@@ -43,13 +43,13 @@ class Utils
     return $currentStatus;
   }
 
-  public function error_reponse_if_not_user_has_level($currentStatus, &$response, $user, $required_level_name)
+  public function error_reponse_if_not_user_has_level($currentStatus, &$response, $user, $required_level_name, $message = 'You are not authorized to do this')
   {
     if($user === false || $currentStatus) return true;
 
     if((int) $user['type'] < $this->c->constants['user_type'][$required_level_name]) {
       $response = $response->withJson([
-        'error' => 'You are not authorized to accept this asset edit',
+        'error' => $message,
       ], 403);
       return true;
     }
@@ -69,28 +69,28 @@ class Utils
     return false;
   }
 
-  public function error_reponse_if_query_bad($currentStatus, &$response, $query)
+  public function error_reponse_if_query_bad($currentStatus, &$response, $query, $message = 'An error occured while executing DB queries')
   {
     if($currentStatus) return true;
 
     if($query->errorCode() != '00000') {
       $this->c->logger->error($query->errorCode(), $query->errorInfo());
       $response = $response->withJson([
-        'error' => 'An error occured while executing DB queries'
+        'error' => $message,
       ], 500);
       return true;
     }
     return false;
   }
 
-  public function error_reponse_if_query_no_results($currentStatus, &$response, $query)
+  public function error_reponse_if_query_no_results($currentStatus, &$response, $query, $message = 'DB returned no results')
   {
     if($currentStatus) return true;
 
     if($query->rowCount() == 0) {
       $response = $response->withJson([
-        'error' => 'DB returned no results'
-      ], 400);
+        'error' => $message
+      ], 404);
       return true;
     }
     return false;

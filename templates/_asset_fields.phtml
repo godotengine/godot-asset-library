@@ -16,7 +16,7 @@ $_asset_values = array_merge([
 <div class="form-group">
 		<label class="col-md-4 control-label" for="title">Asset Name</label>
 		<div class="col-md-5">
-				<input id="title" name="title" type="text" placeholder="Asset Name" class="form-control input-md" required="" value="<?php echo $_asset_values['title'] ?>">
+				<input id="title" name="title" type="text" placeholder="Asset Name" class="form-control input-md" required="" value="<?php echo esc($_asset_values['title']) ?>">
 				<span class="help-block">Set the name of your asset</span>
 		</div>
 </div>
@@ -26,8 +26,8 @@ $_asset_values = array_merge([
 		<div class="col-md-5">
 				<select id="category" name="category_id" class="form-control">
 						<?php foreach($categories as $key => $category) { ?>
-							<option value="<?php echo $category['id'] ?>" <?php if($category['id'] == $_asset_values['category_id']) echo 'selected=""'; ?>>
-								<?php echo $category['name'] ?>
+							<option value="<?php echo esc($category['id']) ?>" <?php if($category['id'] == $_asset_values['category_id']) echo 'selected=""'; ?>>
+								<?php echo esc($category['name']) ?>
 							</option>
 						<?php } ?>
 				</select>
@@ -37,7 +37,7 @@ $_asset_values = array_merge([
 <div class="form-group">
 		<label class="col-md-4 control-label" for="version">Version</label>
 		<div class="col-md-5">
-				<input id="version" name="version_string" type="text" placeholder="Version" class="form-control input-md" required="" value="<?php echo $_asset_values['version_string'] ?>">
+				<input id="version" name="version_string" type="text" placeholder="Version" class="form-control input-md" required="" value="<?php echo esc($_asset_values['version_string']) ?>">
 				<span class="help-block">Set the version of your asset</span>
 		</div>
 </div>
@@ -45,7 +45,7 @@ $_asset_values = array_merge([
 <div class="form-group">
 		<label class="col-md-4 control-label" for="download">Download URL</label>
 		<div class="col-md-5">
-				<input id="download" name="download_url" type="text" placeholder="Download URL" class="form-control input-md" required="" value="<?php echo $_asset_values['download_url'] ?>">
+				<input id="download" name="download_url" type="text" placeholder="Download URL" class="form-control input-md" required="" value="<?php echo esc($_asset_values['download_url']) ?>">
 				<span class="help-block">Set the url to download the asset (directly as a .zip). Should be similar to <code>https://github.com/&lt;user&gt;/&lt;project&gt;/archive/&lt;tag&gt;.zip</code></span>
 		</div>
 </div>
@@ -53,7 +53,7 @@ $_asset_values = array_merge([
 <div class="form-group">
 		<label class="col-md-4 control-label" for="browse">Browse URL</label>
 		<div class="col-md-5">
-				<input id="browse" name="browse_url" type="text" placeholder="Browse URL" class="form-control input-md" required="" value="<?php echo $_asset_values['browse_url'] ?>">
+				<input id="browse" name="browse_url" type="text" placeholder="Browse URL" class="form-control input-md" required="" value="<?php echo esc($_asset_values['browse_url']) ?>">
 				<span class="help-block">Set the url to browse the asset's files (webpage). Should be similar to <code>https://github.com/&lt;user&gt;/&lt;project&gt;/</code></span>
 		</div>
 </div>
@@ -61,7 +61,7 @@ $_asset_values = array_merge([
 <div class="form-group">
 		<label class="col-md-4 control-label" for="icon">Icon URL</label>
 		<div class="col-md-5">
-				<input id="icon" name="icon_url" type="text" placeholder="Icon URL" class="form-control input-md" required="" value="<?php echo $_asset_values['icon_url'] ?>">
+				<input id="icon" name="icon_url" type="text" placeholder="Icon URL" class="form-control input-md" required="" value="<?php echo esc($_asset_values['icon_url']) ?>">
 				<span class="help-block">Set the url to the asset's icon (png or jpg image)</span>
 		</div>
 </div>
@@ -72,8 +72,8 @@ $_asset_values = array_merge([
 				<select id="license" name="cost" class="form-control">
 					<?php $licenses = ['MIT' => 'MIT', 'GPLv3' => 'GPL v3', 'GPLv2' => 'GPL v2', 'CC0' => 'CC0'] ?>
 					<?php foreach($licenses as $id => $name) { ?>
-						<option value="<?php echo $id ?>" <?php if($id == $_asset_values['cost']) echo 'selected=""'; ?>>
-							<?php echo $name ?>
+						<option value="<?php echo raw($id) ?>" <?php if($id == $_asset_values['cost']) echo 'selected=""'; ?>>
+							<?php echo esc($name) ?>
 						</option>
 					<?php } ?>
 				</select>
@@ -83,7 +83,7 @@ $_asset_values = array_merge([
 <div class="form-group">
 		<label class="col-md-4 control-label" for="description">Description</label>
 		<div class="col-md-5">
-				<textarea class="form-control" id="description" name="description" rows="7"><?php echo htmlspecialchars($_asset_values['description']) ?></textarea>
+				<textarea class="form-control" id="description" name="description" rows="7"><?php echo esc($_asset_values['description']) ?></textarea>
 		</div>
 </div>
 
@@ -97,7 +97,7 @@ $_asset_values = array_merge([
 				<span class="panel-title">
 					<?php if($i < count($_asset_values['previews'])) {
 						if(isset($preview['edit_preview_id'])) {
-							echo 'Revise ' . $preview['operation'] . ' operation';
+							echo 'Revise ' . raw($preview['operation']) . ' operation';
 						} else {
 							echo 'Update original preview';
 						}
@@ -109,7 +109,7 @@ $_asset_values = array_merge([
 				<?php if($i < count($_asset_values['previews'])) { ?>
 					<?php if(isset($preview['edit_preview_id'])) { // Existing edit ?>
 
-						<input type="hidden" name="previews[<?php echo $i ?>][edit_preview_id]" value="<?php echo $preview['edit_preview_id'] ?>">
+						<input type="hidden" name="previews[<?php echo $i ?>][edit_preview_id]" value="<?php echo esc($preview['edit_preview_id']) ?>">
 						<input type="hidden" name="previews[<?php echo $i ?>][enabled]" value="true">
 						<label>
 							<input type="checkbox" name="previews[<?php echo $i ?>][remove]" value="true">
@@ -117,7 +117,7 @@ $_asset_values = array_merge([
 						</label>
 
 					<?php } else { // From base asset ?>
-						<input type="hidden" name="previews[<?php echo $i ?>][preview_id]" value="<?php echo $preview['preview_id'] ?>">
+						<input type="hidden" name="previews[<?php echo $i ?>][preview_id]" value="<?php echo esc($preview['preview_id']) ?>">
 						<label>
 							<input type="checkbox" name="previews[<?php echo $i ?>][enabled]" value="true">
 							Enable
@@ -149,8 +149,8 @@ $_asset_values = array_merge([
 							<select id="license" name="previews[<?php echo $i ?>][type]" class="form-control">
 								<?php $types = ['image' => 'Image', 'video' => 'Video'] ?>
 								<?php foreach($types as $id => $name) { ?>
-									<option value="<?php echo $id ?>" <?php if($id == $preview['type']) echo 'selected=""'; ?>>
-										<?php echo $name ?>
+									<option value="<?php echo raw($id) ?>" <?php if($id == $preview['type']) echo 'selected=""'; ?>>
+										<?php echo esc($name) ?>
 									</option>
 								<?php } ?>
 							</select>
@@ -160,14 +160,14 @@ $_asset_values = array_merge([
 			<div class="form-group">
 				<label class="control-label col-md-4" for="previews[<?php echo $i ?>][link]">Image/Youtube Link</label>
 				<div class="col-md-5">
-					<input id="youtube-<?php echo $i ?>" name="previews[<?php echo $i ?>][link]" type="text" placeholder="Image/Youtube Link" class="form-control input-md" value="<?php echo $preview['link'] ?>">
+					<input id="youtube-<?php echo $i ?>" name="previews[<?php echo $i ?>][link]" type="text" placeholder="Image/Youtube Link" class="form-control input-md" value="<?php echo esc($preview['link']) ?>">
 				</div>
 			</div>
 
 			<div class="form-group">
 				<label class="control-label col-md-4" for="previews[<?php echo $i ?>][thumbnail]">Link to thumbnail (To be removed)</label>
 				<div class="col-md-5">
-					<input id="youtube-<?php echo $i ?>" name="previews[<?php echo $i ?>][thumbnail]" type="text" placeholder="Image Link" class="form-control input-md" value="<?php echo $preview['thumbnail'] ?>">
+					<input id="youtube-<?php echo $i ?>" name="previews[<?php echo $i ?>][thumbnail]" type="text" placeholder="Image Link" class="form-control input-md" value="<?php echo esc($preview['thumbnail']) ?>">
 				</div>
 			</div>
 

@@ -18,6 +18,9 @@ if(isset($frontend) && $frontend) {
     $response = $next($request, $response);
     $response->getBody()->rewind();
     $result = json_decode($response->getBody()->getContents(), true);
+    if($result === null) {
+      $result = ['error' => 'Can\'t decode api response - ' . $response->getBody()->getContents()];
+    }
 
 
     $static_routes = [
@@ -29,6 +32,10 @@ if(isset($frontend) && $frontend) {
 
     $route = $request->getAttribute('route');
     $path = $request->getUri()->getPath();
+
+    if(substr($path, 0, 8) == 'frontend') {
+      $response = $response->withHeader('Location', $request->getUri()->getBasePath() . substr($path, 8) . '?' . $request->getUri()->getQuery());
+    }
 
     if(isset($static_routes['/' . $path])) {
       $queryUri = '/' . $path;
@@ -51,7 +58,6 @@ if(isset($frontend) && $frontend) {
       $response = $response->withHeader('Location', $request->getUri()->getBasePath() . '/' . $result['url']);
     } else {
       $template_names = [
-        //'/configure' => 'configure',
         'GET /user/feed' => 'feed',
 
         'GET /asset' => 'assets',
@@ -62,14 +68,21 @@ if(isset($frontend) && $frontend) {
         'GET /asset/edit' => 'asset_edits',
         'GET /asset/edit/{id:[0-9]+}' => 'asset_edit',
         'GET /asset/edit/{id:[0-9]+}/edit' => 'edit_asset_edit',
-        //'/register' => 'registered',
+
         'GET /login' => 'login',
         'GET /register' => 'register',
+        'ERROR GET /login' => 'login',
+        'ERROR GET /register' => 'register',
+
         'ERROR' => 'error',
       ];
 
-      if(isset($result['error']) && !isset($template_names[$queryUri])) {
-        $queryUri = 'ERROR';
+      if(isset($result['error'])) {
+        if(isset($template_names['ERROR ' . $queryUri])) {
+          $queryUri = 'ERROR ' . $queryUri;
+        } else {
+          $queryUri = 'ERROR';
+        }
       }
 
       if(isset($template_names[$queryUri])) {

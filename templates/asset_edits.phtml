@@ -2,24 +2,24 @@
 <?php foreach($data['result'] as $i => $asset_edit) { ?>
     <div class="media">
       <div class="media-left">
-        <a href="<?php echo $basepath . '/asset/edit/' . $asset_edit['edit_id'] ?>">
-          <img class="media-object" src="<?php echo htmlspecialchars($asset_edit['icon_url']) ?>" alt="<?php echo htmlspecialchars($asset_edit['title']) ?>'s icon" width=80 height=80>
+        <a href="<?php echo raw($basepath) . '/asset/edit/' . url($asset_edit['edit_id']) ?>">
+          <img class="media-object" src="<?php echo esc($asset_edit['icon_url']) ?>" alt="<?php echo esc($asset_edit['title']) ?>'s icon" width=80 height=80>
         </a>
       </div>
       <div class="media-body">
         <h4 class="media-heading">
-          <a href="<?php echo $basepath . '/asset/edit/' . $asset_edit['edit_id'] ?>"><?php echo ($asset_edit['asset_id'] == -1 ? "Create " : "Edit ") . htmlspecialchars($asset_edit['title']) ?></a>
+          <a href="<?php echo raw($basepath) . '/asset/edit/' . url($asset_edit['edit_id']) ?>"><?php echo ($asset_edit['asset_id'] == -1 ? 'Create ' : 'Edit ') . esc($asset_edit['title']) ?></a>
 
-          <span class="label label-<?php echo ['new' => 'info', 'in_review' => 'primary', 'rejected' => 'danger', 'accepted' => 'success'][$asset_edit['status']] ?>"><?php echo ucfirst(str_replace('_', ' ', $asset_edit['status'])) ?></span>
+          <span class="label label-<?php echo raw(['new' => 'info', 'in_review' => 'primary', 'rejected' => 'danger', 'accepted' => 'success'][$asset_edit['status']]) ?>"><?php echo raw(ucfirst(str_replace('_', ' ', $asset_edit['status']))) ?></span>
 
-          <span class="label label-<?php echo htmlspecialchars([
+          <span class="label label-<?php echo raw([
             'official' => 'danger',
             'community' => 'info',
             'testing' => 'success',
-          ][$asset_edit['support_level']]) ?>"><?php echo htmlspecialchars(ucfirst($asset_edit['support_level'])) ?></span>
+          ][$asset_edit['support_level']]) ?>"><?php echo raw(ucfirst($asset_edit['support_level'])) ?></span>
         </h4>
 
-        <p>Submitted by user <?php echo htmlspecialchars($asset_edit['author']) ?>; <?php echo htmlspecialchars($asset_edit['cost']) ?></p>
+        <p>Submitted by user <?php echo esc($asset_edit['author']) ?> ?></p>
       </div>
     </div>
 <?php } ?>
