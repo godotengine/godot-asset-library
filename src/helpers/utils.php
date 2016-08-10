@@ -99,9 +99,10 @@ class Utils
   public function get_user_id_from_token_data($token_data)
   {
     if(!$token_data) return false;
-    if(isset($token_data->user_id)) {
-      return (int) $token_data->user_id;
-    }
+    // Way too insecure
+    // if(isset($token_data->user_id)) {
+    //   return (int) $token_data->user_id;
+    // }
     if(isset($token_data->session)) {
       $query = $this->c->queries['user']['get_by_session_token'];
       $query->bindValue(":session_token", $token_data->session);
@@ -129,12 +130,14 @@ class Utils
       return true;
     }
 
-    if(isset($token_data->user_id)) {
-      $query = $this->c->queries['user']['get_one'];
-      $query->bindValue(':id', (int) $token_data->user_id, PDO::PARAM_INT);
-    } else if(isset($token_data->session)) {
+    // Insecure
+    // if(isset($token_data->user_id)) {
+    //   $query = $this->c->queries['user']['get_one'];
+    //   $query->bindValue(':id', (int) $token_data->user_id, PDO::PARAM_INT);
+    // }
+    if(isset($token_data->session)) {
       $query = $this->c->queries['user']['get_by_session_token'];
-      $query->bindValue(":session_token", $token_data->session);
+      $query->bindValue(":session_token", base64_decode($token_data->session));
     } else {
       $response = $response->withJson([
         'error' => 'Invalid token'

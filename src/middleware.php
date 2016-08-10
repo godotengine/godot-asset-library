@@ -17,10 +17,6 @@ if(isset($frontend) && $frontend) {
 
     $response = $next($request, $response);
     $response->getBody()->rewind();
-    $result = json_decode($response->getBody()->getContents(), true);
-    if($result === null) {
-      $result = ['error' => 'Can\'t decode api response - ' . $response->getBody()->getContents()];
-    }
 
 
     $static_routes = [
@@ -39,19 +35,22 @@ if(isset($frontend) && $frontend) {
 
     if(isset($static_routes['/' . $path])) {
       $queryUri = '/' . $path;
-    } else if($route) {
+    } elseif($route) {
       $queryUri = $route->getPattern();
-    } else
-
-    if($queryUri === false) {
+    } else {
       return $response;
     }
+
     $queryUri = $request->getMethod() . ' ' . $queryUri;
 
-    if(isset($result['authenticated'])) {
-      $result['url'] = 'asset';
+    if($route) {
+      $result = json_decode($response->getBody()->getContents(), true);
+      if($result === null) {
+        $result = ['error' => 'Can\'t decode api response - ' . $response->getBody()->getContents()];
+      }
+    } else {
+      $result = [];
     }
-
 
     if(isset($result['url'])) {
       $response = new \Slim\Http\Response(303);
@@ -71,8 +70,8 @@ if(isset($frontend) && $frontend) {
 
         'GET /login' => 'login',
         'GET /register' => 'register',
-        'ERROR GET /login' => 'login',
-        'ERROR GET /register' => 'register',
+        'ERROR POST /login' => 'login',
+        'ERROR POST /register' => 'register',
 
         'ERROR' => 'error',
       ];

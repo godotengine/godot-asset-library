@@ -20,7 +20,7 @@ $app->get('/configure', function ($request, $response, $args) { global $frontend
   if($error) return $response;
 
   if(isset($request->getQueryParams()['session'])) {
-    $id = openssl_random_pseudo_bytes(16);
+    $id = openssl_random_pseudo_bytes($this->settings['auth']['tokenSessionBytesLength']);
     $token = $this->tokens->generate([
       'session' => base64_encode($id),
     ]);
@@ -107,29 +107,33 @@ $app->post('/login', function ($request, $response, $args) {
       ], 400);
     }
 
-    $query_session = $this->queries['user']['set_session_token'];
-    $query_session->bindValue(':id', (int) $user['id'], PDO::PARAM_INT);
-    $query_session->bindValue(':session_token', $token_data->session);
-    $query_session->execute();
-    $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_session);
-    if($error) return $response;
+    $session_id = $token_data->session;
+    $token = $body['authorize_token'];
+  } else {
+    $session_id = openssl_random_pseudo_bytes($this->settings['auth']['tokenSessionBytesLength']);
+    $token = $this->tokens->generate([
+      'session' => base64_encode($session_id),
+    ]);
   }
 
-  $token = $this->tokens->generate([
-    'user_id' => $user['id']
-  ]);
+  $query_session = $this->queries['user']['set_session_token'];
+  $query_session->bindValue(':id', (int) $user['id'], PDO::PARAM_INT);
+  $query_session->bindValue(':session_token', $session_id);
+  $query_session->execute();
+  $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_session);
+  if($error) return $response;
 
   if(password_verify($body['password'], $user['password_hash'])) {
     return $response->withJson([
       'username' => $body['username'],
       'token' => $token,
       'authenticated' => true,
+      'url' => 'asset',
     ], 200);
   } else {
     return $response->withJson([
       'authenticated' => false,
       'error' => 'Password doesn\'t match',
-      'url' => 'login',
     ], 403);
   }
 });

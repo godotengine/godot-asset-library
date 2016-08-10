@@ -26,6 +26,7 @@ return [
         'auth' => [
             'secret' => 'somerandomstringshouldbeputhere', // Check settings-local.php
             'tokenExpirationTime' => 3600 * 24 * 7, // week
+            'tokenSessionBytesLength' => 24, // If set to over 24 -- change DB schema
             'bcryptOptions' => [
               'cost' => 12,
             ],
