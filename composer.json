@@ -1,6 +1,7 @@
 {
     "require": {
         "slim/slim": "^3.0",
-        "dflydev/fig-cookies": "^1.0"
+        "dflydev/fig-cookies": "^1.0",
+        "slim/csrf": "^0.7.0"
     }
 }

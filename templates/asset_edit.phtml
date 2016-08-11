@@ -144,10 +144,12 @@ $preview_field_names = [
   <?php if($user['type'] >= 50) { ?>
     <?php if($data['status'] == 'new') { ?>
       <form class="form-inline" action="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>/review" method="post">
+        <?php include("_csrf.phtml") ?>
         <button type="submit" class="btn btn-primary">Put in queue</button>
       </form>
     <?php } elseif($data['status'] == 'in_review') { ?>
       <form class="form-inline" action="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>/accept" method="post">
+        <?php include("_csrf.phtml") ?>
         <div class="form-group panel">
           <button type="submit" class="btn btn-success">Accept</button>
           <label class="control-label" for="hash">Hash:</label>
@@ -156,6 +158,7 @@ $preview_field_names = [
       </form>
 
       <form class="form-inline" action="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>/reject" method="post">
+        <?php include("_csrf.phtml") ?>
         <div class="form-group panel">
           <button type="submit" class="btn btn-danger">Reject</button>
           <label class="control-label" for="reason">Reason:</label>

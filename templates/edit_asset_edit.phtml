@@ -5,6 +5,7 @@
 	$_asset_values = $data;
 } ?>
 <form class="form-horizontal" action="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>" method="post">
+	<?php include("_csrf.phtml") ?>
 		<fieldset>
 				<!-- Form Name -->
 				<legend>

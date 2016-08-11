@@ -9,6 +9,7 @@
 <?php endif ?>
 
 <form action="<?php echo raw($basepath) ?>/login" method="post">
+  <?php include("_csrf.phtml") ?>
   <div class="form-group">
     <label for="login-form-username">Username</label>
     <input type="text" name="username" class="form-control" id="login-form-username" placeholder="Username">

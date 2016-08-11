@@ -1,23 +1,25 @@
 <?php
 
 if(isset($frontend) && $frontend) {
+  $container = $app->getContainer();
+
   $app->get('/', function ($request, $response) {
     return $response->withJson(['url' => 'asset']);
   });
 
   $app->add(function ($request, $response, $next) {
-    $cookie = $this->cookies['requestCookies']::get($request, 'token');
-    $body = $request->getParsedBody();
-    if($cookie->getValue() !== null && !isset($body['token'])) {
-      $cookieValue = (string) $cookie->getValue();
-      $body['token'] = $cookieValue;
-      $request = $request->withParsedBody($body);
-    }
-
-
-    $response = $next($request, $response);
     $response->getBody()->rewind();
-
+    $preresult = json_decode($response->getBody()->getContents(), true);
+    if(!isset($preresult['error'])) {
+      $cookie = $this->cookies['requestCookies']::get($request, 'token');
+      $body = $request->getParsedBody();
+      if($cookie->getValue() !== null && !isset($body['token'])) {
+        $cookieValue = (string) $cookie->getValue();
+        $body['token'] = $cookieValue;
+        $request = $request->withParsedBody($body);
+      }
+      $response = $next($request, $response);
+    }
 
     $static_routes = [
       '/login' => true,
@@ -44,6 +46,7 @@ if(isset($frontend) && $frontend) {
     $queryUri = $request->getMethod() . ' ' . $queryUri;
 
     if($route) {
+      $response->getBody()->rewind();
       $result = json_decode($response->getBody()->getContents(), true);
       if($result === null) {
         return $response;
@@ -96,6 +99,10 @@ if(isset($frontend) && $frontend) {
           'params' => $request->getQueryParams(),
           'categories' => [], // Filled later
           'constants' => $this->constants,
+          'csrf_name_key' => $this->csrf->getTokenNameKey(),
+          'csrf_name' => $request->getAttribute('csrf_name'),
+          'csrf_value_key' => $this->csrf->getTokenValueKey(),
+          'csrf_value' => $request->getAttribute('csrf_value'),
           //'body' => $request->getParsedBody(),
         ];
 
@@ -128,8 +135,20 @@ if(isset($frontend) && $frontend) {
       $response = $this->cookies['responseCookies']::set($response, $this->cookies['setCookie']('token')
         ->withValue($result['token'])
         ->withDomain($_SERVER['HTTP_HOST'])
+        ->withPath($request->getUri()->getBasePath())
+        ->withHttpOnly(true)
       );
     }
     return $response;
+  });
+
+  // Adding after the real middleware, since it has to run first... o.O
+  $app->add($container->get('csrf'));
+
+  $container->get('csrf')->setFailureCallable(function ($request, $response, $next) {
+    $response = $response->withJson([
+      'error' => 'CSRF check failed',
+    ]);
+    return $next($request, $response);
   });
 }
