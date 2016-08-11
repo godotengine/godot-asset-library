@@ -358,17 +358,22 @@ $app->post('/asset/edit/{id:[0-9]+}', function ($request, $response, $args) {
   $query = $this->queries['asset_edit']['update'];
   $query->bindValue(':edit_id', (int) $args['id'], PDO::PARAM_INT);
 
-  $query_asset = $this->queries['asset']['get_one_bare'];
-  $query_asset->bindValue(':asset_id', (int) $asset_edit['asset_id'], PDO::PARAM_INT);
-  $query_asset->execute();
+  if($asset_edit['asset_id'] != -1) {
+    $query_asset = $this->queries['asset']['get_one_bare'];
+    $query_asset->bindValue(':asset_id', (int) $asset_edit['asset_id'], PDO::PARAM_INT);
+    $query_asset->execute();
 
-  $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_asset);
-  if($error) return $response;
+    $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_asset);
+    if($error) return $response;
 
-  $asset = $query_asset->fetchAll()[0];
+    $asset = $query_asset->fetchAll()[0];
 
-  $error = _insert_asset_edit_fields($this, false, $response, $query, $body, false, $asset);
-  if($error) return $response;
+    $error = _insert_asset_edit_fields($this, false, $response, $query, $body, false, $asset);
+    if($error) return $response;
+  } else {
+    $error = _insert_asset_edit_fields($this, false, $response, $query, $body, false, null);
+    if($error) return $response;
+  }
 
   $query->execute();
   $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
