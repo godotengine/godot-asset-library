@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Godot Addonlib</title>
+
+    <!-- Bootstrap -->
+    <link href="../bower_componenets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+			<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Godot Addonlib</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#">Feed</a>
+                    </li>
+                    <li class="active">
+                        <a href="#">My Assets</a>
+                    </li>
+                    <li>
+                        <a href="#">New Asset</a>
+                    </li>
+                    <li>
+                        <a href="#">Moderator</a>
+                    </li>
+                    <li>
+                        <a href="#">Logout</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <ul class="nav nav-pills nav-stacked">
+                    <li role="presentation"><a href="#">New Asset</a>
+                    <li role="presentation" class="active"><a href="#">SmaraGD</a>
+                    </li>
+                    <li role="presentation"><a href="#">Make Halo</a>
+                    </li>
+                    <li role="presentation"><a href="#">Unity2Godot</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-9">
+                <div class="alert alert-info" role="alert">
+                    This asset is currently pending approval by our moderators. You will be notified by email when decision is made.
+                </div>
+                <form class="form-horizontal">
+                    <fieldset>
+
+                        <!-- Form Name -->
+                        <legend>Edit Asset</legend>
+
+                        <!-- Text input-->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="asset_name">Asset Name</label>
+                            <div class="col-md-5">
+                                <input id="asset_name" name="asset_name" type="text" placeholder="Asset Name" class="form-control input-md" required="">
+                                <span class="help-block">Set the name of your asset</span>
+                            </div>
+                        </div>
+
+                        <!-- Select Basic -->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="category">Category</label>
+                            <div class="col-md-5">
+                                <select id="category" name="category" class="form-control">
+                                    <option value="2d">2D</option>
+                                    <option value="3d">3D</option>
+                                    <option value="script">Script</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Text input-->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="versiono">Version</label>
+                            <div class="col-md-5">
+                                <input id="versiono" name="versiono" type="text" placeholder="Version" class="form-control input-md" required="">
+                                <span class="help-block">Set the version of your asset</span>
+                            </div>
+                        </div>
+
+                        <!-- Text input-->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="download">Download URL</label>
+                            <div class="col-md-5">
+                                <input id="download" name="download" type="text" placeholder="Download URL" class="form-control input-md" required="">
+                                <span class="help-block">Set the url to download the asset (direct)</span>
+                            </div>
+                        </div>
+
+                        <!-- Select Basic -->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="license">License</label>
+                            <div class="col-md-5">
+                                <select id="license" name="license" class="form-control">
+                                    <option value="MIT">MIT</option>
+                                    <option value="GPLv3">GPL v3</option>
+                                    <option value="GPLv2">GPL v2</option>
+                                    <option value="CC0">CC0</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Textarea -->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="description">Description</label>
+                            <div class="col-md-4">
+                                <textarea class="form-control" id="description" name="description"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- File Button -->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="icon">Icon</label>
+                            <div class="col-md-4">
+                                <input id="icon" name="icon" class="input-file" type="file">
+                            </div>
+                        </div>
+
+                        <!-- File Button -->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="screenshot1">Main Screenshot</label>
+                            <div class="col-md-4">
+                                <input id="screenshot1" name="screenshot1" class="input-file" type="file">
+                            </div>
+                        </div>
+
+                        <!-- File Button -->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="screenshot2">Screenshot 2</label>
+                            <div class="col-md-4">
+                                <input id="screenshot2" name="screenshot2" class="input-file" type="file">
+                            </div>
+                        </div>
+
+                        <!-- File Button -->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="filebutton">Screenshot 3</label>
+                            <div class="col-md-4">
+                                <input id="filebutton" name="filebutton" class="input-file" type="file">
+                            </div>
+                        </div>
+
+                        <!-- File Button -->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="screenshot4">Screenshot 4</label>
+                            <div class="col-md-4">
+                                <input id="screenshot4" name="screenshot4" class="input-file" type="file">
+                            </div>
+                        </div>
+
+                        <!-- Text input-->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="youtube">Youtube Link</label>
+                            <div class="col-md-5">
+                                <input id="youtube" name="youtube" type="text" placeholder="Youtube Link" class="form-control input-md">
+                                <span class="help-block">Set the youtube link demonstrating your asset</span>
+                            </div>
+                        </div>
+
+                        <!-- Button -->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="submit"></label>
+                            <div class="col-md-4">
+                                <button id="submit" name="submit" class="btn btn-primary">Edit</button>
+                            </div>
+                        </div>
+
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+        <footer>
+            <div class="row">
+                <div class="col-md-12">
+                    <hr/>
+                    <p>Copyright &copy; 2016 Godot Game Engine All Rights Reserved.</p>
+                </div>
+            </div>
+            <!-- /.row -->
+        </footer>
+    </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="../bower_componenets/bootstrap/dist/js/bootstrap.min.js"></script>
+</body>
+
+</html>
