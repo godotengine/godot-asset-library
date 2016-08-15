@@ -98,7 +98,7 @@ return [
   ],
   'asset_edit' => [
     'get_one' => 'SELECT edit_id, `as_asset_edits`.asset_id, user_id, title, description, category_id, version_string,
-      cost, download_url, browse_url, icon_url, status,
+      cost, download_url, browse_url, icon_url, status, reason,
       edit_preview_id, `as_asset_previews`.preview_id, `as_asset_edit_previews`.type, `as_asset_edit_previews`.link, `as_asset_edit_previews`.thumbnail, `as_asset_edit_previews`.operation,
       `as_asset_previews`.type AS orig_type, `as_asset_previews`.link AS orig_link, `as_asset_previews`.thumbnail AS orig_thumbnail,
       unedited_previews.preview_id AS unedited_preview_id, unedited_previews.type AS unedited_type, unedited_previews.link AS unedited_link, unedited_previews.thumbnail AS unedited_thumbnail, username AS author
@@ -113,7 +113,7 @@ return [
     'get_one_with_status' => 'SELECT * FROM `as_asset_edits` WHERE edit_id=:edit_id AND status=:status',
     'get_editable_by_asset_id' => 'SELECT * FROM `as_asset_edits` WHERE asset_id=:asset_id AND status=0',
 
-    'search' => 'SELECT edit_id, asset_id, `as_asset_edits`.user_id, COALESCE(`as_asset_edits`.title, `as_assets`.title) AS title, COALESCE(`as_asset_edits`.description, `as_assets`.description) AS description, category, COALESCE(`as_asset_edits`.version_string, `as_assets`.version_string) AS version_string, COALESCE(`as_asset_edits`.cost, `as_assets`.cost) AS cost, COALESCE(`as_asset_edits`.download_url, `as_assets`.download_url) AS download_url, COALESCE(`as_asset_edits`.browse_url, `as_assets`.browse_url) AS browse_url, COALESCE(`as_asset_edits`.icon_url, `as_assets`.icon_url) AS icon_url, `as_assets`.support_level, status, username AS author FROM `as_asset_edits`
+    'search' => 'SELECT edit_id, asset_id, `as_asset_edits`.user_id, COALESCE(`as_asset_edits`.title, `as_assets`.title) AS title, COALESCE(`as_asset_edits`.description, `as_assets`.description) AS description, category, COALESCE(`as_asset_edits`.version_string, `as_assets`.version_string) AS version_string, COALESCE(`as_asset_edits`.cost, `as_assets`.cost) AS cost, COALESCE(`as_asset_edits`.download_url, `as_assets`.download_url) AS download_url, COALESCE(`as_asset_edits`.browse_url, `as_assets`.browse_url) AS browse_url, COALESCE(`as_asset_edits`.icon_url, `as_assets`.icon_url) AS icon_url, `as_assets`.support_level, status, reason, username AS author FROM `as_asset_edits`
       LEFT JOIN `as_users` USING (user_id)
       LEFT JOIN `as_categories` USING (category_id)
       LEFT JOIN `as_assets` USING (asset_id)

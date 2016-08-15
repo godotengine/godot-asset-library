@@ -19,7 +19,8 @@
           ][$asset_edit['support_level']]) ?>"><?php echo raw(ucfirst($asset_edit['support_level'])) ?></span>
         </h4>
 
-        <p>Submitted by user <?php echo esc($asset_edit['author']) ?> ?></p>
+        <p>Submitted by user <?php echo esc($asset_edit['author']) ?></p>
+        <?php if($asset_edit['status'] == 'rejected' && $asset_edit['reason']) echo 'Rejection reason: ' . esc($asset_edit['reason']) ?>
       </div>
     </div>
 <?php } ?>

@@ -8,16 +8,16 @@ if(isset($frontend) && $frontend) {
   });
 
   $app->add(function ($request, $response, $next) {
+    $cookie = $this->cookies['requestCookies']::get($request, 'token');
+    $body = $request->getParsedBody();
+    if($cookie->getValue() !== null && !isset($body['token'])) {
+      $cookieValue = (string) $cookie->getValue();
+      $body['token'] = $cookieValue;
+      $request = $request->withParsedBody($body);
+    }
     $response->getBody()->rewind();
     $preresult = json_decode($response->getBody()->getContents(), true);
     if(!isset($preresult['error'])) {
-      $cookie = $this->cookies['requestCookies']::get($request, 'token');
-      $body = $request->getParsedBody();
-      if($cookie->getValue() !== null && !isset($body['token'])) {
-        $cookieValue = (string) $cookie->getValue();
-        $body['token'] = $cookieValue;
-        $request = $request->withParsedBody($body);
-      }
       $response = $next($request, $response);
     }
 
