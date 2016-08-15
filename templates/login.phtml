@@ -1,7 +1,7 @@
 <?php include("_header.phtml") ?>
 
 <?php if(isset($user)): ?>
-  <div class="alert alert-info" role="alert">Your are already logged in as <?php echo esc($user['username']) ?></div>
+  <div class="alert alert-info" role="alert">You are already logged in as <?php echo esc($user['username']) ?></div>
 <?php endif ?>
 
 <?php if(isset($data['error'])): ?>
