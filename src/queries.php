@@ -71,6 +71,7 @@ return [
       WHERE asset_id = :id',
 
     'get_one_bare' => 'SELECT * FROM `as_assets` WHERE asset_id = :asset_id',
+    'get_one_preview_bare' => 'SELECT * FROM `as_asset_previews` WHERE preview_id = :preview_id',
 
     'apply_creational_edit' => 'INSERT INTO `as_assets`
       SET title=:title, description=:description, category_id=:category_id, user_id=:user_id,
@@ -87,10 +88,10 @@ return [
     'apply_preview_edit_insert' => 'INSERT INTO `as_asset_previews`
       SET asset_id=:asset_id, type=:type, link=:link, thumbnail=:thumbnail',
     'apply_preview_edit_remove' => 'DELETE FROM `as_asset_previews`
-      WHERE preview_id=:preview_id',
+      WHERE preview_id=:preview_id AND asset_id=:asset_id',
     'apply_preview_edit_update' => 'UPDATE `as_asset_previews`
       SET type=COALESCE(:type, type), link=COALESCE(:link, link), thumbnail=COALESCE(:thumbnail, thumbnail)
-      WHERE preview_id=:preview_id',
+      WHERE preview_id=:preview_id AND asset_id=:asset_id',
 
     'set_support_level' => 'UPDATE `as_assets`
       SET support_level=:support_level

@@ -29,7 +29,7 @@ function _submit_asset_edit($c, $response, $body, $user_id, $asset_id=-1) {
   $id = $c->db->lastInsertId();
 
   if(isset($body['previews'])) {
-    $error = _add_previews_to_edit($c, $error, $response, $id, $body['previews'], $asset_id==-1);
+    $error = _add_previews_to_edit($c, $error, $response, $id, $body['previews'], null, $asset_id==-1);
     if($error) return $response;
   }
 
@@ -59,7 +59,7 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
   return $error;
 }
 
-function _add_previews_to_edit($c, $error, &$response, $edit_id, $previews, $required=false) {
+function _add_previews_to_edit($c, $error, &$response, $edit_id, $previews, $asset=null, $required=false) {
   if($error) return true;
 
   foreach ($previews as $i => $preview) {
@@ -73,7 +73,7 @@ function _add_previews_to_edit($c, $error, &$response, $edit_id, $previews, $req
 
       $operation = $c->constants['edit_preview_operation']['insert'];
 
-      if(!$required && isset($c->constants['edit_preview_operation'][$preview['operation']])) {
+      if(!$required && $asset !== null && isset($c->constants['edit_preview_operation'][$preview['operation']])) {
         $operation = $c->constants['edit_preview_operation'][$preview['operation']];
       }
       $query->bindValue(':operation',(int) $operation, PDO::PARAM_INT);
@@ -83,6 +83,25 @@ function _add_previews_to_edit($c, $error, &$response, $edit_id, $previews, $req
       } else {
         $error = $c->utils->error_reponse_if_missing_or_not_string($error, $response, $preview, 'preview_id');
         if($error) return $error;
+
+        if($asset !== null) {
+          $query_check = $c->queries['asset']['get_one_preview_bare'];
+          $query_check->bindValue(':preview_id', (int) $preview['preview_id'], PDO::PARAM_INT);
+          $query_check->execute();
+          $error = $c->utils->error_reponse_if_query_bad(false, $response, $query_check);
+          $error = $c->utils->error_reponse_if_query_no_results($error, $response, $query_check);
+          if($error) return $error;
+
+          $original_preview = $query_check->fetchAll()[0];
+          if($original_preview['asset_id'] != $asset['asset_id']) {
+            $response = $response->withJson(['error' => 'Invalid preview id.'], 400);
+            return true;
+          }
+        } else {
+          $response = $response->withJson(['error' => 'Bug in processing code, please report.'], 500);
+          return true;
+        }
+
         $query->bindValue(':preview_id', (int) $preview['preview_id'], PDO::PARAM_INT);
       }
 
@@ -106,7 +125,9 @@ function _add_previews_to_edit($c, $error, &$response, $edit_id, $previews, $req
 
     foreach ($c->constants['asset_edit_preview_fields'] as $i => $field) {
       if(!$required) {
-        if(isset($preview[$field])) {
+        if(isset($preview[$field]) && !(isset($original_preview) && $original_preview[$field] == $preview[$field])) {
+          $query->bindValue(':' . $field, $preview[$field]);
+        } elseif(!isset($preview[$field]) && !isset($original_preview)) {
           $query->bindValue(':' . $field, $preview[$field]);
         } else {
           $query->bindValue(':' . $field, null, PDO::PARAM_NULL);
@@ -116,8 +137,8 @@ function _add_previews_to_edit($c, $error, &$response, $edit_id, $previews, $req
         if(!$error) $query->bindValue(':' . $field, $preview[$field]);
       }
     }
-
     if($error) return $error;
+
     $query->execute();
     $error = $c->utils->error_reponse_if_query_bad(false, $response, $query);
     if($error) return $error;
@@ -229,40 +250,42 @@ $get_edit = function ($request, $response, $args) {
   foreach ($output as $row) {
 
     foreach ($row as $column => $value) {
-      if($value!==null) {
+      if($previews_last_i !== null && ($column==='preview_id' || $column==='type' || $column==='link' || $column==='thumbnail')) {
+        $previews[$previews_last_i][$column] = $value;
+      } elseif($previews_last_i !== null && $column==='operation') {
+        $previews[$previews_last_i][$column] = $this->constants['edit_preview_operation'][(int) $value];
+      } elseif($previews_last_i !== null && ($column==='unedited_type' || $column==='unedited_link' || $column==='unedited_thumbnail')) {
+        $unedited_previews[$unedited_previews_last_i][substr($column, strlen('unedited_'))] = $value;
+      } elseif($value!==null) {
         if($column==='edit_preview_id') {
           $previews[$value] = ['edit_preview_id' => $value];
           $previews_last_i = $value;
-        } elseif($column==='preview_id' || $column==='type' || $column==='link' || $column==='thumbnail') {
-          $previews[$previews_last_i][$column] = $value;
-        } elseif($column==='operation') {
-          $previews[$previews_last_i][$column] = $this->constants['edit_preview_operation'][(int) $value];
-        } elseif($column==='orig_type' || $column==='orig_link' || $column==='orig_thumbnail') {
-          $previews[$previews_last_i]['original'][substr($column, strlen('orig_'))] = $value;
-        }
-        elseif($column==='unedited_preview_id') {
+        } elseif($column==='unedited_preview_id') {
           $unedited_previews[$value] = ['preview_id' => $value];
           $unedited_previews_last_i = $value;
-        } elseif($column==='unedited_type' || $column==='unedited_link' || $column==='unedited_thumbnail') {
-          $unedited_previews[$unedited_previews_last_i][substr($column, strlen('unedited_'))] = $value;
-        }
-        elseif($column==='status') {
+        } elseif($previews_last_i !== null && ($column==='orig_type' || $column==='orig_link' || $column==='orig_thumbnail')) {
+          $previews[$previews_last_i]['original'][substr($column, strlen('orig_'))] = $value;
+        } elseif($column==='status') {
           $asset_edit['status'] = $this->constants['edit_status'][(int) $value];
         } else {
           $asset_edit[$column] = $value;
         }
-      } elseif($column!=='edit_preview_id' && $column!=='preview_id' && $column!=='type' && $column!=='link' && $column!=='thumbnail' && $column!=='operation' && $column!=='orig_type' && $column!=='orig_link' && $column!=='orig_thumbnail') {
+      } elseif($column!=='edit_preview_id' && $column!=='preview_id') {
         $asset_edit[$column] = $value;
       }
     }
   }
 
-  foreach($previews as $preview) {
-    if(isset($preview['preview_id']) && isset($unedited_previews[$preview['preview_id']])) {
-      unset($unedited_previews[$preview['preview_id']]);
+  if($asset_edit['asset_id'] != -1) {
+    foreach($previews as $preview) {
+      if(isset($preview['preview_id']) && isset($unedited_previews[$preview['preview_id']])) {
+        unset($unedited_previews[$preview['preview_id']]);
+      }
     }
+    $asset_edit['previews'] = array_merge(array_values($previews), array_values($unedited_previews));
+  } else {
+    $asset_edit['previews'] = array_values($previews);
   }
-  $asset_edit['previews'] = array_merge($previews, array_values($unedited_previews));
 
   if($asset_edit['asset_id'] != -1) {
     $query_asset = $this->queries['asset']['get_one_bare'];
@@ -358,6 +381,8 @@ $app->post('/asset/edit/{id:[0-9]+}', function ($request, $response, $args) {
   $query = $this->queries['asset_edit']['update'];
   $query->bindValue(':edit_id', (int) $args['id'], PDO::PARAM_INT);
 
+
+  $asset = null;
   if($asset_edit['asset_id'] != -1) {
     $query_asset = $this->queries['asset']['get_one_bare'];
     $query_asset->bindValue(':asset_id', (int) $asset_edit['asset_id'], PDO::PARAM_INT);
@@ -367,20 +392,17 @@ $app->post('/asset/edit/{id:[0-9]+}', function ($request, $response, $args) {
     if($error) return $response;
 
     $asset = $query_asset->fetchAll()[0];
-
-    $error = _insert_asset_edit_fields($this, false, $response, $query, $body, false, $asset);
-    if($error) return $response;
-  } else {
-    $error = _insert_asset_edit_fields($this, false, $response, $query, $body, false, null);
-    if($error) return $response;
   }
+
+  $error = _insert_asset_edit_fields($this, false, $response, $query, $body, false, $asset);
+  if($error) return $response;
 
   $query->execute();
   $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
   if($error) return $response;
 
   if(isset($body['previews'])) {
-    $error = _add_previews_to_edit($this, $error, $response, $args['id'], $body['previews'], false);
+    $error = _add_previews_to_edit($this, $error, $response, $args['id'], $body['previews'], $asset, false);
     if($error) return $response;
   }
 
@@ -492,9 +514,7 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
     $operation = $this->constants['edit_preview_operation'][$preview['operation']];
     $query_apply_preview = $this->queries['asset']['apply_preview_edit_' . $operation];
 
-    if($operation == 'insert') {
-      $query_apply_preview->bindValue(':asset_id', (int) $preview['asset_id']);
-    }
+    $query_apply_preview->bindValue(':asset_id', (int) $asset_edit['asset_id']);
 
     if($operation == 'remove' || $operation == 'update') {
       $query_apply_preview->bindValue(':preview_id', (int) $preview['preview_id']);
