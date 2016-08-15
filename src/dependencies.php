@@ -61,7 +61,8 @@ $container['utils'] = function ($c) {
 
 // csrf guard
 $container['csrf'] = function ($c) {
-    return new \Slim\Csrf\Guard;
+  session_start();
+  return new \Slim\Csrf\Guard;
 };
 
 // cookies
