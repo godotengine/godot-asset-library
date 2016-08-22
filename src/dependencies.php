@@ -22,6 +22,7 @@ $container['logger'] = function ($c) {
 $container['db'] = function ($c) {
   $settings = $c->get('settings')['db'];
   $db = new PDO($settings['dsn'], $settings['user'], $settings['pass']);
+  $db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
   return $db;
 };
 
@@ -33,7 +34,6 @@ $container['constants'] = function ($c) {
 // queries
 $container['queries'] = function ($c) {
   $db = $c->db;
-  $constants = $c->constants;
 
   $raw_queries = require_once __DIR__ . '/queries.php';
   $queries = [];
@@ -41,7 +41,6 @@ $container['queries'] = function ($c) {
     $queries[$model] = [];
     foreach ($model_queries as $query_name => $query) {
       $queries[$model][$query_name] = $db->prepare($query);
-      $queries[$model][$query_name]->setFetchMode(PDO::FETCH_ASSOC);
     }
   }
   return $queries;
