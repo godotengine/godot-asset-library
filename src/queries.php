@@ -81,7 +81,7 @@ return [
 
     'apply_edit' => 'UPDATE `as_assets`
       SET title=COALESCE(:title, title), description=COALESCE(:description, description), category_id=COALESCE(:category_id, category_id),  version_string=COALESCE(:version_string, version_string), cost=COALESCE(:cost, cost),
-      download_url=COALESCE(:download_url, download_url), download_hash=COALESCE(download_hash, :download_hash), browse_url=COALESCE(:browse_url, browse_url), icon_url=COALESCE(:icon_url, icon_url),
+      download_url=COALESCE(:download_url, download_url), download_hash=COALESCE(:download_hash, download_hash), browse_url=COALESCE(:browse_url, browse_url), icon_url=COALESCE(:icon_url, icon_url),
       version=version+:update_version
       WHERE asset_id=:asset_id',
 
