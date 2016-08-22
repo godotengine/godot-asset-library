@@ -166,9 +166,17 @@ $app->get('/asset/edit', function ($request, $response, $args) {
     $asset_id = (int) $params['asset'];
   }
   if(isset($params['status'])) { // Expects the param like `new+in_review`
-    foreach(explode(' ', $params['status']) as $key => $value) { // `+` is changed to ` ` automatically
-      if(isset($this->constants['edit_status'][$value])) {
-        array_push($statuses, (int) $this->constants['edit_status'][$value]);
+    if(is_array($params['status'])) {
+      foreach($params['status'] as $key => $value) {
+        if($value && isset($this->constants['edit_status'][$key])) {
+          array_push($statuses, (int) $this->constants['edit_status'][$key]);
+        }
+      }
+    } else {
+      foreach(explode(' ', $params['status']) as $key => $value) { // `+` is changed to ` ` automatically
+        if(isset($this->constants['edit_status'][$value])) {
+          array_push($statuses, (int) $this->constants['edit_status'][$value]);
+        }
       }
     }
   }
@@ -464,6 +472,7 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
     $error = $this->utils->error_reponse_if_missing_or_not_string(false, $response, $body, 'hash');
     if($error) return $response;
   }
+
   if(isset($body['hash'])) {
     $query->bindValue(':update_version', 1, PDO::PARAM_INT);
     $query->bindValue(':download_hash', $body['hash']);

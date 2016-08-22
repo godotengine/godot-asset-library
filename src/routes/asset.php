@@ -19,17 +19,25 @@ $app->get('/asset', function ($request, $response, $args) { global $frontend;
   $page_size = 10;
   $max_page_size = 500;
   $page_offset = 0;
-  if(isset($params['category'])) {
+  if(isset($params['category']) && $params['category'] != "") {
     $category = (int) $params['category'];
   }
   if(isset($params['type']) && isset($this->constants['category_type'][$params['type']])) {
     $category_type = $this->constants['category_type'][$params['type']];
   }
-  if(isset($params['support'])) { // Expects the param like `community+testing`
+  if(isset($params['support'])) { // Expects the param like `support=community+testing` or `support[community]=1&support[testing]=1&...`
     $support_levels = [];
-    foreach(explode(' ', $params['support']) as $key => $value) { // `+` is changed to ` ` automatically
-      if(isset($this->constants['support_level'][$value])) {
-        array_push($support_levels, (int) $this->constants['support_level'][$value]);
+    if(is_array($params['support'])) {
+      foreach($params['support'] as $key => $value) {
+        if($value && isset($this->constants['support_level'][$key])) {
+          array_push($support_levels, (int) $this->constants['support_level'][$key]);
+        }
+      }
+    } else {
+      foreach(explode(' ', $params['support']) as $key => $value) { // `+` is changed to ` ` automatically
+        if(isset($this->constants['support_level'][$value])) {
+          array_push($support_levels, (int) $this->constants['support_level'][$value]);
+        }
       }
     }
   }

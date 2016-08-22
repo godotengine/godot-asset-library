@@ -51,5 +51,5 @@
   </ul>
 </nav>
 <p>
-  <?php echo esc($data['page_length']) ?> per page, <?php echo esc($data['total_items']) ?> total.
+  <?php echo esc($data['page_length']) ?> item<?php if($data['page_length'] != 1) echo 's' ?> per page, <?php echo esc($data['total_items']) ?> item<?php if($data['total_items'] != 1) echo 's' ?> total.
 </p>
