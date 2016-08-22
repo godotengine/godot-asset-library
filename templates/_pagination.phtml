@@ -1,0 +1,55 @@
+<nav aria-label="Page navigation">
+  <ul class="pagination">
+
+    <?php if($data['page'] - 1 >= 0) { ?>
+      <li>
+        <a href="?<?php echo esc(http_build_query(['page' => $data['page'] - 1] + $params)) ?>" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+    <?php } else { ?>
+      <li class="disabled" aria-hidden="true"><a>&laquo;</a></li>
+    <?php } ?>
+
+    <?php $page = 0; $edge_pages = 1; $mid_pages = 2; ?>
+    <?php for(; $page < $edge_pages && $page < $data['page'] && $page < $data['pages']; $page++) { ?>
+      <li><a href="?<?php echo esc(http_build_query(['page' => $page] + $params)) ?>"><?php echo $page + 1; ?></a></li>
+    <?php } ?>
+
+    <?php if($page < $data['page']) { ?>
+      <li class="disabled"><a>…</a></li>
+    <?php } ?>
+
+    <?php for($page = max($page, $data['page'] - $mid_pages); $page < $data['page'] + $mid_pages + 1 && $page < $data['pages']; $page++) { ?>
+      <?php if($page == $data['page']) { ?>
+        <li class="active">
+          <a href="?<?php echo esc(http_build_query(['page' => $page] + $params)) ?>"><?php echo $page + 1; ?></a>
+        </li>
+        <span class="sr-only">(current)</span>
+      <?php } else { ?>
+        <li><a href="?<?php echo esc(http_build_query(['page' => $page] + $params)) ?>"><?php echo $page + 1; ?></a></li>
+      <?php } ?>
+    <?php } ?>
+
+    <?php if($page < $data['pages'] - $edge_pages) { ?>
+      <li class="disabled"><a>…</a></li>
+    <?php } ?>
+
+    <?php for($page = max($page, $data['pages'] - $edge_pages); $page < $data['pages']; $page++) { ?>
+      <li><a href="?<?php echo esc(http_build_query(['page' => $page] + $params)) ?>"><?php echo $page + 1; ?></a></li>
+    <?php } ?>
+
+    <?php if($data['page'] + 1 < $data['pages']) { ?>
+      <li>
+        <a href="?<?php echo esc(http_build_query(['page' => $data['page'] + 1] + $params)) ?>" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    <?php } else { ?>
+      <li class="disabled" aria-hidden="true"><a>&raquo;</a></li>
+    <?php } ?>
+  </ul>
+</nav>
+<p>
+  <?php echo esc($data['page_length']) ?> per page, <?php echo esc($data['total_items']) ?> total.
+</p>

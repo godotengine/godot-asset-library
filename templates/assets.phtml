@@ -29,4 +29,6 @@
     </div>
   <?php } ?>
 </div>
+<?php include("_pagination.phtml") ?>
+<a href="<?php echo raw($basepath) . '/asset/edit?' . raw($query) . '&asset=-1' ?>" class="btn btn-warning"><i class="glyphicon glyphicon-hourglass"></i> View Pending</a>
 <?php include("_footer.phtml") ?>

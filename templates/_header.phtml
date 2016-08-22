@@ -61,7 +61,7 @@
           <?php if(isset($user)) { ?>
             <?php make_nav_link('Feed', 'user/feed') ?>
             <?php make_nav_link('My Assets', 'asset?user=' . url($user['username'])) ?>
-            <?php if($user['type'] >= 100) { ?>
+            <?php if($user['type'] >= $constants['user_type']['moderator']) { ?>
               <?php make_nav_link('Moderate', 'asset/edit') ?>
             <?php } ?>
             <li class="seperator"></li>

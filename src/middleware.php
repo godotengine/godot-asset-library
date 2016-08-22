@@ -97,6 +97,7 @@ if(isset($frontend) && $frontend) {
           'bowerpath' => $request->getUri()->getBasePath() . '/bower_components',
           'path' => $path,
           'params' => $request->getQueryParams(),
+          'query' => $request->getUri()->getQuery(),
           'categories' => [], // Filled later
           'constants' => $this->constants,
           'csrf_name_key' => $this->csrf->getTokenNameKey(),
