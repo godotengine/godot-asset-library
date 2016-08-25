@@ -8,7 +8,7 @@ if(isset($frontend) && $frontend) {
   });
 
   $app->add(function ($request, $response, $next) {
-    $cookie = $this->cookies['requestCookies']::get($request, 'token');
+    $cookie = $this->cookies['requestCookies']->get($request, 'token');
     $body = $request->getParsedBody();
     if($cookie->getValue() !== null && !isset($body['token'])) {
       $cookieValue = (string) $cookie->getValue();
@@ -133,7 +133,7 @@ if(isset($frontend) && $frontend) {
     }
 
     if(isset($result['token'])) {
-      $response = $this->cookies['responseCookies']::set($response, $this->cookies['setCookie']('token')
+      $response = $this->cookies['responseCookies']->set($response, $this->cookies['setCookie']('token')
         ->withValue($result['token'])
         ->withDomain($_SERVER['HTTP_HOST'])
         ->withPath($request->getUri()->getBasePath())
