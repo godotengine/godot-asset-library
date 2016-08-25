@@ -260,10 +260,14 @@ $get_edit = function ($request, $response, $args) {
     foreach ($row as $column => $value) {
       if($previews_last_i !== null && ($column==='preview_id' || $column==='type' || $column==='link' || $column==='thumbnail')) {
         $previews[$previews_last_i][$column] = $value;
-      } elseif($previews_last_i !== null && $column==='operation') {
+      }elseif($previews_last_i !== null && $column==='operation') {
         $previews[$previews_last_i][$column] = $this->constants['edit_preview_operation'][(int) $value];
-      } elseif($previews_last_i !== null && ($column==='unedited_type' || $column==='unedited_link' || $column==='unedited_thumbnail')) {
+      } elseif($unedited_previews_last_i !== null && ($column==='unedited_type' || $column==='unedited_link' || $column==='unedited_thumbnail')) {
         $unedited_previews[$unedited_previews_last_i][substr($column, strlen('unedited_'))] = $value;
+      }  elseif($column==='orig_type' || $column==='orig_link' || $column==='orig_thumbnail') {
+        if($value != null && $previews_last_i !== null) {
+          $previews[$previews_last_i]['original'][substr($column, strlen('orig_'))] = $value;
+        }
       } elseif($value!==null) {
         if($column==='edit_preview_id') {
           $previews[$value] = ['edit_preview_id' => $value];
@@ -271,8 +275,6 @@ $get_edit = function ($request, $response, $args) {
         } elseif($column==='unedited_preview_id') {
           $unedited_previews[$value] = ['preview_id' => $value];
           $unedited_previews_last_i = $value;
-        } elseif($previews_last_i !== null && ($column==='orig_type' || $column==='orig_link' || $column==='orig_thumbnail')) {
-          $previews[$previews_last_i]['original'][substr($column, strlen('orig_'))] = $value;
         } elseif($column==='status') {
           $asset_edit['status'] = $this->constants['edit_status'][(int) $value];
         } else {
