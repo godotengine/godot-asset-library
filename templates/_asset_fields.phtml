@@ -70,7 +70,7 @@ $_asset_values = array_merge([
 		<label class="col-md-4 control-label" for="license">License</label>
 		<div class="col-md-5">
 				<select id="license" name="cost" class="form-control">
-					<?php $licenses = ['MIT' => 'MIT', 'GPLv3' => 'GPL v3', 'GPLv2' => 'GPL v2', 'CC0' => 'CC0'] ?>
+					<?php $licenses = ['MIT' => 'MIT', 'GPLv3' => 'GPL v3', 'GPLv2' => 'GPL v2', 'CC0' => 'CC0', 'BSD-2-Clause' => 'BSD 2-clause License', 'BSL-1.0' => 'Boost Software License'] ?>
 					<?php foreach($licenses as $id => $name) { ?>
 						<option value="<?php echo raw($id) ?>" <?php if($id == $_asset_values['cost']) echo 'selected=""'; ?>>
 							<?php echo esc($name) ?>
