@@ -511,7 +511,13 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
     if($error) return $response;
   }
 
-  if(isset($body['hash'])) {
+  if(isset($body['hash']) && trim($body['hash']) != '') {
+    $body['hash'] = trim($body['hash']);
+    if(sizeof(preg_grep('/^[a-f0-9]{64}$/', [$body['hash']])) == 0) {
+      return $response->withJson([
+        'error' => 'Invalid hash given. Expected either nothing or 64 lowercase hexadecimal digits.',
+      ]);
+    }
     $query->bindValue(':update_version', 1, PDO::PARAM_INT);
     $query->bindValue(':download_hash', $body['hash']);
   } else {
