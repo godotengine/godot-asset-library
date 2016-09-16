@@ -64,7 +64,7 @@ return [
         OR username LIKE :filter
       )',
 
-    'get_one' => 'SELECT asset_id, category_type, title, username as author, user_id as author_id, version, version_string, category, category_id, rating, cost, description, support_level, download_url, download_hash, browse_url, icon_url, preview_id, `as_asset_previews`.type, link, thumbnail, searchable FROM `as_assets`
+    'get_one' => 'SELECT asset_id, category_type, title, username as author, user_id as author_id, version, version_string, category, category_id, rating, cost, description, support_level, download_provider, download_commit, download_hash, browse_url, icon_url, preview_id, `as_asset_previews`.type, link, thumbnail, searchable FROM `as_assets`
       LEFT JOIN `as_categories` USING (category_id)
       LEFT JOIN `as_users` USING (user_id)
       LEFT JOIN `as_asset_previews` USING (asset_id)
@@ -76,12 +76,12 @@ return [
     'apply_creational_edit' => 'INSERT INTO `as_assets`
       SET title=:title, description=:description, category_id=:category_id, user_id=:user_id,
       version_string=:version_string, cost=:cost,
-      download_url=:download_url, download_hash=:download_hash, browse_url=:browse_url, icon_url=:icon_url,
+      download_provider=:download_provider, download_commit=:download_commit, download_hash=:download_hash, browse_url=:browse_url, icon_url=:icon_url,
       version=0+:update_version, rating=0, searchable=TRUE',
 
     'apply_edit' => 'UPDATE `as_assets`
       SET title=COALESCE(:title, title), description=COALESCE(:description, description), category_id=COALESCE(:category_id, category_id),  version_string=COALESCE(:version_string, version_string), cost=COALESCE(:cost, cost),
-      download_url=COALESCE(:download_url, download_url), download_hash=COALESCE(:download_hash, download_hash), browse_url=COALESCE(:browse_url, browse_url), icon_url=COALESCE(:icon_url, icon_url),
+      download_provider=COALESCE(:download_provider, download_provider), download_commit=COALESCE(:download_commit, download_commit), download_hash=COALESCE(:download_hash, download_hash), browse_url=COALESCE(:browse_url, browse_url), icon_url=COALESCE(:icon_url, icon_url),
       version=version+:update_version
       WHERE asset_id=:asset_id',
 
@@ -99,7 +99,7 @@ return [
   ],
   'asset_edit' => [
     'get_one' => 'SELECT edit_id, `as_asset_edits`.asset_id, user_id, title, description, category_id, version_string,
-      cost, download_url, browse_url, icon_url, status, reason,
+      cost, download_provider, download_commit, browse_url, icon_url, status, reason,
       edit_preview_id, `as_asset_previews`.preview_id, `as_asset_edit_previews`.type, `as_asset_edit_previews`.link, `as_asset_edit_previews`.thumbnail, `as_asset_edit_previews`.operation,
       `as_asset_previews`.type AS orig_type, `as_asset_previews`.link AS orig_link, `as_asset_previews`.thumbnail AS orig_thumbnail,
       unedited_previews.preview_id AS unedited_preview_id, unedited_previews.type AS unedited_type, unedited_previews.link AS unedited_link, unedited_previews.thumbnail AS unedited_thumbnail, username AS author
@@ -114,7 +114,8 @@ return [
     'get_one_with_status' => 'SELECT * FROM `as_asset_edits` WHERE edit_id=:edit_id AND status=:status',
     'get_editable_by_asset_id' => 'SELECT * FROM `as_asset_edits` WHERE asset_id=:asset_id AND status=0',
 
-    'search' => 'SELECT edit_id, asset_id, `as_asset_edits`.user_id, COALESCE(`as_asset_edits`.title, `as_assets`.title) AS title, COALESCE(`as_asset_edits`.description, `as_assets`.description) AS description, category, COALESCE(`as_asset_edits`.version_string, `as_assets`.version_string) AS version_string, COALESCE(`as_asset_edits`.cost, `as_assets`.cost) AS cost, COALESCE(`as_asset_edits`.download_url, `as_assets`.download_url) AS download_url, COALESCE(`as_asset_edits`.browse_url, `as_assets`.browse_url) AS browse_url, COALESCE(`as_asset_edits`.icon_url, `as_assets`.icon_url) AS icon_url, `as_assets`.support_level, status, reason, username AS author FROM `as_asset_edits`
+    'search' => 'SELECT edit_id, asset_id,
+    `as_asset_edits`.user_id, COALESCE(`as_asset_edits`.title, `as_assets`.title) AS title, COALESCE(`as_asset_edits`.description, `as_assets`.description) AS description, category, COALESCE(`as_asset_edits`.version_string, `as_assets`.version_string) AS version_string, COALESCE(`as_asset_edits`.cost, `as_assets`.cost) AS cost, COALESCE(`as_asset_edits`.download_provider, `as_assets`.download_provider) AS download_provider, COALESCE(`as_asset_edits`.download_commit, `as_assets`.download_commit) AS download_commit, COALESCE(`as_asset_edits`.browse_url, `as_assets`.browse_url) AS browse_url, COALESCE(`as_asset_edits`.icon_url, `as_assets`.icon_url) AS icon_url, `as_assets`.support_level, status, reason, username AS author FROM `as_asset_edits`
       LEFT JOIN `as_users` USING (user_id)
       LEFT JOIN `as_categories` USING (category_id)
       LEFT JOIN `as_assets` USING (asset_id)
@@ -142,12 +143,12 @@ return [
 
     'submit' => 'INSERT INTO `as_asset_edits`
       SET asset_id=:asset_id, user_id=:user_id, title=:title, description=:description, category_id=:category_id, version_string=:version_string,
-        cost=:cost, download_url=:download_url, browse_url=:browse_url, icon_url=:icon_url,
+        cost=:cost, download_provider=:download_provider, download_commit=:download_commit,browse_url=:browse_url, icon_url=:icon_url,
         status=0',
 
     'update' => 'UPDATE `as_asset_edits`
       SET title=:title, description=:description, category_id=:category_id, version_string=:version_string, cost=:cost,
-      download_url=:download_url, browse_url=:browse_url, icon_url=:icon_url
+      download_provider=:download_provider, download_commit=:download_commit, browse_url=:browse_url, icon_url=:icon_url
       WHERE edit_id=:edit_id AND status=0',
 
     'add_preview' => 'INSERT INTO `as_asset_edit_previews`

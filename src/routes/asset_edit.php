@@ -43,10 +43,15 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
   if($error) return true;
 
   foreach ($c->constants['asset_edit_fields'] as $i => $field) {
+    if(isset($body[$field]) && $field == 'download_provider') {
+      if(isset($c->constants['download_provider'][$body[$field]])) {
+        $body[$field] = (int) $c->constants['download_provider'][$body[$field]];
+      } else {
+        $body[$field] = 0;
+      }
+    }
     if(!$required) {
       if(isset($body[$field]) && ($bare_asset === null || $bare_asset[$field] != $body[$field])) {
-        $query->bindValue(':' . $field, $body[$field]);
-      } elseif(!isset($body[$field]) && $bare_asset !== null) {
         $query->bindValue(':' . $field, $body[$field]);
       } else {
         $query->bindValue(':' . $field, null, PDO::PARAM_NULL);
@@ -277,6 +282,8 @@ $get_edit = function ($request, $response, $args) {
           $unedited_previews_last_i = $value;
         } elseif($column==='status') {
           $asset_edit['status'] = $this->constants['edit_status'][(int) $value];
+        } elseif($column==='download_provider') {
+          $asset_edit['download_provider'] = $this->constants['download_provider'][(int) $value];
         } else {
           $asset_edit[$column] = $value;
         }
@@ -309,7 +316,36 @@ $get_edit = function ($request, $response, $args) {
     $asset = $query_asset->fetchAll()[0];
 
     $asset_edit['original'] = $asset;
+    $asset_edit['original']['download_provider'] = $this->constants['download_provider'][$asset['download_provider']];
+
+    if($asset_edit['browse_url'] || $asset_edit['download_provider'] || $asset_edit['download_commit']) {
+      $asset_edit['download_url'] = $this->utils->get_computed_download_url(
+        $asset_edit['browse_url'] ?: $asset_edit['original']['browse_url'],
+        $asset_edit['download_provider'] ?: $asset_edit['original']['download_provider'],
+        $asset_edit['download_commit'] ?: $asset_edit['original']['download_commit'],
+        $warning
+      );
+    } else {
+      $asset_edit['download_url'] = null;
+    }
+
+    $asset_edit['original']['download_url'] = $this->utils->get_computed_download_url($asset_edit['original']['browse_url'], $asset_edit['original']['download_provider'], $asset_edit['original']['download_commit'], $warning);
+  } else {
+    $asset_edit['download_url'] = $this->utils->get_computed_download_url($asset_edit['browse_url'], $asset_edit['download_provider'], $asset_edit['download_commit'], $warning);
   }
+
+  if($warning != null) {
+    $asset_edit['warning'] = $warning;
+  }
+  if($asset_edit['download_commit'] == 'master') {
+    if(isset($asset_edit['warning'])) {
+      $asset_edit['warning'] .= "\n\n";
+    } else {
+      $asset_edit['warning'] = '';
+    }
+    $asset_edit['warning'] .= "Giving 'master' (or any other branch name) as the commit to be downloaded is not recommended, since it would invalidate the asset when you push a new version (since we ensure the version is kept the same via a sha256 hash of the zip). You can try using tags instead.";
+  }
+
 
   return $response->withJson($asset_edit, 200);
 };
@@ -464,7 +500,7 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
   foreach ($this->constants['asset_edit_fields'] as $i => $field) {
     if(isset($asset_edit[$field]) && $asset_edit[$field] !== null) {
       $query->bindValue(':' . $field, $asset_edit[$field]);
-      $update_version = $update_version || ($field === 'download_url' || $field === 'version_string');
+      $update_version = $update_version || ($field === 'browse_url' || $field === 'download_provider' || $field === 'download_commit' || $field === 'version_string');
     } else {
       $query->bindValue(':' . $field, null, PDO::PARAM_NULL);
     }

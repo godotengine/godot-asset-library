@@ -152,12 +152,17 @@ $get_asset = function ($request, $response, $args) {
           $asset_info["type"] = $this->constants['category_type'][(int) $value];
         } elseif($column==="support_level") {
           $asset_info["support_level"] = $this->constants['support_level'][(int) $value];
+        } elseif($column==="download_provider") {
+          $asset_info["download_provider"] = $this->constants['download_provider'][(int) $value];
         } else {
           $asset_info[$column] = $value;
         }
       }
     }
   }
+
+  $asset_info['download_url'] = $this->utils->get_computed_download_url($asset_info['browse_url'], $asset_info['download_provider'], $asset_info['download_commit']);
+
   foreach ($previews as $i => $_) {
     if(!isset($previews[$i]['thumbnail']) || $previews[$i]['thumbnail'] == '') {
       if($previews[$i]['type'] == 'video') {

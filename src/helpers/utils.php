@@ -8,6 +8,47 @@ class Utils
     $this->c = $c;
   }
 
+  public function get_computed_download_url($repo_url, $provider, $commit, &$warning=null) // i.e. browse_url, download_provider, download_commit
+  {
+    if(is_int($provider)) {
+      $provider = $this->c->constants['download_provider'][$provider];
+    }
+    $warning_suffix = "Please, ensure that the URL and the repository provider are, indeed, correct.";
+    $light_warning_suffix = "Please, doublecheck that the URL and the repository provider are correct.";
+    switch ($provider) {
+      case 'GitHub':
+        if(sizeof(preg_grep('/^https:\/\/github\.com\/.+?\/.+?$/', [$repo_url])) == 0) {
+          $warning = "\"$repo_url\" doesn't look correct; it should be similar to \"https://github.com/<owner>/<name>\". $warning_suffix";
+        }
+        return "$repo_url/archive/$commit.zip";
+      case 'GitLab':
+        if(sizeof(preg_grep('/^https:\/\/(gitlab\.com|[^\/]+)\/.+?\/.+?$/', [$repo_url])) == 0) {
+          $warning = "\"$repo_url\" doesn't look correct; it should be similar to \"https://<gitlab instance>/<owner>/<name>\". $warning_suffix";
+        } elseif(sizeof(preg_grep('/^https:\/\/(gitlab\.com)\/.+?\/.+?$/', [$repo_url])) == 0) {
+          $warning = "\"$repo_url\" might not be correct; it should be similar to \"https://gitlab.com/<owner>/<name>\", unless the asset is hosted on a custom instance of GitLab. $light_warning_suffix";
+        }
+        return "$repo_url/repository/archive.zip?ref=$commit";
+      case 'BitBucket':
+        if(sizeof(preg_grep('/^https:\/\/bitbucket\.org\/.+?\/.+?$/', [$repo_url])) == 0) {
+          $warning = "\"$repo_url\" doesn't look correct; it should be similar to \"https://bitbucket.org/<owner>/<name>\". $warning_suffix";
+        }
+        return "$repo_url/get/$commit.zip";
+      case 'Gogs':
+        if(sizeof(preg_grep('/^https?:\/\/.+?\/.+?\/.+?$/', [$repo_url])) == 0) {
+          $warning = "\"$repo_url\" doesn't look correct; it should be similar to \"http<s>://<gogs instance>/<owner>/<name>\". $warning_suffix";
+        }
+        $warning = "Since Gogs might be self-hosted, we can't be sure that \"$repo_url\" is a valid Gogs URL. $light_warning_suffix";
+        return "$repo_url/archive/$commit.zip";
+      case 'cgit':
+        if(sizeof(preg_grep('/^https?:\/\/.+?\/.+?\/.+?$/', [$repo_url])) == 0) {
+          $warning = "\"$repo_url\" doesn't look correct; it should be similar to \"http<s>://<cgit instance>/<owner>/<name>\". $warning_suffix";
+        }
+        $warning = "Since cgit might be self-hosted, we can't be sure that \"$repo_url\" is a valid cgit URL. $light_warning_suffix";
+        return "$repo_url/snapshot/$commit.zip";
+      default: return "$repo_url/$commit.zip"; // Obviously incorrect, but we would like to have some default case...
+    }
+  }
+
   public function error_reponse_if_not_user_has_level($currentStatus, &$response, $user, $required_level_name, $message = 'You are not authorized to do this')
   {
     if($user === false || $currentStatus) return true;

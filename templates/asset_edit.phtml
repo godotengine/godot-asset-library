@@ -5,8 +5,10 @@
   'category_id' => 'Category',
   'version_string' => 'Version String',
   'cost' => 'License',
-  'download_url' => 'Download Url',
-  'browse_url' => 'Browse Url',
+  'browse_url' => 'Repository Url',
+  'download_provider' => 'Repository Provider',
+  'download_commit' => 'Download Commit',
+  'download_url' => 'Download Url (Computed)',
   'icon_url' => 'Icon Url',
 ];
 $preview_field_names = [
@@ -60,7 +62,15 @@ $preview_field_names = [
 
 <?php if($data['status'] == 'rejected') { ?>
   <div class="alert alert-danger" role="alert">
-    This asset <?php if($data['asset_id'] != -1) echo 'edit' ?>has been rejected. Reason: <?php echo esc($data['reason']) ?>
+    This asset <?php if($data['asset_id'] != -1) echo 'edit ' ?>has been rejected. Reason: <?php echo esc($data['reason']) ?>
+  </div>
+<?php } ?>
+
+<?php if(isset($data['warning'])) { ?>
+  <div class="alert alert-warning" role="alert">
+    <strong>Warning:</strong> <?php echo nl2br(esc($data['warning'])) ?>
+    <br><br>
+    <em>If you think that this warning should not be here, you can allways <a href="https://github.com/godotengine/asset-library/issues">open an issue</a>.</em>
   </div>
 <?php } ?>
 

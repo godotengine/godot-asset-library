@@ -5,7 +5,8 @@ $_asset_values = array_merge([
 	'title' => '',
 	'category_id' => '0',
 	'version_string' => '',
-	'download_url' => '',
+	'download_provider' => '0',
+	'download_commit' => '',
 	'browse_url' => '',
 	'icon_url' => '',
 	'description' => '',
@@ -43,18 +44,32 @@ $_asset_values = array_merge([
 </div>
 
 <div class="form-group">
-		<label class="col-md-4 control-label" for="download">Download URL</label>
+		<label class="col-md-4 control-label" for="download_provider">Repository hoster</label>
 		<div class="col-md-5">
-				<input id="download" name="download_url" type="text" placeholder="Download URL" class="form-control input-md" required="" value="<?php echo esc($_asset_values['download_url']) ?>">
-				<span class="help-block">Set the url to download the asset (directly as a .zip). Should be similar to <code>https://github.com/&lt;user&gt;/&lt;project&gt;/archive/&lt;tag&gt;.zip</code></span>
+				<select id="download_provider" name="download_provider" class="form-control">
+					<?php foreach($constants['download_provider'] as $id => $name) if(is_int($id)) { ?>
+						<option value="<?php echo esc($name) ?>" <?php if($name == $_asset_values['download_provider']) echo 'selected=""'; ?>>
+							<?php echo esc($name) ?>
+						</option>
+					<?php } ?>
+				</select>
+				<span class="help-block">We really need to know where your repository is hosted in order to compute the final download URL. If your Git repository provider is missing, you might like to <a href="https://github.com/godotengine/asset-library/issues">open an issue</a> about it.</span>
 		</div>
 </div>
 
 <div class="form-group">
-		<label class="col-md-4 control-label" for="browse">Browse URL</label>
+		<label class="col-md-4 control-label" for="browse">Repository URL</label>
 		<div class="col-md-5">
-				<input id="browse" name="browse_url" type="text" placeholder="Browse URL" class="form-control input-md" required="" value="<?php echo esc($_asset_values['browse_url']) ?>">
-				<span class="help-block">Set the url to browse the asset's files (webpage). Should be similar to <code>https://github.com/&lt;user&gt;/&lt;project&gt;/</code></span>
+				<input id="browse" name="browse_url" type="text" placeholder="Repository URL" class="form-control input-md" required="" value="<?php echo esc($_asset_values['browse_url']) ?>">
+				<span class="help-block">Set the url to browse the asset's files (webpage). Should be similar to <code>https://github.com/&lt;user&gt;/&lt;project&gt;/</code> (Might be different depending on your "provider")</span>
+		</div>
+</div>
+
+<div class="form-group">
+		<label class="col-md-4 control-label" for="commit">Download Commit/tag</label>
+		<div class="col-md-5">
+				<input id="commit" name="download_commit" type="text" placeholder="Download URL" class="form-control input-md" required="" value="<?php echo esc($_asset_values['download_commit']) ?>">
+				<span class="help-block">Set the commit or tag to download the asset. Should be similar to <code>b1d3172f89b86e52465a74f63a74ac84c491d3e1</code> or <code>v1.0</code>. The final download url would be computed from this.</span>
 		</div>
 </div>
 
@@ -70,7 +85,14 @@ $_asset_values = array_merge([
 		<label class="col-md-4 control-label" for="license">License</label>
 		<div class="col-md-5">
 				<select id="license" name="cost" class="form-control">
-					<?php $licenses = ['MIT' => 'MIT', 'GPLv3' => 'GPL v3', 'GPLv2' => 'GPL v2', 'CC0' => 'CC0', 'BSD-2-Clause' => 'BSD 2-clause License', 'BSL-1.0' => 'Boost Software License'] ?>
+					<?php $licenses = [
+						'MIT' => 'MIT',
+						'GPLv3' => 'GPL v3',
+						'GPLv2' => 'GPL v2',
+						'CC0' => 'CC0',
+						'BSD-2-Clause' => 'BSD 2-clause License',
+						'BSL-1.0' => 'Boost Software License'
+					] ?>
 					<?php foreach($licenses as $id => $name) { ?>
 						<option value="<?php echo raw($id) ?>" <?php if($id == $_asset_values['cost']) echo 'selected=""'; ?>>
 							<?php echo esc($name) ?>

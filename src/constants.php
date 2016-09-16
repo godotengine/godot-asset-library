@@ -37,10 +37,17 @@ return $constants = [
     'moderator' => 50,
     'admin' => 100,
   ]),
+  'download_provider' => double_map([
+    'GitHub' => 0,
+    'GitLab' => 1,
+    'BitBucket' => 2,
+    'Gogs' => 3,
+    'cgit' => 4,
+  ]),
   'asset_edit_fields' => [
     'title', 'description', 'category_id',
     'version_string', 'cost',
-    'download_url', 'browse_url', 'icon_url',
+    'download_provider', 'download_commit', 'browse_url', 'icon_url',
   ],
   'asset_edit_preview_fields' => [
     'type', 'link', 'thumbnail',
