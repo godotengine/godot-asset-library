@@ -9,11 +9,19 @@
                 $ref = $ref_matches[1];
                 $commit_hash = trim(file_get_contents('.git/' . $ref));
                 ?>
+                <?php if(preg_match('/^[a-zA-Z0-9]+$/', $commit_hash)) { ?>
                   <span class="text-muted pull-right">
                     Currently running version <a href="https://github.com/godotengine/asset-library/commit/<?php echo url($commit_hash) ?>"><?php echo esc(substr($commit_hash, 0, 7)) ?></a>.
                   </span>
+                <?php } ?>
               <?php } ?>
             <?php } ?>
+          </p>
+          <p class="text-muted text-right">
+            Links:
+            <a href="https://github.com/godotengine/asset-library">Repository</a> |
+            <a href="https://github.com/godotengine/asset-library/issues">Issues</a> |
+            <a href="https://godotengine.org">Godot Engine homepage</a>
           </p>
         </div>
       </div>

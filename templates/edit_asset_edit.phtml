@@ -4,12 +4,21 @@
 } else {
 	$_asset_values = $data;
 } ?>
+
+<?php if(isset($data['warning'])) { ?>
+  <div class="alert alert-warning" role="alert">
+    <strong>Warning:</strong> <?php echo nl2br(esc($data['warning'])) ?>
+    <br><br>
+    <em>If you think that this warning should not be here, you can allways <a href="https://github.com/godotengine/asset-library/issues">open an issue</a>.</em>
+  </div>
+<?php } ?>
+
 <form class="form-horizontal" action="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>" method="post">
 	<?php include("_csrf.phtml") ?>
 		<fieldset>
 				<!-- Form Name -->
 				<legend>
-					Revise edit
+					Change edit
 					<a class="btn btn-default btn-sm" href="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>">
 						Back
 					</a>
@@ -20,7 +29,7 @@
 				<div class="form-group">
 						<label class="col-md-4 control-label" for="submit"></label>
 						<div class="col-md-4">
-								<button id="submit" class="btn btn-primary">Revise edit</button>
+								<button id="submit" class="btn btn-primary">Submit changed edit</button>
 								<a class="btn btn-default" href="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>">
 									Cancel
 								</a>
