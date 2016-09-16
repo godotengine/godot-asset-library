@@ -60,6 +60,7 @@ $container['utils'] = function ($c) {
 
 // csrf guard
 $container['csrf'] = function ($c) {
+  session_name('assetlib-csrf');
   session_start();
   return new \Slim\Csrf\Guard;
 };
