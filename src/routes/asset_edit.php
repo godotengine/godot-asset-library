@@ -45,7 +45,7 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
   foreach ($c->constants['asset_edit_fields'] as $i => $field) {
     if(isset($body[$field]) && $field == 'download_provider') {
       if(isset($c->constants['download_provider'][$body[$field]])) {
-        $body[$field] = (int) $c->constants['download_provider'][$body[$field]];
+        $body[$field] = (string) ((int) $c->constants['download_provider'][$body[$field]]);
       } else {
         $body[$field] = 0;
       }
@@ -59,6 +59,10 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
     } else {
       $error = $c->utils->error_reponse_if_missing_or_not_string($error, $response, $body, $field);
       if(!$error) $query->bindValue(':' . $field, $body[$field]);
+    }
+
+    if($error) {
+      return $error;
     }
   }
   return $error;
@@ -509,20 +513,30 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
   if($update_version) {
     $error = $this->utils->error_reponse_if_missing_or_not_string(false, $response, $body, 'hash');
     if($error) return $response;
-  }
 
-  if(isset($body['hash']) && trim($body['hash']) != '') {
     $body['hash'] = trim($body['hash']);
     if(sizeof(preg_grep('/^[a-f0-9]{64}$/', [$body['hash']])) == 0) {
       return $response->withJson([
-        'error' => 'Invalid hash given. Expected either nothing or 64 lowercase hexadecimal digits.',
+        'error' => 'Invalid hash given. Expected 64 lowercase hexadecimal digits.',
       ]);
     }
+
     $query->bindValue(':update_version', 1, PDO::PARAM_INT);
     $query->bindValue(':download_hash', $body['hash']);
   } else {
-    $query->bindValue(':update_version', 0, PDO::PARAM_INT);
-    $query->bindValue(':download_hash', null, PDO::PARAM_NULL);
+    if(isset($body['hash']) && trim($body['hash']) != '') {
+      $body['hash'] = trim($body['hash']);
+      if(sizeof(preg_grep('/^[a-f0-9]{64}$/', [$body['hash']])) == 0) {
+        return $response->withJson([
+          'error' => 'Invalid hash given. Expected either nothing or 64 lowercase hexadecimal digits.',
+        ]);
+      }
+      $query->bindValue(':update_version', 1, PDO::PARAM_INT);
+      $query->bindValue(':download_hash', $body['hash']);
+    } else {
+      $query->bindValue(':update_version', 0, PDO::PARAM_INT);
+      $query->bindValue(':download_hash', null, PDO::PARAM_NULL);
+    }
   }
 
   // Update the status to prevent race conditions
