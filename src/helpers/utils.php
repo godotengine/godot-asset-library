@@ -10,6 +10,7 @@ class Utils
 
   public function get_computed_download_url($repo_url, $provider, $commit, &$warning=null) // i.e. browse_url, download_provider, download_commit
   {
+    $repo_url = rtrim($repo_url, '/');
     if(is_int($provider)) {
       $provider = $this->c->constants['download_provider'][$provider];
     }
