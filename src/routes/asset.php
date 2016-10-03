@@ -20,7 +20,7 @@ $app->get('/asset', function ($request, $response, $args) { global $frontend;
   $max_page_size = 500;
   $page_offset = 0;
   if(isset($params['category']) && $params['category'] != "") {
-    $category = (int) $params['category'];
+    $category = intVal($params['category']);
   }
   if(isset($params['type']) && isset($this->constants['category_type'][$params['type']])) {
     $category_type = $this->constants['category_type'][$params['type']];
@@ -30,13 +30,13 @@ $app->get('/asset', function ($request, $response, $args) { global $frontend;
     if(is_array($params['support'])) {
       foreach($params['support'] as $key => $value) {
         if($value && isset($this->constants['support_level'][$key])) {
-          array_push($support_levels, (int) $this->constants['support_level'][$key]);
+          array_push($support_levels, intVal($this->constants['support_level'][$key]));
         }
       }
     } else {
       foreach(explode(' ', $params['support']) as $key => $value) { // `+` is changed to ` ` automatically
         if(isset($this->constants['support_level'][$value])) {
-          array_push($support_levels, (int) $this->constants['support_level'][$value]);
+          array_push($support_levels, intVal($this->constants['support_level'][$value]));
         }
       }
     }
@@ -48,12 +48,12 @@ $app->get('/asset', function ($request, $response, $args) { global $frontend;
     $username = $params['user'];
   }
   if(isset($params['max_results'])) {
-    $page_size = min(abs((int) $params['max_results']), $max_page_size);
+    $page_size = min(abs(intVal($params['max_results']), $max_page_size));
   }
   if(isset($params['page'])) {
-    $page_offset = abs((int) $params['page']) * $page_size;
+    $page_offset = abs(intVal($params['page'])) * $page_size;
   } elseif(isset($params['offset'])) {
-    $page_offset = abs((int) $params['offset']);
+    $page_offset = abs(intVal($params['offset']));
   }
   if(isset($params['sort'])) {
     $column_mapping = [
@@ -108,7 +108,7 @@ $app->get('/asset', function ($request, $response, $args) { global $frontend;
 
   $context = $this;
   $assets = array_map(function($asset) use($context) {
-    $asset["support_level"] = $context->constants['support_level'][(int) $asset['support_level']];
+    $asset["support_level"] = $context->constants['support_level'][intVal($asset['support_level']]);
     return $asset;
   }, $assets);
 
@@ -117,7 +117,7 @@ $app->get('/asset', function ($request, $response, $args) { global $frontend;
     'page' => floor($page_offset / $page_size),
     'pages' => ceil($total_count / $page_size),
     'page_length' => $page_size,
-    'total_items' => (int) $total_count,
+    'total_items' => intVal($total_count),
   ], 200);
 });
 
@@ -125,7 +125,7 @@ $app->get('/asset', function ($request, $response, $args) { global $frontend;
 $get_asset = function ($request, $response, $args) {
   $query = $this->queries['asset']['get_one'];
 
-  $query->bindValue(':id', (int) $args['id'], PDO::PARAM_INT);
+  $query->bindValue(':id', intVal($args['id']), PDO::PARAM_INT);
   $query->execute();
 
   $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
@@ -149,11 +149,11 @@ $get_asset = function ($request, $response, $args) {
         } elseif($column==="type" || $column==="link" || $column==="thumbnail") {
             $previews[count($previews) - 1][$column] = $value;
         } elseif($column==="category_type") {
-          $asset_info["type"] = $this->constants['category_type'][(int) $value];
+          $asset_info["type"] = $this->constants['category_type'][intval($value)];
         } elseif($column==="support_level") {
-          $asset_info["support_level"] = $this->constants['support_level'][(int) $value];
+          $asset_info["support_level"] = $this->constants['support_level'][intVal($value)];
         } elseif($column==="download_provider") {
-          $asset_info["download_provider"] = $this->constants['download_provider'][(int) $value];
+          $asset_info["download_provider"] = $this->constants['download_provider'][intVal($value)];
         } else {
           $asset_info[$column] = $value;
         }
@@ -197,7 +197,7 @@ $app->post('/asset/{id:[0-9]+}/support_level', function ($request, $response, $a
   if(!isset($this->constants['support_level'][$body['support_level']])) {
     $numeric_value_keys = [];
     foreach ($this->constants['support_level'] as $key => $value) {
-      if((int) $value === $value) {
+      if(is_numeric($value)) {
         array_push($numeric_value_keys, $key);
       }
     }
@@ -208,8 +208,8 @@ $app->post('/asset/{id:[0-9]+}/support_level', function ($request, $response, $a
 
   $query = $this->queries['asset']['set_support_level'];
 
-  $query->bindValue(':asset_id', (int) $args['id'], PDO::PARAM_INT);
-  $query->bindValue(':support_level', (int) $this->constants['support_level'][$body['support_level']], PDO::PARAM_INT);
+  $query->bindValue(':asset_id', intVal($args['id'], PDO::PARAM_INT));
+  $query->bindValue(':support_level', intVal($this->constants['support_level'][$body['support_level']], PDO::PARAM_INT));
 
   $query->execute();
 
