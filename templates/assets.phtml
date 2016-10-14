@@ -34,7 +34,7 @@
     <div class="form-group">
       <label for="sort">Order by</label>
       <select id="sort" name="sort" class="form-control">
-        <?php foreach(['rating', 'cost', 'name', 'updated'] as $id => $order) { ?>
+        <?php if(!isset($params['sort'])) $params['sort'] = 'updated'; foreach(['rating', 'cost', 'name', 'updated'] as $id => $order) { ?>
           <option value="<?php echo esc($order) ?>" <?php if(isset($params['sort']) && $order == $params['sort']) echo 'selected=""'; ?>>
             <?php echo esc(ucfirst($order)) ?>
           </option>

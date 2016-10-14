@@ -13,7 +13,7 @@ $app->get('/asset', function ($request, $response, $args) { global $frontend;
   }
   $filter = '%';
   $username = '%';
-  $order_column = 'rating';
+  $order_column = 'modify_date';
   $order_direction = 'desc';
   $support_levels = [];
   $page_size = 10;
