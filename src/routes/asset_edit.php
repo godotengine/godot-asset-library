@@ -22,15 +22,24 @@ function _submit_asset_edit($c, $response, $body, $user_id, $asset_id=-1) {
     if($error) return $response;
   }
 
+  // Make a transaction, so we can roll back failed submissions
+  $c->db->beginTransaction();
+
   $query->execute();
   $error = $c->utils->error_reponse_if_query_bad(false, $response, $query);
-  if($error) return $response;
+  if($error) {
+    $c->db->rollback();
+    return $response;
+  }
 
   $id = $c->db->lastInsertId();
 
   if(isset($body['previews'])) {
     $error = _add_previews_to_edit($c, $error, $response, $id, $body['previews'], null, $asset_id==-1);
-    if($error) return $response;
+    if($error) {
+      $c->db->rollback();
+      return $response;
+    }
   }
 
   return $response->withJson([
@@ -373,6 +382,14 @@ $get_edit = function ($request, $response, $args) {
     }
     $asset_edit['warning'] .= "Giving 'master' (or any other branch name) as the commit to be downloaded is not recommended, since it would invalidate the asset when you push a new version (since we ensure the version is kept the same via a sha256 hash of the zip). You can try using tags instead.";
   }
+  if(sizeof(preg_grep('/\/|\\|\:|^\.|\ |\^|\~|\?|\*|\[|^\@$|\@\{/', [$asset_edit['download_commit']])) != 0) {
+    if(isset($asset_edit['warning'])) {
+      $asset_edit['warning'] .= "\n\n";
+    } else {
+      $asset_edit['warning'] = '';
+    }
+    $asset_edit['warning'] .= "The inputted download commit is not a valid git ref, please ensure you aren't giving a full URL. (If your tag includes '/' in its name, consider escaping it as '%2F')";
+  }
 
 
   return $response->withJson($asset_edit, 200);
@@ -471,14 +488,25 @@ $app->post('/asset/edit/{id:[0-9]+}', function ($request, $response, $args) {
   $error = _insert_asset_edit_fields($this, false, $response, $query, $body, false, $asset);
   if($error) return $response;
 
+  // Make a transaction, so we can roll back failed submissions
+  $this->db->beginTransaction();
+
   $query->execute();
   $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
-  if($error) return $response;
+  if($error) {
+    $this->db->rollback();
+    return $response;
+  }
 
   if(isset($body['previews'])) {
     $error = _add_previews_to_edit($this, $error, $response, $args['id'], $body['previews'], $asset, false);
-    if($error) return $response;
+    if($error) {
+      $this->db->rollback();
+      return $response;
+    }
   }
+
+  $this->db->commit();
 
   return $response->withJson([
     'id' => $args['id'],
