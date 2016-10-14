@@ -16,7 +16,7 @@
       <li><a href="?<?php echo esc(http_build_query(['page' => $page] + $params)) ?>"><?php echo $page + 1; ?></a></li>
     <?php } ?>
 
-    <?php if($page < $data['page']) { ?>
+    <?php if($page < $data['page'] && $page < $data['page'] - $mid_pages) { ?>
       <li class="disabled"><a>…</a></li>
     <?php } ?>
 
@@ -52,4 +52,13 @@
 </nav>
 <p>
   <?php echo esc($data['page_length']) ?> item<?php if($data['page_length'] != 1) echo 's' ?> per page, <?php echo esc($data['total_items']) ?> item<?php if($data['total_items'] != 1) echo 's' ?> total.
+</p>
+<p>
+  Change items per page to: <span class="btn-group btn-group-xs" role="group" aria-label="Page size">
+    <?php foreach ([10, 20, 50, 100, 200, 500] as $amount) { ?>
+      <a href="?<?php echo esc(http_build_query(['max_results' => $amount, 'page' => floor($data['page'] * $data['page_length'] / $amount)] + $params)) ?>" class="btn btn-default" aria-label="Per page">
+        <?php echo raw($amount); ?>
+      </a>
+    <?php } ?>
+  </span>
 </p>
