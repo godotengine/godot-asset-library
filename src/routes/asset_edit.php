@@ -42,6 +42,8 @@ function _submit_asset_edit($c, $response, $body, $user_id, $asset_id=-1) {
     }
   }
 
+  $c->db->commit();
+
   return $response->withJson([
     'id' => $id,
     'url' => 'asset/edit/' . $id,
