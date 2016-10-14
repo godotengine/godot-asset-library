@@ -188,6 +188,7 @@ $app->get('/asset/edit', function ($request, $response, $args) {
 
   $asset_id = '%';
   $filter = '%';
+  $username = '%';
   $statuses = [];
   $page_size = 10;
   $max_page_size = 500;
@@ -213,6 +214,9 @@ $app->get('/asset/edit', function ($request, $response, $args) {
   if(isset($params['filter'])) {
     $filter = '%'.preg_replace('/[[:punct:]]+/', '%', $params['filter']).'%';
   }
+  if(isset($params['user'])) {
+    $username = $params['user'];
+  }
   if(isset($params['max_results'])) {
     $page_size = min(abs((int) $params['max_results']), $max_page_size);
   }
@@ -229,6 +233,7 @@ $app->get('/asset/edit', function ($request, $response, $args) {
 
   $query = $this->queries['asset_edit']['search'];
   $query->bindValue(':filter', $filter);
+  $query->bindValue(':username', $username);
   $query->bindValue(':asset_id', $asset_id);
   $query->bindValue(':statuses_regex', $statuses);
   $query->bindValue(':page_size', $page_size, PDO::PARAM_INT);
@@ -240,6 +245,7 @@ $app->get('/asset/edit', function ($request, $response, $args) {
 
   $query_count = $this->queries['asset_edit']['search_count'];
   $query_count->bindValue(':filter', $filter);
+  $query_count->bindValue(':username', $username);
   $query_count->bindValue(':asset_id', $asset_id);
   $query_count->bindValue(':statuses_regex', $statuses);
   $query_count->execute();

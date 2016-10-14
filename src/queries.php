@@ -121,7 +121,7 @@ return [
       LEFT JOIN `as_assets` USING (asset_id)
       WHERE
         status RLIKE :statuses_regex
-        AND asset_id LIKE :asset_id
+        AND asset_id LIKE :asset_id AND username LIKE :username
         AND (
           `as_asset_edits`.title LIKE :filter
           OR `as_assets`.title LIKE :filter
@@ -134,7 +134,7 @@ return [
       LEFT JOIN `as_users` USING (user_id)
       WHERE
         status RLIKE :statuses_regex
-        AND asset_id LIKE :asset_id
+        AND asset_id LIKE :asset_id AND username LIKE :username
         AND (
           title LIKE :filter
           OR username LIKE :filter
