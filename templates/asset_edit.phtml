@@ -6,6 +6,7 @@
   'version_string' => 'Version String',
   'cost' => 'License',
   'browse_url' => 'Repository Url',
+  'issues_url' => 'Issues Url',
   'download_provider' => 'Repository Provider',
   'download_commit' => 'Download Commit',
   'download_url' => 'Download Url (Computed)',
@@ -83,9 +84,9 @@ $preview_field_names = [
     <tr>
       <th>Property</th>
       <?php if(isset($data['original'])) { ?>
-        <th style="min-width: 50%" class="text-center">Old</th>
+        <th style="min-width: 50%" class="text-center">Old/Current</th>
       <?php } ?>
-      <th style="min-width: 50%" class="text-center">New</th>
+      <th style="min-width: 50%" class="text-center">New/Edit</th>
     </tr>
     <?php foreach($field_names as $field => $name) { ?>
       <tr>

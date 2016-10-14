@@ -42,14 +42,24 @@ function _submit_asset_edit($c, $response, $body, $user_id, $asset_id=-1) {
 function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $required=false, $bare_asset=null) {
   if($error) return true;
 
-  foreach ($c->constants['asset_edit_fields'] as $i => $field) {
-    if(isset($body[$field]) && $field == 'download_provider') {
-      if(isset($c->constants['download_provider'][$body[$field]])) {
-        $body[$field] = (string) ((int) $c->constants['download_provider'][$body[$field]]);
-      } else {
-        $body[$field] = 0;
-      }
+  if(isset($body['download_provider'])) {
+    if(isset($c->constants['download_provider'][$body['download_provider']])) {
+      $body['download_provider'] = (string) ((int) $c->constants['download_provider'][$body['download_provider']]);
+    } else {
+      $body['download_provider'] = 0;
     }
+  }
+  if(isset($body['issues_url']) && !$required) {
+    $default_issues_url = $c->utils->get_default_issues_url(
+      $body['browse_url'] ?: $bare_asset['browse_url'],
+      intval($body['download_provider'] ?: $bare_asset['download_provider'])
+    );
+    if($default_issues_url == $body['issues_url']) {
+      unset($body['issues_url']);
+    }
+  }
+
+  foreach ($c->constants['asset_edit_fields'] as $i => $field) {
     if(!$required) {
       if(isset($body[$field]) && ($bare_asset === null || $bare_asset[$field] != $body[$field])) {
         $query->bindValue(':' . $field, $body[$field]);
@@ -329,13 +339,27 @@ $get_edit = function ($request, $response, $args) {
         $asset_edit['download_commit'] ?: $asset_edit['original']['download_commit'],
         $warning
       );
+      if($asset_edit['issues_url'] == '') {
+        $asset_edit['issues_url'] = $this->utils->get_default_issues_url(
+          $asset_edit['browse_url'] ?: $asset_edit['original']['browse_url'],
+          $asset_edit['download_provider'] ?: $asset_edit['original']['download_provider']
+        );
+      }
     } else {
       $asset_edit['download_url'] = null;
     }
 
     $asset_edit['original']['download_url'] = $this->utils->get_computed_download_url($asset_edit['original']['browse_url'], $asset_edit['original']['download_provider'], $asset_edit['original']['download_commit'], $warning);
+
+    if($asset_edit['original']['issues_url'] == '') {
+      $asset_edit['original']['issues_url'] = $this->utils->get_default_issues_url($asset_edit['original']['browse_url'], $asset_edit['original']['download_provider']);
+    }
   } else {
     $asset_edit['download_url'] = $this->utils->get_computed_download_url($asset_edit['browse_url'], $asset_edit['download_provider'], $asset_edit['download_commit'], $warning);
+
+    if($asset_edit['issues_url'] == '') {
+      $asset_edit['issues_url'] = $this->utils->get_default_issues_url($asset_edit['issues_url'], $asset_edit['issues_url']);
+    }
   }
 
   if($warning != null) {

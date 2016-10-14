@@ -162,6 +162,10 @@ $get_asset = function ($request, $response, $args) {
   }
 
   $asset_info['download_url'] = $this->utils->get_computed_download_url($asset_info['browse_url'], $asset_info['download_provider'], $asset_info['download_commit']);
+  if($asset_info['issues_url'] == '') {
+    $asset_info['issues_url'] = $this->utils->get_default_issues_url($asset_info['browse_url'], $asset_info['download_provider']);
+  }
+
 
   foreach ($previews as $i => $_) {
     if(!isset($previews[$i]['thumbnail']) || $previews[$i]['thumbnail'] == '') {

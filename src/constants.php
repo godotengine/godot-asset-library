@@ -47,7 +47,7 @@ return $constants = [
   'asset_edit_fields' => [
     'title', 'description', 'category_id',
     'version_string', 'cost',
-    'download_provider', 'download_commit', 'browse_url', 'icon_url',
+    'download_provider', 'download_commit', 'browse_url', 'issues_url', 'icon_url',
   ],
   'asset_edit_preview_fields' => [
     'type', 'link', 'thumbnail',

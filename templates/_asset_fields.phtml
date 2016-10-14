@@ -8,6 +8,7 @@ $_asset_values = array_merge([
 	'download_provider' => '0',
 	'download_commit' => '',
 	'browse_url' => '',
+	'issues_url' => '',
 	'icon_url' => '',
 	'description' => '',
 	'cost' => '',
@@ -66,9 +67,17 @@ $_asset_values = array_merge([
 </div>
 
 <div class="form-group">
+		<label class="col-md-4 control-label" for="issues">Issues URL</label>
+		<div class="col-md-5">
+				<input id="issues" name="issues_url" type="text" placeholder="Issues URL" class="form-control input-md" value="<?php echo esc($_asset_values['issues_url']) ?>">
+				<span class="help-block">Set the url to issues list of the  asset. Should be similar to <code>https://github.com/&lt;user&gt;/&lt;project&gt;/issues</code> (Might be different depending on your "provider"). If you use your provider's issue list, you can leave it empty.</span>
+		</div>
+</div>
+
+<div class="form-group">
 		<label class="col-md-4 control-label" for="commit">Download Commit/tag</label>
 		<div class="col-md-5">
-				<input id="commit" name="download_commit" type="text" placeholder="Download URL" class="form-control input-md" required="" value="<?php echo esc($_asset_values['download_commit']) ?>">
+				<input id="commit" name="download_commit" type="text" placeholder="Download Commit/tag" class="form-control input-md" required="" value="<?php echo esc($_asset_values['download_commit']) ?>">
 				<span class="help-block">Set the commit or tag to download the asset. Should be similar to <code>b1d3172f89b86e52465a74f63a74ac84c491d3e1</code> or <code>v1.0</code>. The final download url would be computed from this.</span>
 		</div>
 </div>

@@ -50,6 +50,24 @@ class Utils
     }
   }
 
+  public function get_default_issues_url($repo_url, $provider) // i.e. browse_url, download_provider
+  {
+    $repo_url = rtrim($repo_url, '/');
+    if(is_int($provider)) {
+      $provider = $this->c->constants['download_provider'][$provider];
+    }
+    switch ($provider) {
+      case 'GitHub':
+      case 'GitLab':
+      case 'BitBucket':
+      case 'Gogs':
+        return "$repo_url/issues";
+      case 'cgit':
+      default:
+        return "";
+    }
+  }
+
   public function error_reponse_if_not_user_has_level($currentStatus, &$response, $user, $required_level_name, $message = 'You are not authorized to do this')
   {
     if($user === false || $currentStatus) return true;
