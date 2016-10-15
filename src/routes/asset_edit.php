@@ -405,7 +405,7 @@ $get_edit = function ($request, $response, $args) {
 
 // Binding to multiple routes
 $app->get('/asset/edit/{id:[0-9]+}', $get_edit);
-if(isset($frontend) && $frontend) {
+if(FRONTEND) {
   $app->get('/asset/edit/{id:[0-9]+}/edit', $get_edit);
 }
 

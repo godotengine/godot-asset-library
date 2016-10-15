@@ -2,11 +2,11 @@
 // Asset routes
 
 // Searches through the list of assets
-$app->get('/asset', function ($request, $response, $args) { global $frontend;
+$app->get('/asset', function ($request, $response, $args) {
   $params = $request->getQueryParams();
 
   $category = '%';
-  if(isset($frontend) && $frontend) {
+  if(FRONTEND) {
     $category_type = $this->constants['category_type']['any'];
   } else {
     $category_type = $this->constants['category_type']['addon'];
@@ -186,7 +186,7 @@ $get_asset = function ($request, $response, $args) {
 };
 // Binding to multiple routes
 $app->get('/asset/{id:[0-9]+}', $get_asset);
-if(isset($frontend) && $frontend) {
+if(FRONTEND) {
   $app->get('/asset/{id:[0-9]+}/edit', $get_asset);
 }
 

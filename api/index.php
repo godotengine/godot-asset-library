@@ -14,6 +14,10 @@ if (PHP_SAPI == 'cli-server') {
 
 require __DIR__ . '/../vendor/autoload.php';
 
+if (!defined('FRONTEND')) {
+    define('FRONTEND', false);
+}
+
 // Instantiate the app
 $settings = require __DIR__ . '/../src/settings.php';
 $local_settings = require __DIR__ . '/../src/settings-local.php';

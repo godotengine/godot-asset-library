@@ -3,7 +3,7 @@
 
 
 // Initializes the connection by sending all categories available
-$app->get('/configure', function ($request, $response, $args) { global $frontend;
+$app->get('/configure', function ($request, $response, $args) {
   $params = $request->getQueryParams();
 
   $category_type = $this->constants['category_type']['addon'];
@@ -29,7 +29,7 @@ $app->get('/configure', function ($request, $response, $args) { global $frontend
       'categories' => $query->fetchAll(),
       'token' => $token,
       'login_url' => $_SERVER['HTTP_HOST'] .
-        (isset($frontend) && $frontend ? dirname($request->getUri()->getBasePath()) : $request->getUri()->getBasePath()) .
+        (FRONTEND ? dirname($request->getUri()->getBasePath()) : $request->getUri()->getBasePath()) .
         '/login#' . urlencode($token),
       // ^ TODO: Make those routes actually work
     ], 200);
@@ -138,7 +138,7 @@ $app->post('/login', function ($request, $response, $args) {
   }
 });
 
-if(isset($frontend) && $frontend) { // Doesn't work for non-frontend, since we can't unissue tokens -- to logout from api/ just drop the token.
+if(FRONTEND) { // Doesn't work for non-frontend, since we can't unissue tokens -- to logout from api/ just drop the token.
   $app->get('/logout', function ($request, $response, $args) {
     return $response->withJson([
       'authenticated' => false,

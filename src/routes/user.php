@@ -43,6 +43,6 @@ $get_feed = function ($request, $response, $args) {
 
 // Binding to multiple routes
 $app->post('/user/feed', $get_feed);
-if(isset($frontend) && $frontend) {
-	$app->get('/user/feed', $get_feed);
+if(FRONTEND) {
+  $app->get('/user/feed', $get_feed);
 }

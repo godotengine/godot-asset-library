@@ -1,6 +1,6 @@
 <?php
 
-if(isset($frontend) && $frontend) {
+if(FRONTEND) {
   $container = $app->getContainer();
 
   $app->get('/', function ($request, $response) {
