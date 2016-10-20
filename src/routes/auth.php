@@ -98,32 +98,32 @@ $app->post('/login', function ($request, $response, $args) {
 
   $user = $query->fetchAll()[0];
 
-  if(isset($body['authorize_token'])) {
-    $token_data = $this->tokens->validate($body['authorize_token']);
+  if(password_verify($body['password'], $user['password_hash'])) {
+    if(isset($body['authorize_token'])) {
+      $token_data = $this->tokens->validate($body['authorize_token']);
 
-    if(!$token_data || !isset($token_data->session)) {
-      return $response->withJson([
-        'error' => 'Invalid token supplied'
-      ], 400);
+      if(!$token_data || !isset($token_data->session)) {
+        return $response->withJson([
+          'error' => 'Invalid token supplied'
+        ], 400);
+      }
+
+      $session_id = $token_data->session;
+      $token = $body['authorize_token'];
+    } else {
+      $session_id = openssl_random_pseudo_bytes($this->settings['auth']['tokenSessionBytesLength']);
+      $token = $this->tokens->generate([
+        'session' => base64_encode($session_id),
+      ]);
     }
 
-    $session_id = $token_data->session;
-    $token = $body['authorize_token'];
-  } else {
-    $session_id = openssl_random_pseudo_bytes($this->settings['auth']['tokenSessionBytesLength']);
-    $token = $this->tokens->generate([
-      'session' => base64_encode($session_id),
-    ]);
-  }
+    $query_session = $this->queries['user']['set_session_token'];
+    $query_session->bindValue(':id', (int) $user['user_id'], PDO::PARAM_INT);
+    $query_session->bindValue(':session_token', $session_id);
+    $query_session->execute();
+    $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_session);
+    if($error) return $response;
 
-  $query_session = $this->queries['user']['set_session_token'];
-  $query_session->bindValue(':id', (int) $user['user_id'], PDO::PARAM_INT);
-  $query_session->bindValue(':session_token', $session_id);
-  $query_session->execute();
-  $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_session);
-  if($error) return $response;
-
-  if(password_verify($body['password'], $user['password_hash'])) {
     return $response->withJson([
       'username' => $body['username'],
       'token' => $token,
@@ -138,12 +138,147 @@ $app->post('/login', function ($request, $response, $args) {
   }
 });
 
-if(FRONTEND) { // Doesn't work for non-frontend, since we can't unissue tokens -- to logout from api/ just drop the token.
-  $app->get('/logout', function ($request, $response, $args) {
-    return $response->withJson([
-      'authenticated' => false,
-      'token' => '',
-      'url' => 'login',
-    ], 200);
-  });
+$logout = function ($request, $response, $args) {
+  $body = $request->getParsedBody();
+  $error = $this->utils->ensure_logged_in(false, $response, $body, $user);
+
+  $query = $this->queries['user']['set_session_token'];
+  $query->bindValue(':id', (int) $user['user_id'], PDO::PARAM_INT);
+  $query->bindValue(':session_token', null, PDO::PARAM_NULL);
+  $query->execute();
+
+  return $response->withJson([
+    'authenticated' => false,
+    'token' => '',
+    'url' => 'login',
+  ], 200);
+};
+
+if(FRONTEND) {
+  $app->get('/logout', $logout); // Cookies would allow us to logout without post body.
+} else {
+  $app->post('/logout', $logout);
 }
+
+$app->post('/forgot_password', function ($request, $response, $args) {
+  $body = $request->getParsedBody();
+
+  $error = $this->utils->error_reponse_if_missing_or_not_string(false, $response, $body, 'email');
+  if($error) return $response;
+
+  $query_user = $this->queries['user']['get_by_email'];
+  $query_user->bindValue(':email', $body['email']);
+  $query_user->execute();
+
+  $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_user);
+  if($error) return $response;
+
+
+  if($query_user->rowCount() != 0) {
+    $user = $query_user->fetchAll()[0];
+
+    $reset_id = openssl_random_pseudo_bytes($this->settings['auth']['tokenResetBytesLength']);
+    $token = $this->tokens->generate([
+      'reset' => base64_encode($reset_id),
+    ]);
+
+    $query = $this->queries['user']['set_reset_token'];
+    $query->bindValue(':id', (int) $user['user_id'], PDO::PARAM_INT);
+    $query->bindValue(':reset_token', $reset_id);
+    $query->execute();
+    $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
+    if($error) return $response;
+
+    $reset_link = $_SERVER['HTTP_HOST'] .
+      (FRONTEND ? $request->getUri()->getBasePath() : dirname($request->getUri()->getBasePath())) .
+      '/reset_password?token=' . urlencode($token);
+
+    $mail = $this->mail->__invoke(); // Since its a function closure, we have to invoke it with magic methods
+    $mail->addAddress($user['email'], $user['username']);
+    $mail->isHTML(true);
+    $mail->Subject =
+    $mail->Body = $this->renderer->fetch('reset_password_email.phtml', [
+      'user' => $user,
+      'link' => $reset_link,
+    ]);
+    $mail->AltBody = "Reset your ($user[username]'s) password: $reset_link\n";
+    if(!$mail->send()) {
+      $this->logger->error('mailSendFail', [$mail->ErrorInfo]);
+    }
+    // $this->logger->info('mailLinkDebug', [$reset_link]);
+  }
+
+  return $response->withJson([
+    'email' => $body['email'],
+  ], 200);
+});
+
+$app->get('/reset_password', function ($request, $response, $args) {
+  $params = $request->getQueryParams();
+  $body = $request->getParsedBody();
+
+  $error = $this->utils->ensure_logged_in(false, $response, $params + $body, $user, $token_data, true);
+  if($error) return $response;
+
+  return $response->withJson([
+    'token' => ($params + $body)['token'],
+  ], 200);
+});
+
+$app->post('/reset_password', function ($request, $response, $args) {
+  $body = $request->getParsedBody();
+
+  $error = $this->utils->ensure_logged_in(false, $response, $body, $user, $token_data, true);
+  $error = $this->utils->error_reponse_if_missing_or_not_string(false, $response, $body, 'password');
+  if($error) return $response;
+
+  $password_hash = password_hash($body['password'], PASSWORD_BCRYPT, $this->get('settings')['auth']['bcryptOptions']);
+
+  $query_password = $this->queries['user']['set_password_and_nullify_session'];
+  $query_password->bindValue(':id', (int) $user['user_id'], PDO::PARAM_INT);
+  $query_password->bindValue(':password_hash', $password_hash);
+  $query_password->execute();
+  $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_password);
+  if($error) return $response;
+
+  $query = $this->queries['user']['set_reset_token'];
+  $query->bindValue(':id', (int) $user['user_id'], PDO::PARAM_INT);
+  $query->bindValue(':reset_token', null, PDO::PARAM_NULL);
+  $query->execute();
+  $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
+  if($error) return $response;
+
+  return $response->withJson([
+    'token' => null,
+    'url' => 'login',
+  ], 200);
+});
+
+$app->post('/change_password', function ($request, $response, $args) {
+  $body = $request->getParsedBody();
+
+  $error = $this->utils->ensure_logged_in(false, $response, $body, $user, $token_data);
+  $error = $this->utils->error_reponse_if_missing_or_not_string(false, $response, $body, 'new_password');
+  $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'old_password');
+  if($error) return $response;
+
+  if(!password_verify($body['old_password'], $user['password_hash'])) {
+    return $response->withJson([
+      'error' => 'Wrong old password supplied!',
+    ], 403);
+  }
+
+  $password_hash = password_hash($body['new_password'], PASSWORD_BCRYPT, $this->get('settings')['auth']['bcryptOptions']);
+
+  $query_password = $this->queries['user']['set_password_and_nullify_session'];
+  $query_password->bindValue(':id', (int) $user['user_id'], PDO::PARAM_INT);
+  $query_password->bindValue(':password_hash', $password_hash);
+  $query_password->execute();
+  $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_password);
+  if($error) return $response;
+
+  return $response->withJson([
+    'token' => null,
+    'url' => 'login',
+  ], 200);
+});

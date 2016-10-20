@@ -13,5 +13,15 @@ return [
         'auth' => [
             'secret' => 'secret',
         ],
+        'db' => [
+            'from' => 'no-reply@localdomain.local',
+            // 'replyTo' => '',
+            // 'smtp' => [
+            //   'host' => '',
+            //   'port' => 0,
+            //   'auth' => ['user' => 'user', 'pass' => 'pass'],
+            //   'secure' => ''
+            // ],
+        ],
     ],
 ];

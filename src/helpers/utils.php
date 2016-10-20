@@ -99,7 +99,7 @@ class Utils
     if($currentStatus) return true;
 
     if($query->errorCode() != '00000') {
-      $this->c->logger->error($query->errorCode(), $query->errorInfo());
+      $this->c->logger->error('DBError', $query->errorInfo());
       $response = $response->withJson([
         'error' => $message,
       ], 500);
@@ -121,17 +121,17 @@ class Utils
     return false;
   }
 
-  public function ensure_logged_in($currentStatus, &$response, $body, &$user)
+  public function ensure_logged_in($currentStatus, &$response, $body, &$user, &$token_data=null, $reset = false)
   {
     $currentStatus = $this->error_reponse_if_missing_or_not_string($currentStatus, $response, $body, 'token');
     if($currentStatus) return true;
 
     $token_data = $this->c->tokens->validate($body['token']);
-    $error = $this->get_user_from_token_data(false, $response, $token_data, $user);
+    $error = $this->get_user_from_token_data(false, $response, $token_data, $user, $reset);
     return $error;
   }
 
-  public function get_user_from_token_data($currentStatus, &$response, $token_data, &$user)
+  public function get_user_from_token_data($currentStatus, &$response, $token_data, &$user, $reset = false)
   {
     if($currentStatus) return true;
     if(!$token_data) {
@@ -146,9 +146,12 @@ class Utils
     //   $query = $this->c->queries['user']['get_one'];
     //   $query->bindValue(':id', (int) $token_data->user_id, PDO::PARAM_INT);
     // }
-    if(isset($token_data->session)) {
+    if(isset($token_data->session) && !$reset) {
       $query = $this->c->queries['user']['get_by_session_token'];
       $query->bindValue(":session_token", base64_decode($token_data->session));
+    } else if(isset($token_data->reset) && $reset) {
+      $query = $this->c->queries['user']['get_by_reset_token'];
+      $query->bindValue(":reset_token", base64_decode($token_data->reset));
     } else {
       $response = $response->withJson([
         'error' => 'Invalid token'
@@ -159,7 +162,7 @@ class Utils
     $query->execute();
 
     $currentStatus = $this->error_reponse_if_query_bad(false, $response, $query);
-    $currentStatus = $this->error_reponse_if_query_no_results($currentStatus, $response, $query);
+    $currentStatus = $this->error_reponse_if_query_no_results($currentStatus, $response, $query, 'Nonexistent token submitted');
     if($currentStatus) return true;
 
     $user = $query->fetchAll()[0];

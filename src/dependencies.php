@@ -46,16 +46,32 @@ $container['queries'] = function ($c) {
   return $queries;
 };
 
-// tokens
-$container['tokens'] = function ($c) {
-  require_once __DIR__ . '/helpers/tokens.php';
-  return new Tokens($c);
-};
-
-// utils
-$container['utils'] = function ($c) {
-  require_once __DIR__ . '/helpers/utils.php';
-  return new Utils($c);
+// mail
+$container['mail'] = function ($c) {
+  return function() use ($c) {
+    $settings = $c->get('settings')['mail'];
+    $mail = new PHPMailer;
+    $mail->setFrom($settings['from']);
+    if(isset($settings['replyTo'])) {
+      $mail->addReplyTo($settings['replyTo']);
+    }
+    if(isset($settings['smtp'])) {
+      $mail->isSMTP();
+      $mail->Host = $settings['smtp']['host'];
+      $mail->Host = $settings['smtp']['port'];
+      if(isset($settings['smtp']['auth'])) {
+        $mail->SMTPAuth = true;
+        $mail->Username = $settings['smtp']['auth']['user'];
+        $mail->Password = $settings['smtp']['auth']['pass'];
+        if($settings['smtp']['secure']) {
+          $mail->SMTPSecure = $settings['smtp']['secure'];
+        }
+      } else {
+        $mail->SMTPAuth = true;
+      }
+    }
+    return $mail;
+  };
 };
 
 // csrf guard
@@ -73,4 +89,16 @@ $container['cookies'] = function ($c) {
     'requestCookies' => new Dflydev\FigCookies\FigRequestCookies,
     'responseCookies' => new Dflydev\FigCookies\FigResponseCookies,
   ];
+};
+
+// tokens
+$container['tokens'] = function ($c) {
+  require_once __DIR__ . '/helpers/tokens.php';
+  return new Tokens($c);
+};
+
+// utils
+$container['utils'] = function ($c) {
+  require_once __DIR__ . '/helpers/utils.php';
+  return new Utils($c);
 };

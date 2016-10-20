@@ -4,6 +4,13 @@
   <div class="alert alert-info" role="alert">You are already logged in as <?php echo esc($user['username']) ?></div>
 <?php endif ?>
 
+<?php if(isset($reset_user)): ?>
+  <div class="alert alert-info" role="alert">
+    You are currently resetting the password for <?php echo esc($reset_user['username']) ?>.
+    <a href="<?php echo raw($basepath) ?>/reset_password">Continue</a>
+  </div>
+<?php endif ?>
+
 <?php if(isset($data['error'])): ?>
   <div class="alert alert-danger" role="alert"><b>Error: </b> <?php echo esc($data['error']) ?></div>
 <?php endif ?>
@@ -21,6 +28,7 @@
   <div class="btn-group">
     <button type="submit" class="btn btn-primary">Login</button>
     <a href="<?php echo raw($basepath) ?>/register" class="btn btn-default">Register</a>
+    <a href="<?php echo raw($basepath) ?>/forgot_password" class="btn btn-link">Forgot password</a>
   </div>
 </form>
 <?php include("_footer.phtml") ?>

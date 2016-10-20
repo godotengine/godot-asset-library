@@ -24,6 +24,8 @@ if(FRONTEND) {
     $static_routes = [
       '/login' => true,
       '/register' => true,
+      '/forgot_password' => true,
+      '/change_password' => true,
       '/asset/submit' => true,
     ];
     $queryUri = false;
@@ -56,10 +58,14 @@ if(FRONTEND) {
       $result = [];
     }
 
+
     if(isset($result['url'])) {
       $response = new \Slim\Http\Response(303);
       $response = $response->withHeader('Location', $request->getUri()->getBasePath() . '/' . $result['url']);
     } else {
+      if(isset($result['token'])) {
+        $body['token'] = $result['token'];
+      }
       $template_names = [
         'GET /user/feed' => 'feed',
 
@@ -73,9 +79,14 @@ if(FRONTEND) {
         'GET /asset/edit/{id:[0-9]+}/edit' => 'edit_asset_edit',
 
         'GET /login' => 'login',
-        'GET /register' => 'register',
         'ERROR POST /login' => 'login',
+        'GET /register' => 'register',
         'ERROR POST /register' => 'register',
+        'GET /forgot_password' => 'forgot_password',
+        'POST /forgot_password' => 'forgot_password_result',
+        'GET /reset_password' => 'reset_password',
+        'GET /change_password' => 'change_password',
+        'ERROR POST /change_password' => 'change_password',
 
         'ERROR' => 'error',
       ];
@@ -112,6 +123,11 @@ if(FRONTEND) {
           $error = $this->utils->get_user_from_token_data(false, $errorResponse, $token, $user);
           if(!$error) {
             $params['user'] = $user;
+          } else {
+            $error = $this->utils->get_user_from_token_data(false, $errorResponse, $token, $reset_user, true);
+            if(!$error) {
+              $params['reset_user'] = $reset_user;
+            }
           }
         }
 
