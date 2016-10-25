@@ -23,7 +23,7 @@ return [
         ],
 
         // Mail configuration
-        'db' => [
+        'mail' => [
             'from' => 'no-reply@localhost.localdomain',
             // 'replyTo' => '',
             // 'smtp' => [
