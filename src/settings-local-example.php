@@ -13,7 +13,7 @@ return [
         'auth' => [
             'secret' => 'secret',
         ],
-        'db' => [
+        'mail' => [
             'from' => 'no-reply@localdomain.local',
             // 'replyTo' => '',
             // 'smtp' => [
