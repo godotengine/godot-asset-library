@@ -333,6 +333,7 @@ $app->get('/asset/edit', function ($request, $response, $args) {
     ], 200);
 });
 
+
 // Get an edit
 $get_edit = function ($request, $response, $args) {
     $query = $this->queries['asset_edit']['get_one'];

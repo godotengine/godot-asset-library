@@ -2,6 +2,8 @@
 
 namespace Godot\AssetLibrary\Helpers;
 
+use PDO;
+
 class Utils
 {
     private $c;
@@ -85,6 +87,26 @@ class Utils
             return true;
         }
         return false;
+    }
+
+    public function errorResponseIfNotOwner($currentStatus, &$response, $user, $asset_id, $message = 'You are not authorized to do this')
+    {
+        if($user === false || $currentStatus) return true;
+
+        $query = $this->c->queries['asset']['get_one'];
+        $query->bindValue(':id', (int) $asset_id, PDO::PARAM_INT);
+        $query->execute();
+
+        if($query->rowCount() <= 0) {
+            return $response->withJson(['error' => 'Couldn\'t find asset with id '.$asset_id.'!'], 404);
+        }
+
+        $asset = $query->fetch();
+
+        if($asset['author_id'] != $user['user_id']) {
+            $response = $response->withJson(['error' => $message], 403);
+            return true;
+        }
     }
 
     public function errorResponseIfMissingOrNotString($currentStatus, &$response, $object, $property)
