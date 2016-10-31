@@ -1,6 +1,6 @@
 <?php
 
-if(FRONTEND) {
+if (FRONTEND) {
     $container = $app->getContainer();
 
     $app->get('/', function ($request, $response) {
@@ -10,14 +10,14 @@ if(FRONTEND) {
     $app->add(function ($request, $response, $next) {
         $cookie = $this->cookies['requestCookies']->get($request, 'token');
         $body = $request->getParsedBody();
-        if($cookie->getValue() !== null && !isset($body['token'])) {
+        if ($cookie->getValue() !== null && !isset($body['token'])) {
             $cookieValue = (string) $cookie->getValue();
             $body['token'] = $cookieValue;
             $request = $request->withParsedBody($body);
         }
         $response->getBody()->rewind();
         $preresult = json_decode($response->getBody()->getContents(), true);
-        if(!isset($preresult['error'])) {
+        if (!isset($preresult['error'])) {
             $response = $next($request, $response);
         }
 
@@ -33,13 +33,13 @@ if(FRONTEND) {
         $route = $request->getAttribute('route');
         $path = $request->getUri()->getPath();
 
-        if(substr($path, 0, 8) == 'frontend') {
+        if (substr($path, 0, 8) == 'frontend') {
             $response = $response->withHeader('Location', $request->getUri()->getBasePath() . substr($path, 8) . '?' . $request->getUri()->getQuery());
         }
 
-        if(isset($static_routes['/' . $path])) {
+        if (isset($static_routes['/' . $path])) {
             $queryUri = '/' . $path;
-        } elseif($route) {
+        } elseif ($route) {
             $queryUri = $route->getPattern();
         } else {
             return $response;
@@ -47,10 +47,10 @@ if(FRONTEND) {
 
         $queryUri = $request->getMethod() . ' ' . $queryUri;
 
-        if($route) {
+        if ($route) {
             $response->getBody()->rewind();
             $result = json_decode($response->getBody()->getContents(), true);
-            if($result === null) {
+            if ($result === null) {
                 return $response;
                 //$result = ['error' => 'Can\'t decode api response - ' . $response->getBody()->getContents()];
             }
@@ -59,11 +59,11 @@ if(FRONTEND) {
         }
 
 
-        if(isset($result['url'])) {
+        if (isset($result['url'])) {
             $response = new \Slim\Http\Response(303);
             $response = $response->withHeader('Location', $request->getUri()->getBasePath() . '/' . $result['url']);
         } else {
-            if(isset($result['token'])) {
+            if (isset($result['token'])) {
                 $body['token'] = $result['token'];
             }
             $template_names = [
@@ -91,15 +91,15 @@ if(FRONTEND) {
                 'ERROR' => 'error',
             ];
 
-            if(isset($result['error'])) {
-                if(isset($template_names['ERROR ' . $queryUri])) {
+            if (isset($result['error'])) {
+                if (isset($template_names['ERROR ' . $queryUri])) {
                     $queryUri = 'ERROR ' . $queryUri;
                 } else {
                     $queryUri = 'ERROR';
                 }
             }
 
-            if(isset($template_names[$queryUri])) {
+            if (isset($template_names[$queryUri])) {
                 $response = new \Slim\Http\Response();
                 $errorResponse = new \Slim\Http\Response();
                 $params = [
@@ -118,14 +118,14 @@ if(FRONTEND) {
                     //'body' => $request->getParsedBody(),
                 ];
 
-                if(isset($body['token'])) {
+                if (isset($body['token'])) {
                     $token = $this->tokens->validate($body['token']);
-                    $error = $this->utils->get_user_from_token_data(false, $errorResponse, $token, $user);
-                    if(!$error) {
+                    $error = $this->utils->getUserFromTokenData(false, $errorResponse, $token, $user);
+                    if (!$error) {
                         $params['user'] = $user;
                     } else {
-                        $error = $this->utils->get_user_from_token_data(false, $errorResponse, $token, $reset_user, true);
-                        if(!$error) {
+                        $error = $this->utils->getUserFromTokenData(false, $errorResponse, $token, $reset_user, true);
+                        if (!$error) {
                             $params['reset_user'] = $reset_user;
                         }
                     }
@@ -135,9 +135,9 @@ if(FRONTEND) {
                 $query_categories->bindValue(':category_type', '%');
                 $query_categories->execute();
 
-                $error = $this->utils->error_reponse_if_query_bad(false, $errorResponse, $query_categories);
-                $error = $this->utils->error_reponse_if_query_no_results($error, $errorResponse, $query_categories);
-                if(!$error) {
+                $error = $this->utils->errorResponseIfQueryBad(false, $errorResponse, $query_categories);
+                $error = $this->utils->errorResponseIfQueryNoResults($error, $errorResponse, $query_categories);
+                if (!$error) {
                     $categories = $query_categories->fetchAll();
                     foreach ($categories as $key => $value) {
                         $params['categories'][$value['id']] = $value;
@@ -148,7 +148,7 @@ if(FRONTEND) {
             }
         }
 
-        if(isset($result['token'])) {
+        if (isset($result['token'])) {
             $response = $this->cookies['responseCookies']->set($response, $this->cookies['setCookie']('token')
                 ->withValue($result['token'])
                 ->withDomain($_SERVER['HTTP_HOST'])

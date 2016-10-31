@@ -8,7 +8,7 @@ $app->get('/configure', function ($request, $response, $args) {
 
     $category_type = $this->constants['category_type']['addon'];
 
-    if(isset($params['type']) && isset($this->constants['category_type'][$params['type']])) {
+    if (isset($params['type']) && isset($this->constants['category_type'][$params['type']])) {
         $category_type = $this->constants['category_type'][$params['type']];
     }
 
@@ -16,10 +16,12 @@ $app->get('/configure', function ($request, $response, $args) {
     $query->bindValue(':category_type', $category_type);
     $query->execute();
 
-    $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
-    if($error) return $response;
+    $error = $this->utils->errorResponseIfQueryBad(false, $response, $query);
+    if ($error) {
+        return $response;
+    }
 
-    if(isset($request->getQueryParams()['session'])) {
+    if (isset($request->getQueryParams()['session'])) {
         $id = openssl_random_pseudo_bytes($this->settings['auth']['tokenSessionBytesLength']);
         $token = $this->tokens->generate([
             'session' => base64_encode($id),
@@ -33,7 +35,6 @@ $app->get('/configure', function ($request, $response, $args) {
                 '/login#' . urlencode($token),
             // ^ TODO: Make those routes actually work
         ], 200);
-
     } else {
         return $response->withJson([
             'categories' => $query->fetchAll(),
@@ -46,18 +47,22 @@ $app->post('/register', function ($request, $response, $args) {
     $query = $this->queries['user']['register'];
     $query_check = $this->queries['user']['get_by_username'];
 
-    $error = $this->utils->error_reponse_if_missing_or_not_string(false, $response, $body, 'username');
-    $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'email');
-    $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'password');
-    if($error) return $response;
+    $error = $this->utils->errorResponseIfMissingOrNotString(false, $response, $body, 'username');
+    $error = $this->utils->errorResponseIfMissingOrNotString($error, $response, $body, 'email');
+    $error = $this->utils->errorResponseIfMissingOrNotString($error, $response, $body, 'password');
+    if ($error) {
+        return $response;
+    }
 
     $query_check->bindValue(':username', $body['username']);
     $query_check->execute();
 
-    $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_check);
-    if($error) return $response;
+    $error = $this->utils->errorResponseIfQueryBad(false, $response, $query_check);
+    if ($error) {
+        return $response;
+    }
 
-    if($query_check->rowCount() > 0) {
+    if ($query_check->rowCount() > 0) {
         return $response->withJson([
             'error' => 'Username already taken.',
         ], 409);
@@ -71,8 +76,10 @@ $app->post('/register', function ($request, $response, $args) {
 
     $query->execute();
 
-    $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
-    if($error) return $response;
+    $error = $this->utils->errorResponseIfQueryBad(false, $response, $query);
+    if ($error) {
+        return $response;
+    }
 
     return $response->withJson([
         'username' => $body['username'],
@@ -85,24 +92,28 @@ $app->post('/login', function ($request, $response, $args) {
     $body = $request->getParsedBody();
     $query = $this->queries['user']['get_by_username'];
 
-    $error = $this->utils->error_reponse_if_missing_or_not_string(false, $response, $body, 'username');
-    $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'password');
-    if($error) return $response;
+    $error = $this->utils->errorResponseIfMissingOrNotString(false, $response, $body, 'username');
+    $error = $this->utils->errorResponseIfMissingOrNotString($error, $response, $body, 'password');
+    if ($error) {
+        return $response;
+    }
 
     $query->bindValue(':username', $body['username']);
     $query->execute();
 
-    $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
-    $error = $this->utils->error_reponse_if_query_no_results(false, $response, $query, 'No such username: ' . $body['username']);
-    if($error) return $response;
+    $error = $this->utils->errorResponseIfQueryBad(false, $response, $query);
+    $error = $this->utils->errorResponseIfQueryNoResults(false, $response, $query, 'No such username: ' . $body['username']);
+    if ($error) {
+        return $response;
+    }
 
     $user = $query->fetchAll()[0];
 
-    if(password_verify($body['password'], $user['password_hash'])) {
-        if(isset($body['authorize_token'])) {
+    if (password_verify($body['password'], $user['password_hash'])) {
+        if (isset($body['authorize_token'])) {
             $token_data = $this->tokens->validate($body['authorize_token']);
 
-            if(!$token_data || !isset($token_data->session)) {
+            if (!$token_data || !isset($token_data->session)) {
                 return $response->withJson([
                     'error' => 'Invalid token supplied'
                 ], 400);
@@ -121,8 +132,10 @@ $app->post('/login', function ($request, $response, $args) {
         $query_session->bindValue(':id', (int) $user['user_id'], PDO::PARAM_INT);
         $query_session->bindValue(':session_token', $session_id);
         $query_session->execute();
-        $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_session);
-        if($error) return $response;
+        $error = $this->utils->errorResponseIfQueryBad(false, $response, $query_session);
+        if ($error) {
+            return $response;
+        }
 
         return $response->withJson([
             'username' => $body['username'],
@@ -140,7 +153,7 @@ $app->post('/login', function ($request, $response, $args) {
 
 $logout = function ($request, $response, $args) {
     $body = $request->getParsedBody();
-    $error = $this->utils->ensure_logged_in(false, $response, $body, $user);
+    $error = $this->utils->ensureLoggedIn(false, $response, $body, $user);
 
     $query = $this->queries['user']['set_session_token'];
     $query->bindValue(':id', (int) $user['user_id'], PDO::PARAM_INT);
@@ -154,7 +167,7 @@ $logout = function ($request, $response, $args) {
     ], 200);
 };
 
-if(FRONTEND) {
+if (FRONTEND) {
     $app->get('/logout', $logout); // Cookies would allow us to logout without post body.
 } else {
     $app->post('/logout', $logout);
@@ -163,18 +176,22 @@ if(FRONTEND) {
 $app->post('/forgot_password', function ($request, $response, $args) {
     $body = $request->getParsedBody();
 
-    $error = $this->utils->error_reponse_if_missing_or_not_string(false, $response, $body, 'email');
-    if($error) return $response;
+    $error = $this->utils->errorResponseIfMissingOrNotString(false, $response, $body, 'email');
+    if ($error) {
+        return $response;
+    }
 
     $query_user = $this->queries['user']['get_by_email'];
     $query_user->bindValue(':email', $body['email']);
     $query_user->execute();
 
-    $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_user);
-    if($error) return $response;
+    $error = $this->utils->errorResponseIfQueryBad(false, $response, $query_user);
+    if ($error) {
+        return $response;
+    }
 
 
-    if($query_user->rowCount() != 0) {
+    if ($query_user->rowCount() != 0) {
         $user = $query_user->fetchAll()[0];
 
         $reset_id = openssl_random_pseudo_bytes($this->settings['auth']['tokenResetBytesLength']);
@@ -186,8 +203,10 @@ $app->post('/forgot_password', function ($request, $response, $args) {
         $query->bindValue(':id', (int) $user['user_id'], PDO::PARAM_INT);
         $query->bindValue(':reset_token', $reset_id);
         $query->execute();
-        $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
-        if($error) return $response;
+        $error = $this->utils->errorResponseIfQueryBad(false, $response, $query);
+        if ($error) {
+            return $response;
+        }
 
         $reset_link = $request->getUri()->getScheme() . '://' . $_SERVER['HTTP_HOST'] .
             (FRONTEND ? $request->getUri()->getBasePath() : dirname($request->getUri()->getBasePath())) .
@@ -202,7 +221,7 @@ $app->post('/forgot_password', function ($request, $response, $args) {
             'link' => $reset_link,
         ]);
         $mail->AltBody = "Reset your ($user[username]'s) password: $reset_link\n";
-        if(!$mail->send()) {
+        if (!$mail->send()) {
             $this->logger->error('mailSendFail', [$mail->ErrorInfo]);
         }
         // $this->logger->info('mailLinkDebug', [$reset_link]);
@@ -217,8 +236,10 @@ $app->get('/reset_password', function ($request, $response, $args) {
     $params = $request->getQueryParams();
     $body = null !== $request->getParsedBody()? $request->getParsedBody() : [];
 
-    $error = $this->utils->ensure_logged_in(false, $response, $params + $body, $user, $token_data, true);
-    if($error) return $response;
+    $error = $this->utils->ensureLoggedIn(false, $response, $params + $body, $user, $token_data, true);
+    if ($error) {
+        return $response;
+    }
 
     $combined_body = $params + $body;
 
@@ -230,9 +251,11 @@ $app->get('/reset_password', function ($request, $response, $args) {
 $app->post('/reset_password', function ($request, $response, $args) {
     $body = $request->getParsedBody();
 
-    $error = $this->utils->ensure_logged_in(false, $response, $body, $user, $token_data, true);
-    $error = $this->utils->error_reponse_if_missing_or_not_string(false, $response, $body, 'password');
-    if($error) return $response;
+    $error = $this->utils->ensureLoggedIn(false, $response, $body, $user, $token_data, true);
+    $error = $this->utils->errorResponseIfMissingOrNotString(false, $response, $body, 'password');
+    if ($error) {
+        return $response;
+    }
 
     $password_hash = password_hash($body['password'], PASSWORD_BCRYPT, $this->get('settings')['auth']['bcryptOptions']);
 
@@ -240,15 +263,19 @@ $app->post('/reset_password', function ($request, $response, $args) {
     $query_password->bindValue(':id', (int) $user['user_id'], PDO::PARAM_INT);
     $query_password->bindValue(':password_hash', $password_hash);
     $query_password->execute();
-    $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_password);
-    if($error) return $response;
+    $error = $this->utils->errorResponseIfQueryBad(false, $response, $query_password);
+    if ($error) {
+        return $response;
+    }
 
     $query = $this->queries['user']['set_reset_token'];
     $query->bindValue(':id', (int) $user['user_id'], PDO::PARAM_INT);
     $query->bindValue(':reset_token', null, PDO::PARAM_NULL);
     $query->execute();
-    $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
-    if($error) return $response;
+    $error = $this->utils->errorResponseIfQueryBad(false, $response, $query);
+    if ($error) {
+        return $response;
+    }
 
     return $response->withJson([
         'token' => null,
@@ -259,12 +286,14 @@ $app->post('/reset_password', function ($request, $response, $args) {
 $app->post('/change_password', function ($request, $response, $args) {
     $body = $request->getParsedBody();
 
-    $error = $this->utils->ensure_logged_in(false, $response, $body, $user, $token_data);
-    $error = $this->utils->error_reponse_if_missing_or_not_string(false, $response, $body, 'new_password');
-    $error = $this->utils->error_reponse_if_missing_or_not_string($error, $response, $body, 'old_password');
-    if($error) return $response;
+    $error = $this->utils->ensureLoggedIn(false, $response, $body, $user, $token_data);
+    $error = $this->utils->errorResponseIfMissingOrNotString(false, $response, $body, 'new_password');
+    $error = $this->utils->errorResponseIfMissingOrNotString($error, $response, $body, 'old_password');
+    if ($error) {
+        return $response;
+    }
 
-    if(!password_verify($body['old_password'], $user['password_hash'])) {
+    if (!password_verify($body['old_password'], $user['password_hash'])) {
         return $response->withJson([
             'error' => 'Wrong old password supplied!',
         ], 403);
@@ -276,8 +305,10 @@ $app->post('/change_password', function ($request, $response, $args) {
     $query_password->bindValue(':id', (int) $user['user_id'], PDO::PARAM_INT);
     $query_password->bindValue(':password_hash', $password_hash);
     $query_password->execute();
-    $error = $this->utils->error_reponse_if_query_bad(false, $response, $query_password);
-    if($error) return $response;
+    $error = $this->utils->errorResponseIfQueryBad(false, $response, $query_password);
+    if ($error) {
+        return $response;
+    }
 
     return $response->withJson([
         'token' => null,

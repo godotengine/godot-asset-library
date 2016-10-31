@@ -48,22 +48,22 @@ $container['queries'] = function ($c) {
 
 // mail
 $container['mail'] = function ($c) {
-    return function() use ($c) {
+    return function () use ($c) {
         $settings = $c->get('settings')['mail'];
         $mail = new PHPMailer;
         $mail->setFrom($settings['from']);
-        if(isset($settings['replyTo'])) {
+        if (isset($settings['replyTo'])) {
             $mail->addReplyTo($settings['replyTo']);
         }
-        if(isset($settings['smtp'])) {
+        if (isset($settings['smtp'])) {
             $mail->isSMTP();
             $mail->Host = $settings['smtp']['host'];
             $mail->Port = $settings['smtp']['port'];
-            if(isset($settings['smtp']['auth'])) {
+            if (isset($settings['smtp']['auth'])) {
                 $mail->SMTPAuth = true;
                 $mail->Username = $settings['smtp']['auth']['user'];
                 $mail->Password = $settings['smtp']['auth']['pass'];
-                if($settings['smtp']['secure']) {
+                if ($settings['smtp']['secure']) {
                     $mail->SMTPSecure = $settings['smtp']['secure'];
                 }
             } else {
@@ -84,8 +84,12 @@ $container['csrf'] = function ($c) {
 // cookies
 $container['cookies'] = function ($c) {
     return [
-        'cookie' => function($name, $value) {return Dflydev\FigCookies\Cookie::create($name, $value);},
-        'setCookie' => function($name) {return Dflydev\FigCookies\SetCookie::create($name);},
+        'cookie' => function ($name, $value) {
+            return Dflydev\FigCookies\Cookie::create($name, $value);
+        },
+        'setCookie' => function ($name) {
+            return Dflydev\FigCookies\SetCookie::create($name);
+        },
         'requestCookies' => new Dflydev\FigCookies\FigRequestCookies,
         'responseCookies' => new Dflydev\FigCookies\FigResponseCookies,
     ];
@@ -93,12 +97,12 @@ $container['cookies'] = function ($c) {
 
 // tokens
 $container['tokens'] = function ($c) {
-    require_once __DIR__ . '/helpers/tokens.php';
-    return new Tokens($c);
+    require_once __DIR__ . '/Helpers/Tokens.php';
+    return new Godot\AssetLibrary\Helpers\Tokens($c);
 };
 
 // utils
 $container['utils'] = function ($c) {
-    require_once __DIR__ . '/helpers/utils.php';
-    return new Utils($c);
+    require_once __DIR__ . '/Helpers/Utils.php';
+    return new Godot\AssetLibrary\Helpers\Utils($c);
 };

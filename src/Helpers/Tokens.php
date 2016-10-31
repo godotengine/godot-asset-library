@@ -1,15 +1,19 @@
 <?php
 // Token format: <base64-encoded json-encoded data>&<base64-encoded id (composed of raw random bytes)>|<base64-encoded time>&<base64-encoded hmac>
 
+namespace Godot\AssetLibrary\Helpers;
+
 class Tokens
 {
-    var $c;
+    private $c;
+
     public function __construct($c)
     {
         $this->c = $c;
     }
 
-    function sign_token($token) {
+    private function signToken($token)
+    {
         return hash_hmac('sha256', $token, $this->c->settings['auth']['secret'], true);
     }
 
@@ -21,7 +25,7 @@ class Tokens
         $token_time = time();
 
         $token_payload = base64_encode($token_data) . '&' . base64_encode($token_id) . '|' . base64_encode($token_time);
-        $token = $token_payload . '&' . base64_encode($this->sign_token($token_payload));
+        $token = $token_payload . '&' . base64_encode($this->signToken($token_payload));
 
         return $token;
     }
@@ -29,7 +33,7 @@ class Tokens
     public function validate($token)
     {
         $token_parts = explode('&', $token);
-        if(count($token_parts) != 3) {
+        if (count($token_parts) != 3) {
             return false;
         }
 
@@ -39,11 +43,10 @@ class Tokens
 
         $token_payload = $token_parts[0] . '&' . $token_parts[1];
 
-        if($token_signature !== $this->sign_token($token_payload) || time() > $token_time + $this->c->settings['auth']['tokenExpirationTime']) {
+        if ($token_signature !== $this->signToken($token_payload) || time() > $token_time + $this->c->settings['auth']['tokenExpirationTime']) {
             return false;
         }
 
         return $token_data;
     }
 }
-

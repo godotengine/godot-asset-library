@@ -31,7 +31,7 @@ require __DIR__ . '/../src/middleware.php';
 
 // Register routes
 
-foreach(glob(__DIR__ . "/../src/routes/*.php") as $filename) {
+foreach (glob(__DIR__ . "/../src/routes/*.php") as $filename) {
     require $filename;
 }
 
