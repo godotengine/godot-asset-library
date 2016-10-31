@@ -1,34 +1,34 @@
 <?php include("_header.phtml") ?>
 
 <?php if(isset($user)): ?>
-  <div class="alert alert-info" role="alert">You are already logged in as <?php echo esc($user['username']) ?></div>
+    <div class="alert alert-info" role="alert">You are already logged in as <?php echo esc($user['username']) ?></div>
 <?php endif ?>
 
 <?php if(isset($reset_user)): ?>
-  <div class="alert alert-info" role="alert">
-    You are currently resetting the password for <?php echo esc($reset_user['username']) ?>.
-    <a href="<?php echo raw($basepath) ?>/reset_password">Continue</a>
-  </div>
+    <div class="alert alert-info" role="alert">
+        You are currently resetting the password for <?php echo esc($reset_user['username']) ?>.
+        <a href="<?php echo raw($basepath) ?>/reset_password">Continue</a>
+    </div>
 <?php endif ?>
 
 <?php if(isset($data['error'])): ?>
-  <div class="alert alert-danger" role="alert"><b>Error: </b> <?php echo esc($data['error']) ?></div>
+    <div class="alert alert-danger" role="alert"><b>Error: </b> <?php echo esc($data['error']) ?></div>
 <?php endif ?>
 
 <form action="<?php echo raw($basepath) ?>/login" method="post">
-  <?php include("_csrf.phtml") ?>
-  <div class="form-group">
-    <label for="login-form-username">Username</label>
-    <input type="text" name="username" class="form-control" id="login-form-username" placeholder="Username">
-  </div>
-  <div class="form-group">
-    <label for="login-form-password">Password</label>
-    <input type="password" name="password" class="form-control" id="login-form-password" placeholder="Password">
-  </div>
-  <div class="btn-group">
-    <button type="submit" class="btn btn-primary">Login</button>
-    <a href="<?php echo raw($basepath) ?>/register" class="btn btn-default">Register</a>
-    <a href="<?php echo raw($basepath) ?>/forgot_password" class="btn btn-link">Forgot password</a>
-  </div>
+    <?php include("_csrf.phtml") ?>
+    <div class="form-group">
+        <label for="login-form-username">Username</label>
+        <input type="text" name="username" class="form-control" id="login-form-username" placeholder="Username">
+    </div>
+    <div class="form-group">
+        <label for="login-form-password">Password</label>
+        <input type="password" name="password" class="form-control" id="login-form-password" placeholder="Password">
+    </div>
+    <div class="btn-group">
+        <button type="submit" class="btn btn-primary">Login</button>
+        <a href="<?php echo raw($basepath) ?>/register" class="btn btn-default">Register</a>
+        <a href="<?php echo raw($basepath) ?>/forgot_password" class="btn btn-link">Forgot password</a>
+    </div>
 </form>
 <?php include("_footer.phtml") ?>

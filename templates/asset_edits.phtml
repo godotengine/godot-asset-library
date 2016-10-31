@@ -1,76 +1,76 @@
 <?php include("_header.phtml") ?>
 
 <form method="get" action="edit">
-  <div class="form-inline">
-    <div class="form-group">
-      <label>Status</label>
-      <?php foreach($constants['edit_status'] as $id => $status) if(is_int($id)) { ?>
-        <label>
-          <input type="checkbox" name="status[<?php echo esc($status) ?>]" value="1"
-            <?php if(isset($params['status']) && (is_array($params['status']) ?
-              isset($params['status'][$status]) && $params['status'][$status] :
-              in_array($status, explode(' ', $params['status'])))
-            ) echo 'checked=""';
-            ?>>
-          <?php echo esc(ucfirst(str_replace('_', ' ', $status))) ?>
-        </label>
-      <?php } ?>
+    <div class="form-inline">
+        <div class="form-group">
+            <label>Status</label>
+            <?php foreach($constants['edit_status'] as $id => $status) if(is_int($id)) { ?>
+                <label>
+                    <input type="checkbox" name="status[<?php echo esc($status) ?>]" value="1"
+                        <?php if(isset($params['status']) && (is_array($params['status']) ?
+                            isset($params['status'][$status]) && $params['status'][$status] :
+                            in_array($status, explode(' ', $params['status'])))
+                        ) echo 'checked=""';
+                        ?>>
+                    <?php echo esc(ucfirst(str_replace('_', ' ', $status))) ?>
+                </label>
+            <?php } ?>
+        </div>
+        <?php if(isset($params['asset'])) { ?>
+            <div style="display:inline-block;width:40px;"></div>
+            <div class="form-group bg-primary" style="padding:0 5px;">
+                <label>
+                    <input type="checkbox" name="asset" value="<?php echo esc($params['asset']) ?>" checked="">
+                    <?php if($params['asset'] == -1) { ?>
+                        Only new assets
+                    <?php } else { ?>
+                        Only asset #<?php echo esc($params['asset']) ?>
+                    <?php } ?>
+                </label>
+            </div>
+        <?php } ?>
+        <?php if(isset($params['user'])) { ?>
+            <div style="display:inline-block;width:40px;"></div>
+            <div class="form-group bg-primary" style="padding:0 5px;">
+                <label>
+                    <input type="checkbox" name="user" value="<?php echo esc($params['user']) ?>" checked="">
+                    Only by <?php echo esc($params['user']) ?>
+                </label>
+            </div>
+        <?php } ?>
     </div>
-    <?php if(isset($params['asset'])) { ?>
-      <div style="display:inline-block;width:40px;"></div>
-      <div class="form-group bg-primary" style="padding:0 5px;">
-        <label>
-          <input type="checkbox" name="asset" value="<?php echo esc($params['asset']) ?>" checked="">
-          <?php if($params['asset'] == -1) { ?>
-            Only new assets
-          <?php } else { ?>
-            Only asset #<?php echo esc($params['asset']) ?>
-          <?php } ?>
-        </label>
-      </div>
-    <?php } ?>
-    <?php if(isset($params['user'])) { ?>
-      <div style="display:inline-block;width:40px;"></div>
-      <div class="form-group bg-primary" style="padding:0 5px;">
-        <label>
-          <input type="checkbox" name="user" value="<?php echo esc($params['user']) ?>" checked="">
-          Only by <?php echo esc($params['user']) ?>
-        </label>
-      </div>
-    <?php } ?>
-  </div>
-  <div class="input-group">
-    <input type="text" class="form-control" name="filter" placeholder="Search for..." value="<?php if(isset($params['filter'])) echo esc($params['filter']) ?>">
-    <span class="input-group-btn">
-      <button class="btn btn-default" type="submit">Search</button>
-    </span>
-  </div>
+    <div class="input-group">
+        <input type="text" class="form-control" name="filter" placeholder="Search for..." value="<?php if(isset($params['filter'])) echo esc($params['filter']) ?>">
+        <span class="input-group-btn">
+            <button class="btn btn-default" type="submit">Search</button>
+        </span>
+    </div>
 </form>
 
 <?php foreach($data['result'] as $i => $asset_edit) { ?>
-    <div class="media">
-      <div class="media-left">
-        <a href="<?php echo raw($basepath) . '/asset/edit/' . url($asset_edit['edit_id']) ?>">
-          <img class="media-object" src="<?php echo esc($asset_edit['icon_url']) ?>" alt="<?php echo esc($asset_edit['title']) ?>'s icon" width=80 height=80>
-        </a>
-      </div>
-      <div class="media-body">
-        <h4 class="media-heading">
-          <a href="<?php echo raw($basepath) . '/asset/edit/' . url($asset_edit['edit_id']) ?>"><?php echo ($asset_edit['asset_id'] == -1 ? 'Create ' : 'Edit ') . esc($asset_edit['title']) ?></a>
+        <div class="media">
+            <div class="media-left">
+                <a href="<?php echo raw($basepath) . '/asset/edit/' . url($asset_edit['edit_id']) ?>">
+                    <img class="media-object" src="<?php echo esc($asset_edit['icon_url']) ?>" alt="<?php echo esc($asset_edit['title']) ?>'s icon" width=80 height=80>
+                </a>
+            </div>
+            <div class="media-body">
+                <h4 class="media-heading">
+                    <a href="<?php echo raw($basepath) . '/asset/edit/' . url($asset_edit['edit_id']) ?>"><?php echo ($asset_edit['asset_id'] == -1 ? 'Create ' : 'Edit ') . esc($asset_edit['title']) ?></a>
 
-          <span class="label label-<?php echo raw(['new' => 'info', 'in_review' => 'primary', 'rejected' => 'danger', 'accepted' => 'success'][$asset_edit['status']]) ?>"><?php echo raw(ucfirst(str_replace('_', ' ', $asset_edit['status']))) ?></span>
+                    <span class="label label-<?php echo raw(['new' => 'info', 'in_review' => 'primary', 'rejected' => 'danger', 'accepted' => 'success'][$asset_edit['status']]) ?>"><?php echo raw(ucfirst(str_replace('_', ' ', $asset_edit['status']))) ?></span>
 
-          <span class="label label-<?php echo raw([
-            'official' => 'danger',
-            'community' => 'info',
-            'testing' => 'success',
-          ][$asset_edit['support_level']]) ?>"><?php echo raw(ucfirst($asset_edit['support_level'])) ?></span>
-        </h4>
+                    <span class="label label-<?php echo raw([
+                        'official' => 'danger',
+                        'community' => 'info',
+                        'testing' => 'success',
+                    ][$asset_edit['support_level']]) ?>"><?php echo raw(ucfirst($asset_edit['support_level'])) ?></span>
+                </h4>
 
-        <p>Submitted by user <?php echo esc($asset_edit['author']) ?></p>
-        <?php if($asset_edit['status'] == 'rejected' && $asset_edit['reason']) echo 'Rejection reason: ' . esc($asset_edit['reason']) ?>
-      </div>
-    </div>
+                <p>Submitted by user <?php echo esc($asset_edit['author']) ?></p>
+                <?php if($asset_edit['status'] == 'rejected' && $asset_edit['reason']) echo 'Rejection reason: ' . esc($asset_edit['reason']) ?>
+            </div>
+        </div>
 <?php } ?>
 <?php include("_pagination.phtml") ?>
 <?php include("_footer.phtml") ?>
