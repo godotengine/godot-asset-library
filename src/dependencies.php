@@ -58,7 +58,7 @@ $container['mail'] = function ($c) {
     if(isset($settings['smtp'])) {
       $mail->isSMTP();
       $mail->Host = $settings['smtp']['host'];
-      $mail->Host = $settings['smtp']['port'];
+      $mail->Port = $settings['smtp']['port'];
       if(isset($settings['smtp']['auth'])) {
         $mail->SMTPAuth = true;
         $mail->Username = $settings['smtp']['auth']['user'];

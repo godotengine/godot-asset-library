@@ -189,14 +189,14 @@ $app->post('/forgot_password', function ($request, $response, $args) {
     $error = $this->utils->error_reponse_if_query_bad(false, $response, $query);
     if($error) return $response;
 
-    $reset_link = $_SERVER['HTTP_HOST'] .
+    $reset_link = $request->getUri()->getScheme() . '://' . $_SERVER['HTTP_HOST'] .
       (FRONTEND ? $request->getUri()->getBasePath() : dirname($request->getUri()->getBasePath())) .
       '/reset_password?token=' . urlencode($token);
 
     $mail = $this->mail->__invoke(); // Since its a function closure, we have to invoke it with magic methods
     $mail->addAddress($user['email'], $user['username']);
     $mail->isHTML(true);
-    $mail->Subject =
+    $mail->Subject = "Password reset requested for $user[username]";
     $mail->Body = $this->renderer->fetch('reset_password_email.phtml', [
       'user' => $user,
       'link' => $reset_link,
