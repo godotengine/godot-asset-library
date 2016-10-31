@@ -147,7 +147,7 @@ return [
     'submit' => 'INSERT INTO `as_asset_edits`
       SET asset_id=:asset_id, user_id=:user_id, title=:title, description=:description, category_id=:category_id, version_string=:version_string,
         cost=:cost, download_provider=:download_provider, download_commit=:download_commit, browse_url=:browse_url, issues_url=:issues_url, icon_url=:icon_url,
-        status=0',
+        status=0, submit_date=NOW()',
 
     'update' => 'UPDATE `as_asset_edits`
       SET title=:title, description=:description, category_id=:category_id, version_string=:version_string, cost=:cost,

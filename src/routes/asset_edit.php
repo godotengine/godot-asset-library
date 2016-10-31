@@ -60,12 +60,20 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
       $body['download_provider'] = 0;
     }
   }
-  if(isset($body['issues_url']) && !$required) {
-    $default_issues_url = $c->utils->get_default_issues_url(
-      $body['browse_url'] ?: $bare_asset['browse_url'],
-      intval($body['download_provider'] ?: $bare_asset['download_provider'])
-    );
-    if($default_issues_url == $body['issues_url']) {
+  if(isset($body['issues_url'])) {
+    $default_issues_url = null;
+    if(isset($body['browse_url']) && isset($body['download_provider'])) {
+      $default_issues_url = $c->utils->get_default_issues_url(
+        $body['browse_url'],
+        intval($body['download_provider'])
+      );
+    } else if($bare_asset !== null) {
+      $default_issues_url = $c->utils->get_default_issues_url(
+        $body['browse_url'] ?: $bare_asset['browse_url'],
+        intval($body['download_provider'] ?: $bare_asset['download_provider'])
+      );
+    }
+    if($default_issues_url !== null && $default_issues_url == $body['issues_url']) {
       unset($body['issues_url']);
     }
   }
@@ -78,8 +86,25 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
         $query->bindValue(':' . $field, null, PDO::PARAM_NULL);
       }
     } else {
-      $error = $c->utils->error_reponse_if_missing_or_not_string($error, $response, $body, $field);
-      if(!$error) $query->bindValue(':' . $field, $body[$field]);
+      if($bare_asset === null) {
+        if($field == 'issues_url') { // Default value present, so, no need to error out
+          if(isset($body[$field])) {
+            $query->bindValue(':' . $field, $body[$field]);
+          } else {
+            $query->bindValue(':' . $field, '', PDO::PARAM_NULL);
+          }
+        } else {
+          $error = $c->utils->error_reponse_if_missing_or_not_string($error, $response, $body, $field);
+          if(!$error) $query->bindValue(':' . $field, $body[$field]);
+        }
+      } else { // "Required" (so, non-null), but there is a base asset, so we can support incremental changes
+        if(isset($body[$field])) {
+          $query->bindValue(':' . $field, $body[$field]);
+        } else {
+          $query->bindValue(':' . $field, $bare_asset[$field]);
+        }
+
+      }
     }
 
     if($error) {
@@ -375,7 +400,7 @@ $get_edit = function ($request, $response, $args) {
     $asset_edit['download_url'] = $this->utils->get_computed_download_url($asset_edit['browse_url'], $asset_edit['download_provider'], $asset_edit['download_commit'], $warning);
 
     if($asset_edit['issues_url'] == '') {
-      $asset_edit['issues_url'] = $this->utils->get_default_issues_url($asset_edit['issues_url'], $asset_edit['issues_url']);
+      $asset_edit['issues_url'] = $this->utils->get_default_issues_url($asset_edit['browse_url'], $asset_edit['download_provider']);
     }
   }
 
@@ -491,10 +516,14 @@ $app->post('/asset/edit/{id:[0-9]+}', function ($request, $response, $args) {
     if($error) return $response;
 
     $asset = $query_asset->fetchAll()[0];
+
+    $error = _insert_asset_edit_fields($this, false, $response, $query, $body, false, $asset);
+    if($error) return $response;
+  } else {
+    $error = _insert_asset_edit_fields($this, false, $response, $query, $body, true, $asset_edit); // Edit of new asset, everything must be non-null
+    if($error) return $response;
   }
 
-  $error = _insert_asset_edit_fields($this, false, $response, $query, $body, false, $asset);
-  if($error) return $response;
 
   // Make a transaction, so we can roll back failed submissions
   $this->db->beginTransaction();
