@@ -220,8 +220,10 @@ $app->get('/reset_password', function ($request, $response, $args) {
   $error = $this->utils->ensure_logged_in(false, $response, $params + $body, $user, $token_data, true);
   if($error) return $response;
 
+  $combined_body = $params + $body;
+
   return $response->withJson([
-    'token' => ($params + $body)['token'],
+    'token' => $combined_body['token'],
   ], 200);
 });
 
