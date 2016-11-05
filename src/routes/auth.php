@@ -215,7 +215,7 @@ $app->post('/forgot_password', function ($request, $response, $args) {
 
 $app->get('/reset_password', function ($request, $response, $args) {
   $params = $request->getQueryParams();
-  $body = $request->getParsedBody();
+  $body = null !== $request->getParsedBody()? $request->getParsedBody() : [];
 
   $error = $this->utils->ensure_logged_in(false, $response, $params + $body, $user, $token_data, true);
   if($error) return $response;
