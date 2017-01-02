@@ -1,192 +1,192 @@
 <?php include("_header.phtml") ?>
 <?php $field_names = [
-  'title' => 'Title',
-  'description' => 'Description',
-  'category_id' => 'Category',
-  'version_string' => 'Version String',
-  'cost' => 'License',
-  'browse_url' => 'Repository Url',
-  'issues_url' => 'Issues Url',
-  'download_provider' => 'Repository Provider',
-  'download_commit' => 'Download Commit',
-  'download_url' => 'Download Url (Computed)',
-  'icon_url' => 'Icon Url',
+    'title' => 'Title',
+    'description' => 'Description',
+    'category_id' => 'Category',
+    'version_string' => 'Version String',
+    'cost' => 'License',
+    'browse_url' => 'Repository Url',
+    'issues_url' => 'Issues Url',
+    'download_provider' => 'Repository Provider',
+    'download_commit' => 'Download Commit',
+    'download_url' => 'Download Url (Computed)',
+    'icon_url' => 'Icon Url',
 ];
 $preview_field_names = [
-  'type' => 'Type',
-  'link' => 'Image/Video URL',
-  'thumbnail' => 'Thumbnail',
+    'type' => 'Type',
+    'link' => 'Image/Video URL',
+    'thumbnail' => 'Thumbnail',
 ]; ?>
 
 <?php function output_field($data, $name, $categories = []) { ?>
-  <?php if (strpos($name, 'url') !== false || strpos($name, 'link') !== false || strpos($name, 'thumbnail') !== false) { ?>
-    <a href="<?php echo esc($data) ?>"><?php echo esc($data) ?></a>
-    <?php if ($name == 'icon_url') { ?>
-      <br><img src="<?php echo esc($data) ?>" width="80" height="80"></a>
-    <?php }?>
-    <?php if ($name == 'preview_link') { ?>
-      <br><img src="<?php echo esc($data) ?>" style="max-height:80px"></a>
-    <?php }?>
-    <?php if ($name == 'preview_thumbnail') { ?>
-      <br><img src="<?php echo esc($data) ?>" style="max-height:345px"></a>
-    <?php }?>
-  <?php } elseif($name == 'category_id') { ?>
-    <?php echo raw($categories[$data]['name']) ?>
-  <?php } elseif($name == 'description') { ?>
-    <?php echo nl2br(esc($data)) ?>
-  <?php } else { ?>
-    <?php echo esc($data) ?>
-  <?php } ?>
+    <?php if (strpos($name, 'url') !== false || strpos($name, 'link') !== false || strpos($name, 'thumbnail') !== false) { ?>
+        <a href="<?php echo esc($data) ?>"><?php echo esc($data) ?></a>
+        <?php if ($name == 'icon_url') { ?>
+            <br><img src="<?php echo esc($data) ?>" width="80" height="80"></a>
+        <?php }?>
+        <?php if ($name == 'preview_link') { ?>
+            <br><img src="<?php echo esc($data) ?>" style="max-height:80px"></a>
+        <?php }?>
+        <?php if ($name == 'preview_thumbnail') { ?>
+            <br><img src="<?php echo esc($data) ?>" style="max-height:345px"></a>
+        <?php }?>
+    <?php } elseif($name == 'category_id') { ?>
+        <?php echo raw($categories[$data]['name']) ?>
+    <?php } elseif($name == 'description') { ?>
+        <?php echo nl2br(esc($data)) ?>
+    <?php } else { ?>
+        <?php echo esc($data) ?>
+    <?php } ?>
 <?php } ?>
 
 <h1>
-  <?php if(isset($data['original'])) { ?>
-    Edit of asset
-    <a href="<?php echo raw($basepath) ?>/asset/<?php echo raw($data['asset_id']) ?>">"<?php echo esc($data['original']['title']) ?>"</a>
-  <?php } else { ?>
-    Creation of asset
-    <a href="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>">"<?php echo esc($data['title']) ?>"</a>
-  <?php } ?>
-  <span class="label label-<?php echo raw(['new' => 'info', 'in_review' => 'primary', 'rejected' => 'danger', 'accepted' => 'success'][$data['status']]) ?>">
-    <?php echo raw(ucfirst(str_replace('_', ' ', $data['status']))) ?>
-  </span>
+    <?php if(isset($data['original'])) { ?>
+        Edit of asset
+        <a href="<?php echo raw($basepath) ?>/asset/<?php echo raw($data['asset_id']) ?>">"<?php echo esc($data['original']['title']) ?>"</a>
+    <?php } else { ?>
+        Creation of asset
+        <a href="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>">"<?php echo esc($data['title']) ?>"</a>
+    <?php } ?>
+    <span class="label label-<?php echo raw(['new' => 'info', 'in_review' => 'primary', 'rejected' => 'danger', 'accepted' => 'success'][$data['status']]) ?>">
+        <?php echo raw(ucfirst(str_replace('_', ' ', $data['status']))) ?>
+    </span>
 </h1>
 
 <?php if(isset($user) && $data['user_id'] == $user['user_id'] && $data['status'] == 'new') { ?>
-  <div class="form-group">
-    <a class="btn btn-success" href="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>/edit">Edit modifications</a>
-  </div>
-  <div class="alert alert-info" role="alert">
-    <?php if($data['asset_id'] != -1) { ?>
-      This edit you made is currently pending approval by our moderators. <strong>When it is approved, changes would finally go live</strong>. To access this page again later, you can use the "View pending" button on the asset's page, or just use the "Feed" button in the toolbar. <!--You will be notified by email when decision is made.-->
-    <?php } else { ?>
-      This new asset is currently pending approval by our moderators. <strong>Only when it is approved, it would be searchable</strong>. To access this page again later, you can use the <em>"View pending"</em> button on the "My assets" page, or just use the "Feed" button in the toolbar. <!--You will be notified by email when decision is made.-->
-    <?php } ?>
-  </div>
+    <div class="form-group">
+        <a class="btn btn-success" href="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>/edit">Edit modifications</a>
+    </div>
+    <div class="alert alert-info" role="alert">
+        <?php if($data['asset_id'] != -1) { ?>
+            This edit you made is currently pending approval by our moderators. <strong>When it is approved, changes would finally go live</strong>. To access this page again later, you can use the "View pending" button on the asset's page, or just use the "Feed" button in the toolbar. <!--You will be notified by email when decision is made.-->
+        <?php } else { ?>
+            This new asset is currently pending approval by our moderators. <strong>Only when it is approved, it would be searchable</strong>. To access this page again later, you can use the <em>"View pending"</em> button on the "My assets" page, or just use the "Feed" button in the toolbar. <!--You will be notified by email when decision is made.-->
+        <?php } ?>
+    </div>
 <?php } ?>
 
 <?php if($data['status'] == 'rejected') { ?>
-  <div class="alert alert-danger" role="alert">
-    This asset <?php if($data['asset_id'] != -1) echo 'edit ' ?>has been rejected. Reason: <?php echo esc($data['reason']) ?>
-  </div>
+    <div class="alert alert-danger" role="alert">
+        This asset <?php if($data['asset_id'] != -1) echo 'edit ' ?>has been rejected. Reason: <?php echo esc($data['reason']) ?>
+    </div>
 <?php } ?>
 
 <?php if(isset($data['warning'])) { ?>
-  <div class="alert alert-warning" role="alert">
-    <strong>Warning:</strong> <?php echo nl2br(esc($data['warning'])) ?>
-    <br><br>
-    <em>If you think that this warning should not be here, you can always <a href="https://github.com/godotengine/asset-library/issues">open an issue</a>.</em>
-  </div>
+    <div class="alert alert-warning" role="alert">
+        <strong>Warning:</strong> <?php echo nl2br(esc($data['warning'])) ?>
+        <br><br>
+        <em>If you think that this warning should not be here, you can always <a href="https://github.com/godotengine/asset-library/issues">open an issue</a>.</em>
+    </div>
 <?php } ?>
 
 <table class="table table-bordered">
-  <tbody>
-    <tr>
-      <th>Property</th>
-      <?php if(isset($data['original'])) { ?>
-        <th style="min-width: 50%" class="text-center">Old/Current</th>
-      <?php } ?>
-      <th style="min-width: 50%" class="text-center">New/Edit</th>
-    </tr>
-    <?php foreach($field_names as $field => $name) { ?>
-      <tr>
-        <td>
-          <?php echo raw($name) ?>
-        </td>
-        <?php if(isset($data['original']) && $data[$field] == null) { ?>
-
-          <td colspan="2" class="text-center active">
-            <?php output_field($data['original'][$field], $field, $categories) ?>
-          </td>
-
-        <?php } else { ?>
-          <?php if(isset($data['original'])) { ?>
-
-            <td class="text-right danger">
-              <?php output_field($data['original'][$field], $field, $categories) ?>
-            </td>
-
-          <?php } ?>
-
-          <td class="text-left success">
-            <?php output_field($data[$field], $field, $categories) ?>
-          </td>
-
-        <?php } ?>
-      </tr>
-    <?php } ?>
-    <?php foreach($data['previews'] as $i => $preview) if(isset($preview['edit_preview_id'])) { ?>
-      <tr>
-        <th colspan="3" class="text-center">
-          Preview
-          <span class="label label-danger"><?php output_field(ucfirst($preview['operation']), 'preview_operation') ?></span>
-        </th>
-      </tr>
-      <?php foreach($preview_field_names as $field => $name) { ?>
+    <tbody>
         <tr>
-          <td>
-            <?php echo raw($name) ?>
-          </td>
-          <?php if(isset($preview['original']) && $preview['operation'] != "remove" && ($preview[$field] === null || $preview[$field] === $preview['original'][$field])) { ?>
-
-            <td colspan="2" class="text-center active">
-              <?php output_field($preview['original'][$field], 'preview_' . $field, $categories) ?>
-            </td>
-
-          <?php } else { ?>
-            <?php if(isset($preview['original'])) { ?>
-
-              <?php if($preview['operation'] == "remove") { ?>
-                <td class="text-center danger" colspan="2">
-                  <?php output_field($preview['original'][$field], 'preview_' . $field, $categories) ?>
-                </td>
-              <?php } else { ?>
-                <td class="text-right danger">
-                  <?php output_field($preview['original'][$field], 'preview_' . $field, $categories) ?>
-                </td>
-                <td class="text-left success">
-                  <?php output_field($preview[$field], 'preview_' . $field, $categories) ?>
-                </td>
-              <?php } ?>
-
-            <?php } else { ?>
-              <td class="text-center success" colspan="2">
-                <?php output_field($preview[$field], 'preview_' . $field, $categories) ?>
-              </td>
+            <th>Property</th>
+            <?php if(isset($data['original'])) { ?>
+                <th style="min-width: 50%" class="text-center">Old/Current</th>
             <?php } ?>
-
-          <?php } ?>
+            <th style="min-width: 50%" class="text-center">New/Edit</th>
         </tr>
-      <?php } ?>
-    <?php } ?>
-  </tbody>
+        <?php foreach($field_names as $field => $name) { ?>
+            <tr>
+                <td>
+                    <?php echo raw($name) ?>
+                </td>
+                <?php if(isset($data['original']) && $data[$field] == null) { ?>
+
+                    <td colspan="2" class="text-center active">
+                        <?php output_field($data['original'][$field], $field, $categories) ?>
+                    </td>
+
+                <?php } else { ?>
+                    <?php if(isset($data['original'])) { ?>
+
+                        <td class="text-right danger">
+                            <?php output_field($data['original'][$field], $field, $categories) ?>
+                        </td>
+
+                    <?php } ?>
+
+                    <td class="text-left success">
+                        <?php output_field($data[$field], $field, $categories) ?>
+                    </td>
+
+                <?php } ?>
+            </tr>
+        <?php } ?>
+        <?php foreach($data['previews'] as $i => $preview) if(isset($preview['edit_preview_id'])) { ?>
+            <tr>
+                <th colspan="3" class="text-center">
+                    Preview
+                    <span class="label label-danger"><?php output_field(ucfirst($preview['operation']), 'preview_operation') ?></span>
+                </th>
+            </tr>
+            <?php foreach($preview_field_names as $field => $name) { ?>
+                <tr>
+                    <td>
+                        <?php echo raw($name) ?>
+                    </td>
+                    <?php if(isset($preview['original']) && $preview['operation'] != "remove" && ($preview[$field] === null || $preview[$field] === $preview['original'][$field])) { ?>
+
+                        <td colspan="2" class="text-center active">
+                            <?php output_field($preview['original'][$field], 'preview_' . $field, $categories) ?>
+                        </td>
+
+                    <?php } else { ?>
+                        <?php if(isset($preview['original'])) { ?>
+
+                            <?php if($preview['operation'] == "remove") { ?>
+                                <td class="text-center danger" colspan="2">
+                                    <?php output_field($preview['original'][$field], 'preview_' . $field, $categories) ?>
+                                </td>
+                            <?php } else { ?>
+                                <td class="text-right danger">
+                                    <?php output_field($preview['original'][$field], 'preview_' . $field, $categories) ?>
+                                </td>
+                                <td class="text-left success">
+                                    <?php output_field($preview[$field], 'preview_' . $field, $categories) ?>
+                                </td>
+                            <?php } ?>
+
+                        <?php } else { ?>
+                            <td class="text-center success" colspan="2">
+                                <?php output_field($preview[$field], 'preview_' . $field, $categories) ?>
+                            </td>
+                        <?php } ?>
+
+                    <?php } ?>
+                </tr>
+            <?php } ?>
+        <?php } ?>
+    </tbody>
 </table>
 <?php if(isset($user)) { ?>
-  <?php if($user['type'] >= $constants['user_type']['moderator']) { ?>
-    <?php if($data['status'] == 'new') { ?>
-      <form class="form-inline" action="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>/review" method="post">
-        <?php include("_csrf.phtml") ?>
-        <button type="submit" class="btn btn-primary">Put in queue</button>
-      </form>
-    <?php } elseif($data['status'] == 'in_review') { ?>
-      <form class="form-inline" action="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>/accept" method="post">
-        <?php include("_csrf.phtml") ?>
-        <div class="form-group panel">
-          <button type="submit" class="btn btn-success">Accept</button>
-          <label class="control-label" for="hash">Hash:</label>
-          <input type="text" class="form-control" id="hash" name="hash">
-        </div>
-      </form>
+    <?php if($user['type'] >= $constants['user_type']['moderator']) { ?>
+        <?php if($data['status'] == 'new') { ?>
+            <form class="form-inline" action="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>/review" method="post">
+                <?php include("_csrf.phtml") ?>
+                <button type="submit" class="btn btn-primary">Put in queue</button>
+            </form>
+        <?php } elseif($data['status'] == 'in_review') { ?>
+            <form class="form-inline" action="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>/accept" method="post">
+                <?php include("_csrf.phtml") ?>
+                <div class="form-group panel">
+                    <button type="submit" class="btn btn-success">Accept</button>
+                    <label class="control-label" for="hash">Hash:</label>
+                    <input type="text" class="form-control" id="hash" name="hash">
+                </div>
+            </form>
 
-      <form class="form-inline" action="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>/reject" method="post">
-        <?php include("_csrf.phtml") ?>
-        <div class="form-group panel">
-          <button type="submit" class="btn btn-danger">Reject</button>
-          <label class="control-label" for="reason" required>Reason:</label>
-          <input type="text" class="form-control" id="reason" name="reason">
-        </div>
-      </form>
+            <form class="form-inline" action="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>/reject" method="post">
+                <?php include("_csrf.phtml") ?>
+                <div class="form-group panel">
+                    <button type="submit" class="btn btn-danger">Reject</button>
+                    <label class="control-label" for="reason" required>Reason:</label>
+                    <input type="text" class="form-control" id="reason" name="reason">
+                </div>
+            </form>
+        <?php } ?>
     <?php } ?>
-  <?php } ?>
 <?php } ?>
 <?php include("_footer.phtml") ?>

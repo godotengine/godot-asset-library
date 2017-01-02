@@ -1,37 +1,37 @@
-    <footer>
-      <div class="row">
-        <div class="col-md-12">
-          <hr/>
-          <p>
-            Copyright &copy; 2016 The Godot Engine community - MIT Licensed.
-            <?php if(file_exists('.git/HEAD')) { $HEAD_contents = file_get_contents('.git/HEAD');?>
-              <?php if(preg_match('/^ref: (.+)$/m', $HEAD_contents, $ref_matches)) {
-                $ref = $ref_matches[1];
-                $commit_hash = trim(file_get_contents('.git/' . $ref));
-                ?>
-                <?php if(preg_match('/^[a-zA-Z0-9]+$/', $commit_hash)) { ?>
-                  <span class="text-muted pull-right">
-                    Currently running version <a href="https://github.com/godotengine/asset-library/commit/<?php echo url($commit_hash) ?>"><?php echo esc(substr($commit_hash, 0, 7)) ?></a>.
-                  </span>
-                <?php } ?>
-              <?php } ?>
-            <?php } ?>
-          </p>
-          <p class="text-muted text-right">
-            Links:
-            <a href="https://github.com/godotengine/asset-library">GitHub repository</a> |
-            <a href="https://github.com/godotengine/asset-library/issues">Issues</a> |
-            <a href="https://godotengine.org">Godot Engine homepage</a>
-          </p>
-        </div>
-      </div>
-    </footer>
-  </div>
+        <footer>
+            <div class="row">
+                <div class="col-md-12">
+                    <hr/>
+                    <p>
+                        Copyright &copy; 2016 The Godot Engine community - MIT Licensed.
+                        <?php if(file_exists('.git/HEAD')) { $HEAD_contents = file_get_contents('.git/HEAD');?>
+                            <?php if(preg_match('/^ref: (.+)$/m', $HEAD_contents, $ref_matches)) {
+                                $ref = $ref_matches[1];
+                                $commit_hash = trim(file_get_contents('.git/' . $ref));
+                                ?>
+                                <?php if(preg_match('/^[a-zA-Z0-9]+$/', $commit_hash)) { ?>
+                                    <span class="text-muted pull-right">
+                                        Currently running version <a href="https://github.com/godotengine/asset-library/commit/<?php echo url($commit_hash) ?>"><?php echo esc(substr($commit_hash, 0, 7)) ?></a>.
+                                    </span>
+                                <?php } ?>
+                            <?php } ?>
+                        <?php } ?>
+                    </p>
+                    <p class="text-muted text-right">
+                        Links:
+                        <a href="https://github.com/godotengine/asset-library">GitHub repository</a> |
+                        <a href="https://github.com/godotengine/asset-library/issues">Issues</a> |
+                        <a href="https://godotengine.org">Godot Engine homepage</a>
+                    </p>
+                </div>
+            </div>
+        </footer>
+    </div>
 
-  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-  <!-- Include all compiled plugins (below), or include individual files as needed -->
-  <script src="<?php echo raw($bowerpath) ?>/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="<?php echo raw($bowerpath) ?>/bootstrap/dist/js/bootstrap.min.js"></script>
 </body>
 
 </html>

@@ -1,79 +1,79 @@
 <?php // Utils
-  function esc($param) {
-    return htmlspecialchars($param);
-  }
-  function url($param) {
-    return htmlspecialchars(urlencode($param));
-  }
-  function raw($param) {
-    return $param;
-  }
+    function esc($param) {
+        return htmlspecialchars($param);
+    }
+    function url($param) {
+        return htmlspecialchars(urlencode($param));
+    }
+    function raw($param) {
+        return $param;
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-  <title><?php if(!empty($data['title'])){ echo(esc($data['title'].' - ')); } ?>Godot Asset Library</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title><?php if(!empty($data['title'])){ echo(esc($data['title'].' - ')); } ?>Godot Asset Library</title>
 
-  <!-- Bootstrap -->
-  <link href="<?php echo raw($bowerpath) ?>/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap -->
+    <link href="<?php echo raw($bowerpath) ?>/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-  <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-  <![endif]-->
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
 </head>
 
 <body>
-  <!-- Navigation -->
-  <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
-    <div class="container">
-      <!-- Brand and toggle get grouped for better mobile display -->
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-1">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="<?php echo raw($basepath) ?>">Godot Asset Library</a>
-      </div>
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="<?php echo raw($basepath) ?>">Godot Asset Library</a>
+            </div>
 
-      <?php global $gPaths; $gPaths = [$basepath, $path];
-      function make_nav_link($name, $link='#') { global $gPaths; ?>
-        <li <?php if($gPaths[1] == $link) echo 'class="active"' ?>>
-          <a href="<?php echo raw($gPaths[0]) . '/' . raw($link) ?>"><?php echo esc($name) ?></a>
-        </li>
-      <?php } ?>
-
-      <!-- Collect the nav links, forms, and other content for toggling -->
-      <div class="collapse navbar-collapse" id="navbar-collapse-1">
-        <ul class="nav navbar-nav navbar-left">
-          <?php make_nav_link('Assets', 'asset') ?>
-        </ul>
-        <ul class="nav navbar-nav navbar-right">
-          <?php if(isset($user)) { ?>
-            <?php make_nav_link('Feed', 'user/feed') ?>
-            <?php make_nav_link('My Assets', 'asset?user=' . url($user['username'])) ?>
-            <?php if($user['type'] >= $constants['user_type']['moderator']) { ?>
-              <?php make_nav_link('Moderate', 'asset/edit') ?>
+            <?php global $gPaths; $gPaths = [$basepath, $path];
+            function make_nav_link($name, $link='#') { global $gPaths; ?>
+                <li <?php if($gPaths[1] == $link) echo 'class="active"' ?>>
+                    <a href="<?php echo raw($gPaths[0]) . '/' . raw($link) ?>"><?php echo esc($name) ?></a>
+                </li>
             <?php } ?>
-            <li class="seperator"></li>
-            <?php make_nav_link('Submit Asset', 'asset/submit') ?>
-            <?php make_nav_link('Logout (' . esc($user['username']) . ')', 'logout') ?>
-          <?php } else { ?>
-            <?php make_nav_link('Login/Register', 'login') ?>
-          <?php } ?>
-        </ul>
-      </div>
-      <!-- /.navbar-collapse -->
-    </div>
-    <!-- /.container -->
-  </nav>
-  <div class="container">
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-left">
+                    <?php make_nav_link('Assets', 'asset') ?>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <?php if(isset($user)) { ?>
+                        <?php make_nav_link('Feed', 'user/feed') ?>
+                        <?php make_nav_link('My Assets', 'asset?user=' . url($user['username'])) ?>
+                        <?php if($user['type'] >= $constants['user_type']['moderator']) { ?>
+                            <?php make_nav_link('Moderate', 'asset/edit') ?>
+                        <?php } ?>
+                        <li class="seperator"></li>
+                        <?php make_nav_link('Submit Asset', 'asset/submit') ?>
+                        <?php make_nav_link('Logout (' . esc($user['username']) . ')', 'logout') ?>
+                    <?php } else { ?>
+                        <?php make_nav_link('Login/Register', 'login') ?>
+                    <?php } ?>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+    <div class="container">
