@@ -239,7 +239,7 @@ $app->post('/asset/{id:[0-9]+}/support_level', function ($request, $response, $a
 /*
  * Delete asset from library
  */
-$app->get('/asset/{id:[0-9]+}/delete', function ($request, $response, $args) {
+$app->post('/asset/{id:[0-9]+}/delete', function ($request, $response, $args) {
 
     $body = $request->getParsedBody();
 
