@@ -91,7 +91,9 @@ class Utils
 
     public function errorResponseIfNotOwner($currentStatus, &$response, $user, $asset_id, $message = 'You are not authorized to do this')
     {
-        if($user === false || $currentStatus) return true;
+        if($user === false || $currentStatus) {
+            return true;
+        }
 
         $query = $this->c->queries['asset']['get_one'];
         $query->bindValue(':id', (int) $asset_id, PDO::PARAM_INT);
@@ -107,6 +109,8 @@ class Utils
             $response = $response->withJson(['error' => $message], 403);
             return true;
         }
+
+        return false;
     }
 
     public function errorResponseIfMissingOrNotString($currentStatus, &$response, $object, $property)

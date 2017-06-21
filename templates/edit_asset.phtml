@@ -26,7 +26,7 @@
                 <div class="form-group">
                     <div class="col-md-4 col-md-push-9 align-right">
                         <form action="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/delete" method="POST">
-                            <input type="submit" id="delete" class="btn btn-danger" onclick="javascript:if(window.confirm('Do you really want to delete this asset?')){ return true; }else{ return false; }" value="Delete asset from library">
+                            <button type="submit" id="delete" class="btn btn-danger" onclick="javascript:if(window.confirm('Do you really want to delete this asset?')){ return true; }else{ return false; }">Delete asset from library</button>
                         </form>
                     </div>
                 </div>

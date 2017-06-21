@@ -257,7 +257,7 @@ $app->post('/asset/{id:[0-9]+}/delete', function ($request, $response, $args) {
 
     return $response->withJson([
         'changed' => true,
-        'url' => '/',
+        'url' => 'asset/',
     ], 200);
 });
 
