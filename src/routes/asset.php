@@ -19,6 +19,8 @@ $app->get('/asset', function ($request, $response, $args) {
     $page_size = 10;
     $max_page_size = 500;
     $page_offset = 0;
+    $min_godot_version = 0;
+    $max_godot_version = 9999999;
     if (isset($params['category']) && $params['category'] != "") {
         $category = (int) $params['category'];
     }
@@ -50,6 +52,12 @@ $app->get('/asset', function ($request, $response, $args) {
     if (isset($params['max_results'])) {
         $page_size = min(abs((int) $params['max_results']), $max_page_size);
     }
+    if (isset($params['godot_version']) && $params['godot_version'] != '') {
+        $godot_version = $this->utils->getUnformattedGodotVersion($params['godot_version']);
+        $min_godot_version = floor($godot_version / 10000) * 10000; // Keep just the major version
+        $max_godot_version = $godot_version; // Assume version requested can't handle future patches
+        // $max_godot_version = floor($godot_version / 100) * 100 + 99; // Assume future patches will work
+    }
     if (isset($params['page'])) {
         $page_offset = abs((int) $params['page']) * $page_size;
     } elseif (isset($params['offset'])) {
@@ -79,6 +87,8 @@ $app->get('/asset', function ($request, $response, $args) {
     $query = $this->queries['asset']['search'];
     $query->bindValue(':category', $category);
     $query->bindValue(':category_type', $category_type, PDO::PARAM_INT);
+    $query->bindValue(':min_godot_version', $min_godot_version, PDO::PARAM_INT);
+    $query->bindValue(':max_godot_version', $max_godot_version, PDO::PARAM_INT);
     $query->bindValue(':support_levels_regex', $support_levels);
     $query->bindValue(':filter', $filter);
     $query->bindValue(':username', $username);
@@ -96,6 +106,8 @@ $app->get('/asset', function ($request, $response, $args) {
     $query_count = $this->queries['asset']['search_count'];
     $query_count->bindValue(':category', $category, PDO::PARAM_INT);
     $query_count->bindValue(':category_type', $category_type, PDO::PARAM_INT);
+    $query_count->bindValue(':min_godot_version', $min_godot_version, PDO::PARAM_INT);
+    $query_count->bindValue(':max_godot_version', $max_godot_version, PDO::PARAM_INT);
     $query_count->bindValue(':support_levels_regex', $support_levels);
     $query_count->bindValue(':filter', $filter);
     $query_count->bindValue(':username', $username);
@@ -112,7 +124,8 @@ $app->get('/asset', function ($request, $response, $args) {
 
     $context = $this;
     $assets = array_map(function ($asset) use ($context) {
-        $asset["support_level"] = $context->constants['support_level'][(int) $asset['support_level']];
+        $asset['godot_version'] = $this->utils->getFormattedGodotVersion((int) $asset['godot_version']);
+        $asset['support_level'] = $context->constants['support_level'][(int) $asset['support_level']];
         return $asset;
     }, $assets);
 
@@ -160,6 +173,8 @@ $get_asset = function ($request, $response, $args) {
                     $asset_info["support_level"] = $this->constants['support_level'][(int) $value];
                 } elseif ($column==="download_provider") {
                     $asset_info["download_provider"] = $this->constants['download_provider'][(int) $value];
+                } elseif ($column==="godot_version") {
+                    $asset_info["godot_version"] = $this->utils->getFormattedGodotVersion((int) $value);
                 } else {
                     $asset_info[$column] = $value;
                 }
@@ -261,4 +276,27 @@ $app->post('/asset/{id:[0-9]+}/delete', function ($request, $response, $args) {
     ], 200);
 });
 
+/*
+ * Delete asset from library
+ */
+$app->post('/asset/{id:[0-9]+}/undelete', function ($request, $response, $args) {
 
+    $body = $request->getParsedBody();
+
+    $error = $this->utils->ensureLoggedIn(false, $response, $body, $user);
+    $error = $this->utils->errorResponseIfNotOwner($error, $response, $user, $args['id']);
+
+    if($error) return $response;
+
+    $query = $this->queries['asset_edit']['undelete'];
+    $query->bindValue(':asset_id', (int) $args['id'], PDO::PARAM_INT);
+    $query->execute();
+
+    $error = $this->utils->errorResponseIfQueryBad(false, $response, $query);
+    if($error) return $response;
+
+    return $response->withJson([
+        'changed' => true,
+        'url' => 'asset/',
+    ], 200);
+});

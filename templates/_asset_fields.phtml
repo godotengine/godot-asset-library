@@ -37,6 +37,24 @@ $_asset_values = array_merge([
 </div>
 
 <div class="form-group">
+    <label class="col-md-4 control-label" for="version">Godot version</label>
+    <div class="col-md-5">
+        <select id="category" name="godot_version" class="form-control">
+            <option value="">
+                Any
+            </option>
+
+            <?php foreach($constants['common_godot_versions'] as $version) { ?>
+                <option value="<?php echo esc($version) ?>" <?php if($version == $_asset_values['godot_version']) echo 'selected=""'; ?>>
+                    <?php echo esc(ucfirst($version)) ?>
+                </option>
+            <?php } ?>
+        </select>
+        <span class="help-block">The version of Godot the asset works with</span>
+    </div>
+</div>
+
+<div class="form-group">
         <label class="col-md-4 control-label" for="version">Version</label>
         <div class="col-md-5">
                 <input id="version" name="version_string" type="text" placeholder="Version" class="form-control input-md" required="" value="<?php echo esc($_asset_values['version_string']) ?>">

@@ -87,6 +87,9 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
             unset($body['issues_url']);
         }
     }
+    if (isset($body['godot_version'])) {
+        $body['godot_version'] = $c->utils->getUnformattedGodotVersion($body['godot_version']);
+    }
 
     foreach ($c->constants['asset_edit_fields'] as $i => $field) {
         if (!$required) {
@@ -320,6 +323,7 @@ $app->get('/asset/edit', function ($request, $response, $args) {
     $context = $this;
     $asset_edits = array_map(function ($asset_edit) use ($context) {
         $asset_edit['status'] = $context->constants['edit_status'][(int) $asset_edit['status']];
+        $asset_edit['godot_version'] = $this->utils->getFormattedGodotVersion((int) $asset_edit['godot_version']);
         $asset_edit['support_level'] = $context->constants['support_level'][(int) $asset_edit['support_level']];
         return $asset_edit;
     }, $asset_edits);
@@ -377,6 +381,8 @@ $get_edit = function ($request, $response, $args) {
                     $asset_edit['status'] = $this->constants['edit_status'][(int) $value];
                 } elseif ($column==='download_provider') {
                     $asset_edit['download_provider'] = $this->constants['download_provider'][(int) $value];
+                }  elseif ($column==='godot_version') {
+                    $asset_edit['godot_version'] = $this->utils->getFormattedGodotVersion((int) $value);
                 } else {
                     $asset_edit[$column] = $value;
                 }
@@ -412,6 +418,7 @@ $get_edit = function ($request, $response, $args) {
 
         $asset_edit['original'] = $asset;
         $asset_edit['original']['download_provider'] = $this->constants['download_provider'][$asset['download_provider']];
+        $asset_edit['original']['godot_version'] = $this->utils->getFormattedGodotVersion($asset['godot_version']);
 
         if ($asset_edit['browse_url'] || $asset_edit['download_provider'] || $asset_edit['download_commit']) {
             $asset_edit['download_url'] = $this->utils->getComputedDownloadUrl(

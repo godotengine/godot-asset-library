@@ -1,0 +1,24 @@
+.form-search .form-group {
+    margin-bottom: 0.2em;
+    margin-right: 40px;
+}
+@media screen and (max-width: 768px) {
+    .form-search .form-group {
+        margin-right: 0;
+    }
+}
+@supports (display: flex) {
+    @media screen and (min-width: 768px) {
+        .form-search {
+            display: flex;
+            justify-content: space-between;
+            flex-flow: wrap;
+        }
+        .form-search .form-group {
+            margin-right: 1em;
+            margin-left: 1em;
+            flex-shrink: 0;
+            display: block;
+        }
+    }
+}

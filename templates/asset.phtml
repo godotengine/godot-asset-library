@@ -11,6 +11,7 @@
                 <i class="glyphicon glyphicon-star<?php if($data['rating'] < $star) echo '-empty'; ?>"></i>
             <?php } ?>
             <span class="label label-primary"><?php echo esc($data['category']) ?></span>
+            <span class="label label-danger"><?php echo esc(ucfirst($data['godot_version'])) ?></span>
             <span class="label label-<?php echo raw([
                 'official' => 'success',
                 'community' => 'info',

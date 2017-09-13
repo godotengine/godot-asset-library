@@ -74,6 +74,41 @@ class Utils
         }
     }
 
+    public function getFormattedGodotVersion($internal_id, &$warning=null)
+    {
+        if ($internal_id == 0) {
+            $warning = "Setting Godot version as \"unknown\" is not recommended, as it would prevent people from finding your asset easily.";
+        }
+        if (isset($this->c->constants['special_godot_versions'][$internal_id])) {
+            return $this->c->constants['special_godot_versions'][$internal_id];
+        } else {
+            $major = floor($internal_id / 10000) % 100;
+            $minor = floor($internal_id / 100) % 100;
+            $patch = floor($internal_id / 1) % 100;
+            if ($patch != 0) {
+                return $major . '.' . $minor . '.' . $patch;
+            } else {
+                return $major . '.' . $minor;
+            }
+        }
+    }
+
+    public function getUnformattedGodotVersion($value)
+    {
+        if (is_int($value)) {
+            return $value;
+        }
+        if (isset($this->c->constants['special_godot_versions'][$value])) {
+            return $this->c->constants['special_godot_versions'][$value];
+        } else {
+            $slices = explode('.', $value);
+            $major = (int) $slices[0];
+            $minor = min(100, max(0, (int) ($slices[1] ?? 0)));
+            $patch = min(100, max(0, (int) ($slices[2] ?? 0)));
+            return $major * 10000 + $minor * 100 + $patch;
+        }
+    }
+
     public function errorResponseIfNotUserHasLevel($currentStatus, &$response, $user, $required_level_name, $message = 'You are not authorized to do this')
     {
         if ($user === false || $currentStatus) {

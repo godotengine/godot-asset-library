@@ -45,11 +45,25 @@ return $constants = [
         'cgit' => 4,
     ]),
     'asset_edit_fields' => [
-        'title', 'description', 'category_id',
+        'title', 'description', 'category_id', 'godot_version',
         'version_string', 'cost',
         'download_provider', 'download_commit', 'browse_url', 'issues_url', 'icon_url',
     ],
     'asset_edit_preview_fields' => [
         'type', 'link', 'thumbnail',
+    ],
+    'special_godot_versions' => double_map([
+        0 => 'unknown',
+        9999999 => 'custom'
+    ]),
+    'common_godot_versions' => [
+        '1.0',
+        '1.1',
+        '2.0', //'2.0.1', '2.0.2', '2.0.3', '2.0.4',
+        '2.1', '2.1.1', '2.1.2', '2.1.3', '2.1.4',
+        '2.2',
+        '3.0', //'3.1'
+        'unknown',
+        'custom',
     ]
 ];

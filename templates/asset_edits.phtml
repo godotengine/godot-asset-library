@@ -59,6 +59,7 @@
                     <a href="<?php echo raw($basepath) . '/asset/edit/' . url($asset_edit['edit_id']) ?>"><?php echo ($asset_edit['asset_id'] == -1 ? 'Create ' : 'Edit ') . esc($asset_edit['title']) ?></a>
 
                     <span class="label label-<?php echo raw(['new' => 'info', 'in_review' => 'primary', 'rejected' => 'danger', 'accepted' => 'success'][$asset_edit['status']]) ?>"><?php echo raw(ucfirst(str_replace('_', ' ', $asset_edit['status']))) ?></span>
+                    <span class="label label-danger"><?php echo esc(ucfirst($asset_edit['godot_version'])) ?></span>
 
                     <span class="label label-<?php echo raw([
                         'official' => 'danger',
