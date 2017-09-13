@@ -6,11 +6,6 @@ $app->get('/asset', function ($request, $response, $args) {
     $params = $request->getQueryParams();
 
     $category = '%';
-    if (FRONTEND) {
-        $category_type = $this->constants['category_type']['any'];
-    } else {
-        $category_type = $this->constants['category_type']['addon'];
-    }
     $filter = '%';
     $username = '%';
     $order_column = 'modify_date';
@@ -21,6 +16,13 @@ $app->get('/asset', function ($request, $response, $args) {
     $page_offset = 0;
     $min_godot_version = 0;
     $max_godot_version = 9999999;
+    if (FRONTEND) {
+        $category_type = $this->constants['category_type']['any'];
+    } else {
+        $category_type = $this->constants['category_type']['addon'];
+        $min_godot_version = 20100;
+        $max_godot_version = 20199;
+    }
     if (isset($params['category']) && $params['category'] != "") {
         $category = (int) $params['category'];
     }
@@ -53,10 +55,15 @@ $app->get('/asset', function ($request, $response, $args) {
         $page_size = min(abs((int) $params['max_results']), $max_page_size);
     }
     if (isset($params['godot_version']) && $params['godot_version'] != '') {
-        $godot_version = $this->utils->getUnformattedGodotVersion($params['godot_version']);
-        $min_godot_version = floor($godot_version / 10000) * 10000; // Keep just the major version
-        $max_godot_version = $godot_version; // Assume version requested can't handle future patches
-        // $max_godot_version = floor($godot_version / 100) * 100 + 99; // Assume future patches will work
+        if ($params['godot_version'] == 'any') {
+            $min_godot_version = 0;
+            $max_godot_version = 9999999;
+        } else {
+            $godot_version = $this->utils->getUnformattedGodotVersion($params['godot_version']);
+            $min_godot_version = floor($godot_version / 10000) * 10000; // Keep just the major version
+            $max_godot_version = $godot_version; // Assume version requested can't handle future patches
+            // $max_godot_version = floor($godot_version / 100) * 100 + 99; // Assume future patches will work
+        }
     }
     if (isset($params['page'])) {
         $page_offset = abs((int) $params['page']) * $page_size;
