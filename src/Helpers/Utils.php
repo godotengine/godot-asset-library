@@ -2,8 +2,6 @@
 
 namespace Godot\AssetLibrary\Helpers;
 
-use PDO;
-
 class Utils
 {
     private $c;
@@ -103,8 +101,8 @@ class Utils
         } else {
             $slices = explode('.', $value);
             $major = (int) $slices[0];
-            $minor = min(100, max(0, (int) ($slices[1] ?? 0)));
-            $patch = min(100, max(0, (int) ($slices[2] ?? 0)));
+            $minor = min(100, max(0, (int) (isset($slices[1]) ? $slices[1] : 0)));
+            $patch = min(100, max(0, (int) (isset($slices[2]) ? $slices[2] : 0)));
             return $major * 10000 + $minor * 100 + $patch;
         }
     }
