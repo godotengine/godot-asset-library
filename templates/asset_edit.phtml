@@ -31,6 +31,8 @@ $preview_field_names = [
         <?php if ($name == 'preview_thumbnail') { ?>
             <br><img src="<?php echo esc($data) ?>" style="max-height:345px"></a>
         <?php }?>
+    <?php } elseif($name == 'godot_version') { ?>
+        <?php echo raw(ucfirst(str_replace('_', ' ', $data))) ?>
     <?php } elseif($name == 'category_id') { ?>
         <?php echo raw($categories[$data]['name']) ?>
     <?php } elseif($name == 'description') { ?>
@@ -46,7 +48,11 @@ $preview_field_names = [
         <a href="<?php echo raw($basepath) ?>/asset/<?php echo raw($data['asset_id']) ?>">"<?php echo esc($data['original']['title']) ?>"</a>
     <?php } else { ?>
         Creation of asset
-        <a href="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>">"<?php echo esc($data['title']) ?>"</a>
+        <?php if($data['asset_id'] != -1) { ?>
+            <a href="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>">"<?php echo esc($data['title']) ?>"</a>
+        <?php } else { ?>
+            <a href="#">"<?php echo esc($data['title']) ?>"</a>
+        <?php } ?>
     <?php } ?>
     <span class="label label-<?php echo raw(['new' => 'info', 'in_review' => 'primary', 'rejected' => 'danger', 'accepted' => 'success'][$data['status']]) ?>">
         <?php echo raw(ucfirst(str_replace('_', ' ', $data['status']))) ?>
@@ -57,6 +63,18 @@ $preview_field_names = [
     <div class="form-group">
         <a class="btn btn-success" href="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>/edit">Edit modifications</a>
     </div>
+<?php } ?>
+
+<?php if(isset($data['warning'])) { ?>
+    <div class="alert alert-warning" role="alert">
+        <?php foreach (explode("\n", $data['warning']) as $warning) if ($warning != '') { ?>
+            <strong>Warning:</strong> <?php echo esc($warning) ?> <br><br>
+        <?php } ?>
+        <em>If you think that this warning is incorrect, you can always <a href="https://github.com/godotengine/asset-library/issues">open an issue</a>.</em>
+    </div>
+<?php } ?>
+
+<?php if(isset($user) && $data['user_id'] == $user['user_id'] && $data['status'] == 'new') { ?>
     <div class="alert alert-info" role="alert">
         <?php if($data['asset_id'] != -1) { ?>
             This edit you made is currently pending approval by our moderators. <strong>When it is approved, changes would finally go live</strong>. To access this page again later, you can use the "View pending" button on the asset's page, or just use the "Feed" button in the toolbar. <!--You will be notified by email when decision is made.-->
@@ -69,14 +87,6 @@ $preview_field_names = [
 <?php if($data['status'] == 'rejected') { ?>
     <div class="alert alert-danger" role="alert">
         This asset <?php if($data['asset_id'] != -1) echo 'edit ' ?>has been rejected. Reason: <?php echo esc($data['reason']) ?>
-    </div>
-<?php } ?>
-
-<?php if(isset($data['warning'])) { ?>
-    <div class="alert alert-warning" role="alert">
-        <strong>Warning:</strong> <?php echo nl2br(esc($data['warning'])) ?>
-        <br><br>
-        <em>If you think that this warning should not be here, you can always <a href="https://github.com/godotengine/asset-library/issues">open an issue</a>.</em>
     </div>
 <?php } ?>
 

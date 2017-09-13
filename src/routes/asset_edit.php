@@ -88,7 +88,7 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
         }
     }
     if (isset($body['godot_version'])) {
-        $body['godot_version'] = $c->utils->getUnformattedGodotVersion($body['godot_version']);
+        $body['godot_version'] = (string) $c->utils->getUnformattedGodotVersion($body['godot_version']);
     }
 
     foreach ($c->constants['asset_edit_fields'] as $i => $field) {
@@ -350,6 +350,8 @@ $get_edit = function ($request, $response, $args) {
         return $response;
     }
 
+    $warning = null;
+
     $output = $query->fetchAll();
 
     $previews = [];
@@ -381,8 +383,6 @@ $get_edit = function ($request, $response, $args) {
                     $asset_edit['status'] = $this->constants['edit_status'][(int) $value];
                 } elseif ($column==='download_provider') {
                     $asset_edit['download_provider'] = $this->constants['download_provider'][(int) $value];
-                }  elseif ($column==='godot_version') {
-                    $asset_edit['godot_version'] = $this->utils->getFormattedGodotVersion((int) $value);
                 } else {
                     $asset_edit[$column] = $value;
                 }
@@ -427,7 +427,7 @@ $get_edit = function ($request, $response, $args) {
                 $asset_edit['download_commit'] ?: $asset_edit['original']['download_commit'],
                 $warning
             );
-            if ($asset_edit['issues_url'] == '') {
+            if ($asset_edit['issues_url'] === '') {
                 $asset_edit['issues_url'] = $this->utils->getDefaultIssuesUrl(
                     $asset_edit['browse_url'] ?: $asset_edit['original']['browse_url'],
                     $asset_edit['download_provider'] ?: $asset_edit['original']['download_provider']
@@ -437,15 +437,20 @@ $get_edit = function ($request, $response, $args) {
             $asset_edit['download_url'] = null;
         }
 
-        $asset_edit['original']['download_url'] = $this->utils->getComputedDownloadUrl($asset_edit['original']['browse_url'], $asset_edit['original']['download_provider'], $asset_edit['original']['download_commit'], $warning);
+        if ($asset_edit['godot_version'] != null) {
+            $asset_edit['godot_version'] = $this->utils->getFormattedGodotVersion((int) $asset_edit['godot_version'], $warning);
+        }
+
+        $asset_edit['original']['download_url'] = $this->utils->getComputedDownloadUrl($asset_edit['original']['browse_url'], $asset_edit['original']['download_provider'], $asset_edit['original']['download_commit']);
 
         if ($asset_edit['original']['issues_url'] == '') {
             $asset_edit['original']['issues_url'] = $this->utils->getDefaultIssuesUrl($asset_edit['original']['browse_url'], $asset_edit['original']['download_provider']);
         }
     } else {
         $asset_edit['download_url'] = $this->utils->getComputedDownloadUrl($asset_edit['browse_url'], $asset_edit['download_provider'], $asset_edit['download_commit'], $warning);
+        $asset_edit['godot_version'] = $this->utils->getFormattedGodotVersion((int) $asset_edit['godot_version'], $warning);
 
-        if ($asset_edit['issues_url'] == '') {
+        if ($asset_edit['issues_url'] === '') {
             $asset_edit['issues_url'] = $this->utils->getDefaultIssuesUrl($asset_edit['browse_url'], $asset_edit['download_provider']);
         }
     }

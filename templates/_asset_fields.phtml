@@ -4,6 +4,7 @@
 $_asset_values = array_merge([
     'title' => '',
     'category_id' => '0',
+    'godot_version' => 'unknown',
     'version_string' => '',
     'download_provider' => '0',
     'download_commit' => '',
@@ -16,37 +17,38 @@ $_asset_values = array_merge([
 ], $_asset_values);
 ?>
 <div class="form-group">
-        <label class="col-md-4 control-label" for="title">Asset Name</label>
+        <label class="col-md-4 control-label required_mark" for="title">Asset Name</label>
         <div class="col-md-5">
                 <input id="title" name="title" type="text" placeholder="Asset Name" class="form-control input-md" required="" value="<?php echo esc($_asset_values['title']) ?>">
-                <span class="help-block">Set the name of your asset</span>
+                <span class="help-block">The name of the asset</span>
         </div>
 </div>
 
 <div class="form-group">
-        <label class="col-md-4 control-label" for="category">Category</label>
-        <div class="col-md-5">
-                <select id="category" name="category_id" class="form-control">
-                        <?php foreach($categories as $key => $category) { ?>
-                            <option value="<?php echo esc($category['id']) ?>" <?php if($category['id'] == $_asset_values['category_id']) echo 'selected=""'; ?>>
-                                <?php echo esc($category['name']) ?>
-                            </option>
-                        <?php } ?>
-                </select>
-        </div>
-</div>
-
-<div class="form-group">
-    <label class="col-md-4 control-label" for="version">Godot version</label>
+    <label class="col-md-4 control-label required_mark" for="category">Category</label>
     <div class="col-md-5">
-        <select id="category" name="godot_version" class="form-control">
-            <option value="">
-                Any
-            </option>
+        <select id="category" name="category_id" class="form-control">
+            <?php foreach($constants['category_type'] as $type => $type_name) if(is_int($type)) { ?>
+                <optgroup label="<?php echo esc(ucfirst($type_name . 's')) ?>">
+                    <?php foreach($categories as $key => $category) if($category['type'] == $type) { ?>
+                        <option value="<?php echo esc($category['id']) ?>" <?php if($category['id'] == $_asset_values['category_id']) echo 'selected=""'; ?>>
+                            <?php echo esc($category['name']) ?>
+                        </option>
+                    <?php } ?>
+                </optgroup>
+            <?php } ?>
+        </select>
+        <span class="help-block">The category the asset belongs to</span>
+    </div>
+</div>
 
+<div class="form-group">
+    <label class="col-md-4 control-label required_mark" for="godot_version">Godot version</label>
+    <div class="col-md-5">
+        <select id="godot_version" name="godot_version" class="form-control">
             <?php foreach($constants['common_godot_versions'] as $version) { ?>
                 <option value="<?php echo esc($version) ?>" <?php if($version == $_asset_values['godot_version']) echo 'selected=""'; ?>>
-                    <?php echo esc(ucfirst($version)) ?>
+                    <?php echo esc(ucfirst(str_replace('_', ' ', $version))) ?>
                 </option>
             <?php } ?>
         </select>
@@ -55,90 +57,92 @@ $_asset_values = array_merge([
 </div>
 
 <div class="form-group">
-        <label class="col-md-4 control-label" for="version">Version</label>
-        <div class="col-md-5">
-                <input id="version" name="version_string" type="text" placeholder="Version" class="form-control input-md" required="" value="<?php echo esc($_asset_values['version_string']) ?>">
-                <span class="help-block">Set the version of your asset</span>
-        </div>
+    <label class="col-md-4 control-label required_mark" for="version">Version</label>
+    <div class="col-md-5">
+        <input id="version" name="version_string" type="text" placeholder="Version" class="form-control input-md" required="" value="<?php echo esc($_asset_values['version_string']) ?>">
+        <span class="help-block">The version of the asset</span>
+    </div>
 </div>
 
 <div class="form-group">
-        <label class="col-md-4 control-label" for="download_provider">Repository hoster</label>
-        <div class="col-md-5">
-                <select id="download_provider" name="download_provider" class="form-control">
-                    <?php foreach($constants['download_provider'] as $id => $name) if(is_int($id)) { ?>
-                        <option value="<?php echo esc($name) ?>" <?php if($name == $_asset_values['download_provider']) echo 'selected=""'; ?>>
-                            <?php echo esc($name) ?>
-                        </option>
-                    <?php } ?>
-                </select>
-                <span class="help-block">We really need to know where your repository is hosted in order to compute the final download URL. If your Git repository provider is missing, you might like to <a href="https://github.com/godotengine/asset-library/issues">open an issue</a> about it.</span>
-        </div>
+    <label class="col-md-4 control-label required_mark" for="download_provider">Repository host</label>
+    <div class="col-md-5">
+        <select id="download_provider" name="download_provider" class="form-control">
+            <?php foreach($constants['download_provider'] as $id => $name) if(is_int($id)) { ?>
+                <option value="<?php echo esc($name) ?>" <?php if($name == $_asset_values['download_provider']) echo 'selected=""'; ?>>
+                    <?php echo esc($name) ?>
+                </option>
+            <?php } ?>
+        </select>
+        <span class="help-block">We need to know where your repository is hosted in order to compute the final download URL. If your Git repository provider is missing, you might like to <a href="https://github.com/godotengine/asset-library/issues">open an issue</a> about it.</span>
+    </div>
 </div>
 
 <div class="form-group">
-        <label class="col-md-4 control-label" for="browse">Repository URL</label>
-        <div class="col-md-5">
-                <input id="browse" name="browse_url" type="text" placeholder="Repository URL" class="form-control input-md" required="" value="<?php echo esc($_asset_values['browse_url']) ?>">
-                <span class="help-block">Set the url to browse the asset's files (webpage). Should be similar to <code>https://github.com/&lt;user&gt;/&lt;project&gt;</code> (Might be different depending on your "provider")</span>
-        </div>
+    <label class="col-md-4 control-label required_mark" for="browse">Repository URL</label>
+    <div class="col-md-5">
+        <input id="browse" name="browse_url" type="text" placeholder="Repository URL" class="form-control input-md" required="" value="<?php echo esc($_asset_values['browse_url']) ?>">
+        <span class="help-block">The url to browse the asset's files (webpage). Should be similar to <code>https://github.com/&lt;user&gt;/&lt;project&gt;</code> (Might be different depending on your "provider")</span>
+    </div>
 </div>
 
 <div class="form-group">
-        <label class="col-md-4 control-label" for="issues">Issues URL</label>
-        <div class="col-md-5">
-                <input id="issues" name="issues_url" type="text" placeholder="Issues URL" class="form-control input-md" value="<?php echo esc($_asset_values['issues_url']) ?>">
-                <span class="help-block">Set the url to issues list of the  asset. Should be similar to <code>https://github.com/&lt;user&gt;/&lt;project&gt;/issues</code> (Might be different depending on your "provider"). If you use your provider's issue list, you can leave it empty.</span>
-        </div>
+    <label class="col-md-4 control-label" for="issues">Issues URL</label>
+    <div class="col-md-5">
+        <input id="issues" name="issues_url" type="text" placeholder="Issues URL" class="form-control input-md" value="<?php echo esc($_asset_values['issues_url']) ?>">
+        <span class="help-block">The url to issues list of the  asset. Should be similar to <code>https://github.com/&lt;user&gt;/&lt;project&gt;/issues</code> (Might be different depending on your "provider"). If you use your provider's issue list, you can leave it empty.</span>
+    </div>
 </div>
 
 <div class="form-group">
-        <label class="col-md-4 control-label" for="commit">Download Commit/tag</label>
-        <div class="col-md-5">
-                <input id="commit" name="download_commit" type="text" placeholder="Download Commit/tag" class="form-control input-md" required="" value="<?php echo esc($_asset_values['download_commit']) ?>">
-                <span class="help-block">Set the commit or tag to download the asset. Should be similar to <code>b1d3172f89b86e52465a74f63a74ac84c491d3e1</code> or <code>v1.0</code>. The final download url would be computed from this.</span>
-        </div>
+    <label class="col-md-4 control-label required_mark" for="commit">Download Commit/tag</label>
+    <div class="col-md-5">
+        <input id="commit" name="download_commit" type="text" placeholder="Download Commit/tag" class="form-control input-md" required="" value="<?php echo esc($_asset_values['download_commit']) ?>">
+        <span class="help-block">The commit or tag to download the asset. Should be similar to <code>b1d3172f89b86e52465a74f63a74ac84c491d3e1</code> or <code>v1.0</code>. The final download url would be computed from this.</span>
+    </div>
 </div>
 
 <div class="form-group">
-        <label class="col-md-4 control-label" for="icon">Icon URL</label>
-        <div class="col-md-5">
-                <input id="icon" name="icon_url" type="text" placeholder="Icon URL" class="form-control input-md" required="" value="<?php echo esc($_asset_values['icon_url']) ?>">
-                <span class="help-block">Set the url to the asset's icon (png or jpg image)</span>
-        </div>
+    <label class="col-md-4 control-label required_mark" for="icon">Icon URL</label>
+    <div class="col-md-5">
+        <input id="icon" name="icon_url" type="text" placeholder="Icon URL" class="form-control input-md" required="" value="<?php echo esc($_asset_values['icon_url']) ?>">
+        <span class="help-block">The url to the asset's icon (png or jpg image)</span>
+    </div>
 </div>
 
 <div class="form-group">
-        <label class="col-md-4 control-label" for="license">License</label>
-        <div class="col-md-5">
-                <select id="license" name="cost" class="form-control">
-                    <?php $licenses = [
-                        'MIT' => 'MIT',
-                        'GPLv3' => 'GPL v3',
-                        'GPLv2' => 'GPL v2',
-                        'CC0' => 'CC0',
-                        'BSD-2-Clause' => 'BSD 2-clause License',
-                        'BSL-1.0' => 'Boost Software License'
-                    ] ?>
-                    <?php foreach($licenses as $id => $name) { ?>
-                        <option value="<?php echo raw($id) ?>" <?php if($id == $_asset_values['cost']) echo 'selected=""'; ?>>
-                            <?php echo esc($name) ?>
-                        </option>
-                    <?php } ?>
-                </select>
-        </div>
+    <label class="col-md-4 control-label required_mark" for="license">License</label>
+    <div class="col-md-5">
+        <select id="license" name="cost" class="form-control">
+            <?php $licenses = [
+                'MIT' => 'MIT',
+                'GPLv3' => 'GPL v3',
+                'GPLv2' => 'GPL v2',
+                'CC0' => 'CC0',
+                'BSD-2-Clause' => 'BSD 2-clause License',
+                'BSL-1.0' => 'Boost Software License'
+            ] ?>
+            <?php foreach($licenses as $id => $name) { ?>
+                <option value="<?php echo raw($id) ?>" <?php if($id == $_asset_values['cost']) echo 'selected=""'; ?>>
+                    <?php echo esc($name) ?>
+                </option>
+            <?php } ?>
+        </select>
+        <span class="help-block">The license under which the asset is available. Check <a href="https://opensource.org/licenses">opensource.org</a> for a more detailed description of each. <br> In case an OSI-approved license you are using is missing, you might <a href="https://github.com/godotengine/asset-library/issues">open an issue</a> about it.</span>
+    </div>
 </div>
 
 <div class="form-group">
-        <label class="col-md-4 control-label" for="description">Description</label>
-        <div class="col-md-5">
-                <textarea class="form-control" id="description" name="description" rows="7"><?php echo esc($_asset_values['description']) ?></textarea>
-        </div>
+    <label class="col-md-4 control-label required_mark" for="description">Description</label>
+    <div class="col-md-5">
+        <textarea class="form-control" id="description" name="description" rows="7"><?php echo esc($_asset_values['description']) ?></textarea>
+        <span class="help-block">The description which would be visible on the asset page</span>
+    </div>
 </div>
 
 <?php for ($i=0; $i < count($_asset_values['previews']) + 3; $i++) {
     if($i < count($_asset_values['previews'])) $preview = $_asset_values['previews'][$i];
-    else $preview = ['type' => 'image', 'link' => '', 'thumbnail' => '']
+    else $preview = ['type' => 'image', 'link' => '', 'thumbnail' => ''];
     ?>
     <div class="panel panel-default">
         <div class="panel-heading form-inline">
@@ -189,34 +193,34 @@ $_asset_values = array_merge([
                     </label>
                 <?php } ?>
             </div>
-    </div>
+        </div>
 
         <div class="panel-body">
             <div class="form-group">
-                    <label class="col-md-4 control-label" for="previews[<?php echo $i ?>][type]">Type</label>
-                    <div class="col-md-5">
-                            <select id="license" name="previews[<?php echo $i ?>][type]" class="form-control">
-                                <?php $types = ['image' => 'Image', 'video' => 'Video'] ?>
-                                <?php foreach($types as $id => $name) { ?>
-                                    <option value="<?php echo raw($id) ?>" <?php if($id == $preview['type']) echo 'selected=""'; ?>>
-                                        <?php echo esc($name) ?>
-                                    </option>
-                                <?php } ?>
-                            </select>
-                    </div>
-            </div>
-
-            <div class="form-group">
-                <label class="control-label col-md-4" for="previews[<?php echo $i ?>][link]">Image/Youtube Link</label>
+                <label class="col-md-4 control-label required_mark" for="previews[<?php echo $i ?>][type]">Type</label>
                 <div class="col-md-5">
-                    <input id="youtube-<?php echo $i ?>" name="previews[<?php echo $i ?>][link]" type="text" placeholder="Image/Youtube Link" class="form-control input-md" value="<?php echo esc($preview['link']) ?>">
+                    <select id="previews[<?php echo $i ?>][type]" name="previews[<?php echo $i ?>][type]" class="form-control">
+                        <?php $types = ['image' => 'Image', 'video' => 'Video'] ?>
+                        <?php foreach($types as $id => $name) { ?>
+                            <option value="<?php echo raw($id) ?>" <?php if($id == $preview['type']) echo 'selected=""'; ?>>
+                                <?php echo esc($name) ?>
+                            </option>
+                        <?php } ?>
+                    </select>
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="control-label col-md-4" for="previews[<?php echo $i ?>][thumbnail]">Link to thumbnail (To be removed)</label>
+                <label class="col-md-4 control-label required_mark" for="previews[<?php echo $i ?>][link]">Image/Youtube Link</label>
                 <div class="col-md-5">
-                    <input id="youtube-<?php echo $i ?>" name="previews[<?php echo $i ?>][thumbnail]" type="text" placeholder="Image Link" class="form-control input-md" value="<?php echo esc($preview['thumbnail']) ?>">
+                    <input id="previews[<?php echo $i ?>][link]" name="previews[<?php echo $i ?>][link]" type="text" placeholder="Image/Youtube Link" class="form-control input-md" value="<?php echo esc($preview['link']) ?>">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-4 control-label required_mark" for="previews[<?php echo $i ?>][thumbnail]">Link to thumbnail (To be removed)</label>
+                <div class="col-md-5">
+                    <input id="previews[<?php echo $i ?>][thumbnail]" name="previews[<?php echo $i ?>][thumbnail]" type="text" placeholder="Image Link" class="form-control input-md" value="<?php echo esc($preview['thumbnail']) ?>">
                 </div>
             </div>
 

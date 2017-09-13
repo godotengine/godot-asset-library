@@ -100,7 +100,10 @@ return [
 
         'set_support_level' => 'UPDATE `as_assets`
             SET support_level=:support_level
-            WHERE asset_id=:asset_id'
+            WHERE asset_id=:asset_id',
+
+        'delete' => 'UPDATE `as_assets` SET searchable=FALSE WHERE asset_id=:asset_id',
+        'undelete' => 'UPDATE `as_assets` SET searchable=TRUE WHERE asset_id=:asset_id'
     ],
     'asset_edit' => [
         'get_one' => 'SELECT edit_id, `as_asset_edits`.asset_id, user_id, title, description, category_id, godot_version, version_string,
@@ -173,8 +176,6 @@ return [
             WHERE edit_id=:edit_id AND edit_preview_id=:edit_preview_id',
 
         'set_asset_id' => 'UPDATE `as_asset_edits` SET asset_id=:asset_id WHERE edit_id=:edit_id',
-        'set_status_and_reason' => 'UPDATE `as_asset_edits` SET status=:status, reason=:reason WHERE edit_id=:edit_id',
-        'delete' => 'UPDATE `as_assets` SET searchable=FALSE WHERE asset_id=:asset_id',
-        'undelete' => 'UPDATE `as_assets` SET searchable=TRUE WHERE asset_id=:asset_id'
+        'set_status_and_reason' => 'UPDATE `as_asset_edits` SET status=:status, reason=:reason WHERE edit_id=:edit_id'
     ]
 ];

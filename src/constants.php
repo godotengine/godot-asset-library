@@ -54,7 +54,7 @@ return $constants = [
     ],
     'special_godot_versions' => double_map([
         0 => 'unknown',
-        9999999 => 'custom'
+        9999999 => 'custom_build'
     ]),
     'common_godot_versions' => [
         '1.0',
@@ -64,6 +64,6 @@ return $constants = [
         '2.2',
         '3.0', //'3.1'
         'unknown',
-        'custom',
+        'custom_build',
     ]
 ];

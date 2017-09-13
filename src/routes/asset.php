@@ -259,11 +259,11 @@ $app->post('/asset/{id:[0-9]+}/delete', function ($request, $response, $args) {
     $body = $request->getParsedBody();
 
     $error = $this->utils->ensureLoggedIn(false, $response, $body, $user);
-    $error = $this->utils->errorResponseIfNotOwner($error, $response, $user, $args['id']);
+    $error = $this->utils->errorResponseIfNotOwnerOrLevel($error, $response, $user, $args['id'], 'moderator');
 
     if($error) return $response;
 
-    $query = $this->queries['asset_edit']['delete'];
+    $query = $this->queries['asset']['delete'];
     $query->bindValue(':asset_id', (int) $args['id'], PDO::PARAM_INT);
     $query->execute();
 
@@ -272,7 +272,7 @@ $app->post('/asset/{id:[0-9]+}/delete', function ($request, $response, $args) {
 
     return $response->withJson([
         'changed' => true,
-        'url' => 'asset/',
+        'url' => 'asset/' . $args['id'],
     ], 200);
 });
 
@@ -284,11 +284,11 @@ $app->post('/asset/{id:[0-9]+}/undelete', function ($request, $response, $args) 
     $body = $request->getParsedBody();
 
     $error = $this->utils->ensureLoggedIn(false, $response, $body, $user);
-    $error = $this->utils->errorResponseIfNotOwner($error, $response, $user, $args['id']);
+    $error = $this->utils->errorResponseIfNotOwnerOrLevel($error, $response, $user, $args['id'], 'moderator');
 
     if($error) return $response;
 
-    $query = $this->queries['asset_edit']['undelete'];
+    $query = $this->queries['asset']['undelete'];
     $query->bindValue(':asset_id', (int) $args['id'], PDO::PARAM_INT);
     $query->execute();
 
@@ -297,6 +297,6 @@ $app->post('/asset/{id:[0-9]+}/undelete', function ($request, $response, $args) 
 
     return $response->withJson([
         'changed' => true,
-        'url' => 'asset/',
+        'url' => 'asset/' . $args['id'],
     ], 200);
 });

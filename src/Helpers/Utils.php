@@ -19,37 +19,37 @@ class Utils
         if (is_int($provider)) {
             $provider = $this->c->constants['download_provider'][$provider];
         }
-        $warning_suffix = "Please, ensure that the URL and the repository provider are, indeed, correct.";
+        $warning_suffix = "Please, ensure that the URL and the repository provider are correct.";
         $light_warning_suffix = "Please, doublecheck that the URL and the repository provider are correct.";
         switch ($provider) {
             case 'GitHub':
                 if (sizeof(preg_grep('/^https:\/\/github\.com\/[^\/]+?\/[^\/]+?$/', [$repo_url])) == 0) {
-                    $warning = "\"$repo_url\" doesn't look correct; it should be similar to \"https://github.com/<owner>/<name>\". $warning_suffix";
+                    $warning .= "\"$repo_url\" doesn't look correct; it should be similar to \"https://github.com/<owner>/<name>\". $warning_suffix\n";
                 }
                 return "$repo_url/archive/$commit.zip";
             case 'GitLab':
                 if (sizeof(preg_grep('/^https:\/\/(gitlab\.com|[^\/]+)\/[^\/]+?\/[^\/]+?$/', [$repo_url])) == 0) {
-                    $warning = "\"$repo_url\" doesn't look correct; it should be similar to \"https://<gitlab instance>/<owner>/<name>\". $warning_suffix";
+                    $warning .= "\"$repo_url\" doesn't look correct; it should be similar to \"https://<gitlab instance>/<owner>/<name>\". $warning_suffix\n";
                 } elseif (sizeof(preg_grep('/^https:\/\/(gitlab\.com)\/[^\/]+?\/[^\/]+?$/', [$repo_url])) == 0) {
-                    $warning = "\"$repo_url\" might not be correct; it should be similar to \"https://gitlab.com/<owner>/<name>\", unless the asset is hosted on a custom instance of GitLab. $light_warning_suffix";
+                    $warning .= "\"$repo_url\" might not be correct; it should be similar to \"https://gitlab.com/<owner>/<name>\", unless the asset is hosted on\n a custom instance of GitLab. $light_warning_suffix";
                 }
                 return "$repo_url/repository/archive.zip?ref=$commit";
             case 'BitBucket':
                 if (sizeof(preg_grep('/^https:\/\/bitbucket\.org\/[^\/]+?\/[^\/]+?$/', [$repo_url])) == 0) {
-                    $warning = "\"$repo_url\" doesn't look correct; it should be similar to \"https://bitbucket.org/<owner>/<name>\". $warning_suffix";
+                    $warning .= "\"$repo_url\" doesn't look correct; it should be similar to \"https://bitbucket.org/<owner>/<name>\". $warning_suffix\n";
                 }
                 return "$repo_url/get/$commit.zip";
             case 'Gogs':
                 if (sizeof(preg_grep('/^https?:\/\/[^\/]+?\/[^\/]+?\/[^\/]+?$/', [$repo_url])) == 0) {
-                    $warning = "\"$repo_url\" doesn't look correct; it should be similar to \"http<s>://<gogs instance>/<owner>/<name>\". $warning_suffix";
+                    $warning .= "\"$repo_url\" doesn't look correct; it should be similar to \"http<s>://<gogs instance>/<owner>/<name>\". $warning_suffix\n";
                 }
-                $warning = "Since Gogs might be self-hosted, we can't be sure that \"$repo_url\" is a valid Gogs URL. $light_warning_suffix";
+                $warning .= "Since Gogs might be self-hosted, we can't be sure that \"$repo_url\" is a valid Gogs URL. $light_warning_suffix\n";
                 return "$repo_url/archive/$commit.zip";
             case 'cgit':
                 if (sizeof(preg_grep('/^https?:\/\/[^\/]+?\/[^\/]+?\/[^\/]+?$/', [$repo_url])) == 0) {
-                    $warning = "\"$repo_url\" doesn't look correct; it should be similar to \"http<s>://<cgit instance>/<owner>/<name>\". $warning_suffix";
+                    $warning .= "\"$repo_url\" doesn't look correct; it should be similar to \"http<s>://<cgit instance>/<owner>/<name>\". $warning_suffix\n";
                 }
-                $warning = "Since cgit might be self-hosted, we can't be sure that \"$repo_url\" is a valid cgit URL. $light_warning_suffix";
+                $warning .= "Since cgit might be self-hosted, we can't be sure that \"$repo_url\" is a valid cgit URL. $light_warning_suffix\n";
                 return "$repo_url/snapshot/$commit.zip";
             default:
                 return "$repo_url/$commit.zip"; // Obviously incorrect, but we would like to have some default case...
@@ -76,8 +76,8 @@ class Utils
 
     public function getFormattedGodotVersion($internal_id, &$warning=null)
     {
-        if ($internal_id == 0) {
-            $warning = "Setting Godot version as \"unknown\" is not recommended, as it would prevent people from finding your asset easily.";
+        if ($internal_id == $this->c->constants['special_godot_versions']['unknown']) {
+            $warning .= "Setting Godot version as \"unknown\" is not recommended, as it would prevent people from finding your asset easily.\n";
         }
         if (isset($this->c->constants['special_godot_versions'][$internal_id])) {
             return $this->c->constants['special_godot_versions'][$internal_id];
@@ -124,7 +124,7 @@ class Utils
         return false;
     }
 
-    public function errorResponseIfNotOwner($currentStatus, &$response, $user, $asset_id, $message = 'You are not authorized to do this')
+    public function errorResponseIfNotOwnerOrLevel($currentStatus, &$response, $user, $asset_id, $required_level_name, $message = 'You are not authorized to do this')
     {
         if($user === false || $currentStatus) {
             return true;
@@ -141,8 +141,7 @@ class Utils
         $asset = $query->fetch();
 
         if($asset['author_id'] != $user['user_id']) {
-            $response = $response->withJson(['error' => $message], 403);
-            return true;
+            return $this->errorResponseIfNotUserHasLevel(false, $response, $user, $required_level_name, $message);
         }
 
         return false;

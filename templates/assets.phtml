@@ -1,6 +1,6 @@
 <?php include("_header.phtml") ?>
 <form method="get" action="asset">
-    <div class="form-inline">
+    <div class="form-inline form-search">
         <div class="form-group">
             <label for="category">Category</label>
             <select id="category" name="category" class="form-control">
@@ -15,9 +15,8 @@
                 <?php } ?>
             </select>
         </div>
-        <div style="display:inline-block;width:40px;"></div>
         <div class="form-group">
-            <label>Support level</label>
+            <label>Support level</label><br class="visible-xs-block">
             <?php foreach($constants['support_level'] as $id => $level) if(is_int($id)) { ?>
                 <label>
                     <input type="checkbox" name="support[<?php echo esc($level) ?>]" value="1"
@@ -30,7 +29,6 @@
                 </label>
             <?php } ?>
         </div>
-        <div style="display:inline-block;width:40px;"></div>
         <div class="form-group">
             <label>Godot version</label>
             <select id="category" name="godot_version" class="form-control">
@@ -60,7 +58,6 @@
             </label>
         </div>
         <?php if(isset($params['user'])) { ?>
-            <div style="display:inline-block;width:40px;"></div>
             <div class="form-group bg-primary" style="padding:0 5px;">
                 <label>
                     <input type="checkbox" name="user" value="<?php echo esc($params['user']) ?>" checked="">
@@ -93,8 +90,9 @@
                         <?php for ($star=1; $star <= 5; $star++) { ?>
                             <i class="glyphicon glyphicon-star<?php if($asset['rating'] < $star) echo '-empty'; ?>"></i>
                         <?php } ?>
+                        <br>
                         <span class="label label-primary"><?php echo esc($asset['category']) ?></span>
-                        <span class="label label-danger"><?php echo esc(ucfirst($asset['godot_version'])) ?></span>
+                        <span class="label label-danger"><?php echo esc(ucfirst(str_replace('_', ' ', $asset['godot_version']))) ?></span>
                         <span class="label label-<?php echo raw([
                             'official' => 'success',
                             'community' => 'info',

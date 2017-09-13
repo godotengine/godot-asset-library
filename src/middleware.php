@@ -58,7 +58,6 @@ if (FRONTEND) {
             $result = [];
         }
 
-
         if (isset($result['url'])) {
             $response = new \Slim\Http\Response(303);
             $response = $response->withHeader('Location', $request->getUri()->getBasePath() . '/' . $result['url']);

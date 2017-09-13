@@ -5,13 +5,21 @@
     </div>
     <div class="media-body">
         <h4 class="media-heading">
+            <?php if (!$data['searchable']) { ?><del><?php } ?>
             <?php echo esc($data['title']) ?>
+            <?php if (!$data['searchable']) { ?></del><?php } ?>
             <small><?php echo esc($data['version_string']) ?></small>
+
             <?php for ($star=1; $star <= 5; $star++) { ?>
                 <i class="glyphicon glyphicon-star<?php if($data['rating'] < $star) echo '-empty'; ?>"></i>
             <?php } ?>
+
+            <?php if (!$data['searchable']) { ?>
+                <span class="label label-default">Deleted</span>
+            <?php } ?>
+
             <span class="label label-primary"><?php echo esc($data['category']) ?></span>
-            <span class="label label-danger"><?php echo esc(ucfirst($data['godot_version'])) ?></span>
+            <span class="label label-danger"><?php echo esc(ucfirst(str_replace('_', ' ', $data['godot_version']))) ?></span>
             <span class="label label-<?php echo raw([
                 'official' => 'success',
                 'community' => 'info',
@@ -46,7 +54,7 @@
             </a>
         </p>
         <?php if(isset($user) && ($user['type'] >= $constants['user_type']['moderator'])) { ?>
-            <form class="form-inline" action="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/support_level" method="post">
+            <form class="form-inline" style="display: inline-block" action="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/support_level" method="post">
                 <?php include("_csrf.phtml") ?>
                 <div class="btn-group">
                     <select id="support_level" name="support_level" class="form-control btn btn-default">
@@ -56,9 +64,20 @@
                             </option>
                         <?php } ?>
                     </select>
-                    <button type="submit" class="btn btn-danger">Change support level</button>
+                    <button type="submit" class="btn btn-warning">Change support level</button>
                 </div>
             </form>
+            <?php if ($data['searchable']) { ?>
+                <form class="form-inline" style="display: inline-block" action="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/delete" method="post">
+                    <?php include("_csrf.phtml") ?>
+                    <button type="submit" class="btn btn-danger" onclick="javascript:return window.confirm('Do you really want to delete this asset?');">Remove from library</button>
+                </form>
+            <?php } else { ?>
+                <form class="form-inline" style="display: inline-block" action="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/undelete" method="post">
+                    <?php include("_csrf.phtml") ?>
+                    <button type="submit" class="btn btn-info" onclick="javascript:return window.confirm('Do you want to restore this asset?');">Restore to library</button>
+                </form>
+            <?php } ?>
         <?php } ?>
         <p class="text-muted">Sha256 Hash: <code><?php echo esc($data['download_hash']) ?></code></p>
         <hr/>

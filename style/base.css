@@ -22,3 +22,12 @@
         }
     }
 }
+
+.required_mark::after {
+    content: ' *';
+    color: #d9534f;
+}
+.media-object {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
