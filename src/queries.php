@@ -164,5 +164,6 @@ return [
 
         'set_asset_id' => 'UPDATE `as_asset_edits` SET asset_id=:asset_id WHERE edit_id=:edit_id',
         'set_status_and_reason' => 'UPDATE `as_asset_edits` SET status=:status, reason=:reason WHERE edit_id=:edit_id',
-    ],
+        'delete' => 'UPDATE `as_assets` SET searchable=0 WHERE asset_id=:asset_id'
+    ]
 ];

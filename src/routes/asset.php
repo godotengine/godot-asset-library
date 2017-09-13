@@ -235,3 +235,30 @@ $app->post('/asset/{id:[0-9]+}/support_level', function ($request, $response, $a
         'url' => 'asset/' . $args['id'],
     ], 200);
 });
+
+/*
+ * Delete asset from library
+ */
+$app->post('/asset/{id:[0-9]+}/delete', function ($request, $response, $args) {
+
+    $body = $request->getParsedBody();
+
+    $error = $this->utils->ensureLoggedIn(false, $response, $body, $user);
+    $error = $this->utils->errorResponseIfNotOwner($error, $response, $user, $args['id']);
+
+    if($error) return $response;
+
+    $query = $this->queries['asset_edit']['delete'];
+    $query->bindValue(':asset_id', (int) $args['id'], PDO::PARAM_INT);
+    $query->execute();
+
+    $error = $this->utils->errorResponseIfQueryBad(false, $response, $query);
+    if($error) return $response;
+
+    return $response->withJson([
+        'changed' => true,
+        'url' => 'asset/',
+    ], 200);
+});
+
+
