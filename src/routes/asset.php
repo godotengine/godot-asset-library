@@ -284,7 +284,7 @@ $app->post('/asset/{id:[0-9]+}/delete', function ($request, $response, $args) {
 });
 
 /*
- * Delete asset from library
+ * Undelete asset from library
  */
 $app->post('/asset/{id:[0-9]+}/undelete', function ($request, $response, $args) {
 
