@@ -27,7 +27,10 @@
             ][$data['support_level']]) ?>"><?php echo esc(ucfirst($data['support_level'])) ?></span>
         </h4>
 
-        <p class="text-muted">Submitted by user <?php echo esc($data['author']) ?>; <?php echo esc($data['cost']) ?></p>
+        <p class="text-muted">
+          Submitted by user <a href="../asset?filter=<?php echo esc($data['author']) ?>" title="Search assets with filter '<?php echo esc($data['author']) ?>'"><?php echo esc($data['author']) ?></a>;
+          <a href="../asset?filter=<?php echo esc($data['cost']) ?>" title="Search assets with filter '<?php echo esc($data['cost']) ?>'"><?php echo esc($data['cost']) ?></a>
+        </p>
         <p>
             <?php echo nl2br(esc($data['description']), false) ?>
         </p>
