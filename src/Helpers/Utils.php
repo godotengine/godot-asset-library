@@ -129,7 +129,7 @@ class Utils
         }
 
         $query = $this->c->queries['asset']['get_one'];
-        $query->bindValue(':id', (int) $asset_id, PDO::PARAM_INT);
+        $query->bindValue(':id', (int) $asset_id, \PDO::PARAM_INT);
         $query->execute();
 
         if($query->rowCount() <= 0) {
