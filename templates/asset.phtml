@@ -28,8 +28,8 @@
         </h4>
 
         <p class="text-muted">
-          Submitted by user <a href="../asset?filter=<?php echo esc($data['author']) ?>" title="Search assets with filter '<?php echo esc($data['author']) ?>'"><?php echo esc($data['author']) ?></a>;
-          <a href="../asset?filter=<?php echo esc($data['cost']) ?>" title="Search assets with filter '<?php echo esc($data['cost']) ?>'"><?php echo esc($data['cost']) ?></a>;
+          Submitted by user <a href="<?php echo raw($basepath) ?>/asset?filter=<?php echo esc($data['author']) ?>" title="Search assets with filter '<?php echo esc($data['author']) ?>'"><?php echo esc($data['author']) ?></a>;
+          <a href="<?php echo raw($basepath) ?>/asset?filter=<?php echo esc($data['cost']) ?>" title="Search assets with filter '<?php echo esc($data['cost']) ?>'"><?php echo esc($data['cost']) ?></a>;
           <?php echo esc(explode(" ", $asset['modify_date'])[0]) ?>
         </p>
         <p>
