@@ -33,10 +33,6 @@ if (FRONTEND) {
         $route = $request->getAttribute('route');
         $path = $request->getUri()->getPath();
 
-        if (substr($path, 0, 8) == 'frontend') {
-            $response = $response->withHeader('Location', $request->getUri()->getBasePath() . substr($path, 8) . '?' . $request->getUri()->getQuery());
-        }
-
         if (isset($static_routes['/' . $path])) {
             $queryUri = '/' . $path;
         } elseif ($route) {
