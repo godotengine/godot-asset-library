@@ -22,7 +22,7 @@ return [
         'list' => 'SELECT category_id as id, category as name, category_type as type FROM `as_categories` WHERE category_type LIKE :category_type ORDER BY category_id',
     ],
     'asset' => [
-        'search' => 'SELECT asset_id, title, username as author, user_id as author_id, category, category_id, godot_version, rating, cost, support_level, icon_url, version, version_string FROM `as_assets`
+        'search' => 'SELECT asset_id, title, username as author, user_id as author_id, category, category_id, godot_version, rating, cost, support_level, icon_url, version, version_string, modify_date FROM `as_assets`
             LEFT JOIN `as_users` USING (user_id)
             LEFT JOIN `as_categories` USING (category_id)
 
@@ -69,7 +69,7 @@ return [
                 OR username LIKE :filter
             )',
 
-        'get_one' => 'SELECT asset_id, category_type, title, username as author, user_id as author_id, version, version_string, category, category_id, godot_version, rating, cost, description, support_level, download_provider, download_commit, download_hash, browse_url, issues_url, icon_url, preview_id, `as_asset_previews`.type, link, thumbnail, searchable FROM `as_assets`
+        'get_one' => 'SELECT asset_id, category_type, title, username as author, user_id as author_id, version, version_string, category, category_id, godot_version, rating, cost, description, support_level, download_provider, download_commit, download_hash, browse_url, issues_url, icon_url, preview_id, `as_asset_previews`.type, link, thumbnail, searchable, modify_date FROM `as_assets`
             LEFT JOIN `as_categories` USING (category_id)
             LEFT JOIN `as_users` USING (user_id)
             LEFT JOIN `as_asset_previews` USING (asset_id)
