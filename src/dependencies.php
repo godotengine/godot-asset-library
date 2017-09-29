@@ -97,12 +97,10 @@ $container['cookies'] = function ($c) {
 
 // tokens
 $container['tokens'] = function ($c) {
-    require_once __DIR__ . '/Helpers/Tokens.php';
     return new Godot\AssetLibrary\Helpers\Tokens($c);
 };
 
 // utils
 $container['utils'] = function ($c) {
-    require_once __DIR__ . '/Helpers/Utils.php';
     return new Godot\AssetLibrary\Helpers\Utils($c);
 };

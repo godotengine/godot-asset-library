@@ -6,5 +6,11 @@
         "monolog/monolog": "^1.17",
         "slim/php-view": "^2.0",
         "phpmailer/phpmailer": "^5.2"
+    },
+
+    "autoload": {
+        "psr-4": {
+            "Godot\\AssetLibrary\\": "src/"
+        }
     }
 }
