@@ -35,58 +35,58 @@
         <p>
             <?php echo nl2br(esc($data['description']), false) ?>
         </p>
-        <hr/>
-        <p>
-            <a class="btn btn-default" href="<?php echo esc($data['browse_url']) ?>">
-                <i class="glyphicon glyphicon-folder-open"></i> View files
-            </a>
-            <a class="btn btn-primary" href="<?php echo esc($data['download_url']) ?>">
-                <i class="glyphicon glyphicon-download"></i> Download
-            </a>
-            <?php if($data['issues_url'] != "") { ?>
-                <a class="btn btn-success" href="<?php echo esc($data['issues_url']) ?>">
-                    <i class="glyphicon glyphicon-check"></i> Submit an issue
-                </a>
-            <?php } ?>
-            <?php if(isset($user) && ($user['user_id'] == $data['author_id'] || $user['type'] >= $constants['user_type']['editor'])) { ?>
-                <a class="btn btn-success" href="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/edit">
-                    <i class="glyphicon glyphicon-pencil"></i> Edit
-                </a>
-            <?php } ?>
-            <a class="btn btn-warning" href="<?php echo raw($basepath) ?>/asset/edit?asset=<?php echo url($data['asset_id']) ?>&amp;status=accepted+rejected">
-                <i class="glyphicon glyphicon-list"></i> Recent Edits
-            </a>
-        </p>
-        <?php if(isset($user) && ($user['type'] >= $constants['user_type']['moderator'])) { ?>
-            <form class="form-inline" style="display: inline-block" action="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/support_level" method="post">
-                <?php include("_csrf.phtml") ?>
-                <div class="btn-group">
-                    <select id="support_level" name="support_level" class="form-control btn btn-default">
-                        <?php foreach($constants['support_level'] as $id => $name) if(is_int($id)) { ?>
-                            <option value="<?php echo esc($name) ?>" <?php if($name == $data['support_level']) echo 'selected=""'; ?>>
-                                <?php echo esc(ucfirst($name)) ?>
-                            </option>
-                        <?php } ?>
-                    </select>
-                    <button type="submit" class="btn btn-warning">Change support level</button>
-                </div>
-            </form>
-            <?php if ($data['searchable']) { ?>
-                <form class="form-inline" style="display: inline-block" action="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/delete" method="post">
-                    <?php include("_csrf.phtml") ?>
-                    <button type="submit" class="btn btn-danger" onclick="javascript:return window.confirm('Do you really want to delete this asset?');">Remove from library</button>
-                </form>
-            <?php } else { ?>
-                <form class="form-inline" style="display: inline-block" action="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/undelete" method="post">
-                    <?php include("_csrf.phtml") ?>
-                    <button type="submit" class="btn btn-info" onclick="javascript:return window.confirm('Do you want to restore this asset?');">Restore to library</button>
-                </form>
-            <?php } ?>
-        <?php } ?>
-        <p class="text-muted">Sha256 Hash: <code><?php echo esc($data['download_hash']) ?></code></p>
-        <hr/>
     </div>
 </div>
+<hr/>
+<p>
+    <a class="btn btn-default" href="<?php echo esc($data['browse_url']) ?>">
+        <i class="glyphicon glyphicon-folder-open"></i> View files
+    </a>
+    <a class="btn btn-primary" href="<?php echo esc($data['download_url']) ?>">
+        <i class="glyphicon glyphicon-download"></i> Download
+    </a>
+    <?php if($data['issues_url'] != "") { ?>
+        <a class="btn btn-success" href="<?php echo esc($data['issues_url']) ?>">
+            <i class="glyphicon glyphicon-check"></i> Submit an issue
+        </a>
+    <?php } ?>
+    <?php if(isset($user) && ($user['user_id'] == $data['author_id'] || $user['type'] >= $constants['user_type']['editor'])) { ?>
+        <a class="btn btn-success" href="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/edit">
+            <i class="glyphicon glyphicon-pencil"></i> Edit
+        </a>
+    <?php } ?>
+    <a class="btn btn-warning" href="<?php echo raw($basepath) ?>/asset/edit?asset=<?php echo url($data['asset_id']) ?>&amp;status=new+in_review+accepted+rejected">
+        <i class="glyphicon glyphicon-list"></i> Recent Edits
+    </a>
+</p>
+<?php if(isset($user) && ($user['type'] >= $constants['user_type']['moderator'])) { ?>
+    <form class="form-inline" style="display: inline-block" action="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/support_level" method="post">
+        <?php include("_csrf.phtml") ?>
+        <div class="btn-group">
+            <select id="support_level" name="support_level" class="form-control btn btn-default">
+                <?php foreach($constants['support_level'] as $id => $name) if(is_int($id)) { ?>
+                    <option value="<?php echo esc($name) ?>" <?php if($name == $data['support_level']) echo 'selected=""'; ?>>
+                        <?php echo esc(ucfirst($name)) ?>
+                    </option>
+                <?php } ?>
+            </select>
+            <button type="submit" class="btn btn-warning">Change support level</button>
+        </div>
+    </form>
+    <?php if ($data['searchable']) { ?>
+        <form class="form-inline" style="display: inline-block" action="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/delete" method="post">
+            <?php include("_csrf.phtml") ?>
+            <button type="submit" class="btn btn-danger" onclick="javascript:return window.confirm('Do you really want to delete this asset?');">Remove from library</button>
+        </form>
+    <?php } else { ?>
+        <form class="form-inline" style="display: inline-block" action="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/undelete" method="post">
+            <?php include("_csrf.phtml") ?>
+            <button type="submit" class="btn btn-info" onclick="javascript:return window.confirm('Do you want to restore this asset?');">Restore to library</button>
+        </form>
+    <?php } ?>
+<?php } ?>
+<p class="text-muted">Sha256 Hash: <code style="word-break: break-word;"><?php echo esc($data['download_hash']) ?></code></p>
+<hr/>
 <div class="row">
     <?php foreach($data['previews'] as $key => $preview) { ?>
         <div class="col-xs-6 col-md-4 col-lg-3 text-center">
