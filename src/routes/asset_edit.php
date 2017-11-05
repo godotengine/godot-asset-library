@@ -70,6 +70,7 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
             $body['download_provider'] = 0;
         }
     }
+
     if (isset($body['issues_url'])) {
         $default_issues_url = null;
         if (isset($body['browse_url']) && isset($body['download_provider'])) {
@@ -84,9 +85,14 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
             );
         }
         if ($default_issues_url !== null && $default_issues_url == $body['issues_url']) {
-            unset($body['issues_url']);
+            if ($bare_asset !== null && ($bare_asset['issues_url'] == $body['issues_url'] || $bare_asset['issues_url'] == '')) {
+                unset($body['issues_url']);
+            } else {
+                $body['issues_url'] = '';
+            }
         }
     }
+
     if (isset($body['godot_version'])) {
         $body['godot_version'] = (string) $c->utils->getUnformattedGodotVersion($body['godot_version']);
     }
@@ -420,21 +426,24 @@ $get_edit = function ($request, $response, $args) {
         $asset_edit['original']['download_provider'] = $this->constants['download_provider'][$asset['download_provider']];
         $asset_edit['original']['godot_version'] = $this->utils->getFormattedGodotVersion($asset['godot_version']);
 
-        if ($asset_edit['browse_url'] || $asset_edit['download_provider'] || $asset_edit['download_commit']) {
+        $repository_changed = $asset_edit['browse_url'] !== null || $asset_edit['download_provider'] !== null;
+
+        if ($repository_changed || $asset_edit['download_commit'] !== null) {
             $asset_edit['download_url'] = $this->utils->getComputedDownloadUrl(
                 $asset_edit['browse_url'] ?: $asset_edit['original']['browse_url'],
                 $asset_edit['download_provider'] ?: $asset_edit['original']['download_provider'],
                 $asset_edit['download_commit'] ?: $asset_edit['original']['download_commit'],
                 $warning
             );
-            if ($asset_edit['issues_url'] === '') {
-                $asset_edit['issues_url'] = $this->utils->getDefaultIssuesUrl(
-                    $asset_edit['browse_url'] ?: $asset_edit['original']['browse_url'],
-                    $asset_edit['download_provider'] ?: $asset_edit['original']['download_provider']
-                );
-            }
         } else {
             $asset_edit['download_url'] = null;
+        }
+
+        if (($repository_changed && $asset_edit['original']['issues_url'] === '') || $asset_edit['issues_url'] === '') {
+            $asset_edit['issues_url'] = $this->utils->getDefaultIssuesUrl(
+                $asset_edit['browse_url'] ?: $asset_edit['original']['browse_url'],
+                $asset_edit['download_provider'] ?: $asset_edit['original']['download_provider']
+            );
         }
 
         if ($asset_edit['godot_version'] != null) {
@@ -744,7 +753,7 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
 
     $previews_processed = [];
     foreach ($asset_edit_previews as $i => $preview) {
-        if (!isset($preview['edit_preview_id']) || $preview['edit_preview_id'] == null || isset($previews_processed[$preview['edit_preview_id']])) {
+        if (!isset($preview['edit_preview_id']) || $preview['edit_preview_id'] === null || isset($previews_processed[$preview['edit_preview_id']])) {
             continue;
         }
         $previews_processed[$preview['edit_preview_id']] = true;
