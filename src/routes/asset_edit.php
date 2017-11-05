@@ -3,11 +3,13 @@
 
 function _submit_asset_edit($c, $response, $body, $user_id, $asset_id=-1)
 {
+    $has_changes = false;
+
     $query = $c->queries['asset_edit']['submit'];
     $query->bindValue(':user_id', $user_id, PDO::PARAM_INT);
     $query->bindValue(':asset_id', $asset_id, PDO::PARAM_INT);
     if ($asset_id == -1) {
-        $error = _insert_asset_edit_fields($c, false, $response, $query, $body, true);
+        $error = _insert_asset_edit_fields($c, false, $response, $query, $body, true, null);
         if ($error) {
             return $response;
         }
@@ -23,7 +25,7 @@ function _submit_asset_edit($c, $response, $body, $user_id, $asset_id=-1)
 
         $asset = $query_asset->fetchAll()[0];
 
-        $error = _insert_asset_edit_fields($c, false, $response, $query, $body, false, $asset);
+        $error = _insert_asset_edit_fields($c, false, $response, $query, $body, false, $asset, $has_changes);
         if ($error) {
             return $response;
         }
@@ -42,7 +44,14 @@ function _submit_asset_edit($c, $response, $body, $user_id, $asset_id=-1)
     $id = $c->db->lastInsertId();
 
     if (isset($body['previews'])) {
-        $error = _add_previews_to_edit($c, $error, $response, $id, $body['previews'], null, $asset_id==-1);
+        $error = _add_previews_to_edit($c, $error, $response, $id, $body['previews'], null, $asset_id==-1, $has_changes);
+
+        if (!$has_changes) {
+            $response = $response->withJson([
+                'error' => 'Creating edits without changes is not allowed.',
+            ], 400);
+            $error = true;
+        }
         if ($error) {
             $c->db->rollback();
             return $response;
@@ -57,7 +66,7 @@ function _submit_asset_edit($c, $response, $body, $user_id, $asset_id=-1)
     ], 200);
 }
 
-function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $required=false, $bare_asset=null)
+function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $required=false, $bare_asset=null, &$has_changes=false)
 {
     if ($error) {
         return true;
@@ -100,6 +109,7 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
     foreach ($c->constants['asset_edit_fields'] as $i => $field) {
         if (!$required) {
             if (isset($body[$field]) && ($bare_asset === null || $bare_asset[$field] != $body[$field])) {
+                $has_changes = true;
                 $query->bindValue(':' . $field, $body[$field]);
             } else {
                 $query->bindValue(':' . $field, null, PDO::PARAM_NULL);
@@ -108,6 +118,7 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
             if ($bare_asset === null) {
                 if ($field == 'issues_url') { // Default value present, so, no need to error out
                     if (isset($body[$field])) {
+                        $has_changes = true;
                         $query->bindValue(':' . $field, $body[$field]);
                     } else {
                         $query->bindValue(':' . $field, '', PDO::PARAM_NULL);
@@ -120,6 +131,7 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
                 }
             } else { // "Required" (so, non-null), but there is a base asset, so we can support incremental changes
                 if (isset($body[$field])) {
+                    $has_changes = true;
                     $query->bindValue(':' . $field, $body[$field]);
                 } else {
                     $query->bindValue(':' . $field, $bare_asset[$field]);
@@ -131,10 +143,11 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
             return $error;
         }
     }
+
     return $error;
 }
 
-function _add_previews_to_edit($c, $error, &$response, $edit_id, $previews, $asset=null, $required=false)
+function _add_previews_to_edit($c, $error, &$response, $edit_id, $previews, $asset=null, $required=false, &$has_changes=false)
 {
     if ($error) {
         return true;
@@ -145,6 +158,7 @@ function _add_previews_to_edit($c, $error, &$response, $edit_id, $previews, $ass
             continue;
         }
         if ($required || !isset($preview['edit_preview_id'])) {
+            $has_changes = true;
             $query = $c->queries['asset_edit']['add_preview'];
 
             $error = $c->utils->errorResponseIfMissingOrNotString($error, $response, $preview, 'operation');
@@ -190,6 +204,7 @@ function _add_previews_to_edit($c, $error, &$response, $edit_id, $previews, $ass
                 $query->bindValue(':preview_id', (int) $preview['preview_id'], PDO::PARAM_INT);
             }
         } elseif (isset($preview['remove']) && $preview['remove']) {
+            $has_changes = true;
             $query = $c->queries['asset_edit']['remove_preview'];
             $query->bindValue(':edit_preview_id', (int) $preview['edit_preview_id'], PDO::PARAM_INT);
             $query->bindValue(':edit_id', (int) $edit_id, PDO::PARAM_INT);
@@ -213,6 +228,7 @@ function _add_previews_to_edit($c, $error, &$response, $edit_id, $previews, $ass
         foreach ($c->constants['asset_edit_preview_fields'] as $i => $field) {
             if (!$required) {
                 if (isset($preview[$field]) && !(isset($original_preview) && $original_preview[$field] == $preview[$field])) {
+                    $has_changes = true;
                     $query->bindValue(':' . $field, $preview[$field]);
                 } elseif (!isset($preview[$field]) && !isset($original_preview)) {
                     $query->bindValue(':' . $field, $preview[$field]);
@@ -365,9 +381,14 @@ $get_edit = function ($request, $response, $args) {
     $unedited_previews = [];
     $unedited_previews_last_i = null;
     $asset_edit = [];
+    $has_changes = false;
 
     foreach ($output as $row) {
         foreach ($row as $column => $value) {
+            if ($value !== null && $column !== 'edit_preview_id' && $column !== 'edit_id' && $column !== 'asset_id' && $column !== 'user_id' && $column !== 'status' && $column !== 'reason' && $column !== 'author') {
+                $has_changes = true;
+            }
+
             if ($previews_last_i !== null && ($column==='preview_id' || $column==='type' || $column==='link' || $column==='thumbnail')) {
                 $previews[$previews_last_i][$column] = $value;
             } elseif ($previews_last_i !== null && $column==='operation') {
@@ -396,6 +417,10 @@ $get_edit = function ($request, $response, $args) {
                 $asset_edit[$column] = $value;
             }
         }
+    }
+
+    if (!$has_changes) {
+        $warning .= "No changes are present.";
     }
 
     if ($asset_edit['asset_id'] != -1) {
