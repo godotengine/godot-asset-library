@@ -29,7 +29,7 @@ class Utils
                 if (sizeof(preg_grep('/^https:\/\/(gitlab\.com|[^\/]+)\/[^\/]+?\/[^\/]+?$/', [$repo_url])) == 0) {
                     $warning .= "\"$repo_url\" doesn't look correct; it should be similar to \"https://<gitlab instance>/<owner>/<name>\". $warning_suffix\n";
                 } elseif (sizeof(preg_grep('/^https:\/\/(gitlab\.com)\/[^\/]+?\/[^\/]+?$/', [$repo_url])) == 0) {
-                    $warning .= "\"$repo_url\" might not be correct; it should be similar to \"https://gitlab.com/<owner>/<name>\", unless the asset is hosted on\n a custom instance of GitLab. $light_warning_suffix";
+                    $warning .= "\"$repo_url\" might not be correct; it should be similar to \"https://gitlab.com/<owner>/<name>\", unless the asset is hosted on a custom instance of GitLab. $light_warning_suffix\n";
                 }
                 return "$repo_url/repository/archive.zip?ref=$commit";
             case 'BitBucket':

@@ -46,7 +46,7 @@ function _submit_asset_edit($c, $response, $body, $user_id, $asset_id=-1)
     if (isset($body['previews'])) {
         $error = _add_previews_to_edit($c, $error, $response, $id, $body['previews'], null, $asset_id==-1, $has_changes);
 
-        if (!$has_changes) {
+        if (!$has_changes && $asset_id != -1) {
             $response = $response->withJson([
                 'error' => 'Creating edits without changes is not allowed.',
             ], 400);
