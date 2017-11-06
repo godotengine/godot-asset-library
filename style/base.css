@@ -27,7 +27,23 @@
     content: ' *';
     color: #d9534f;
 }
+
 .media-object {
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.nowrap {
+    white-space: nowrap;
+    display: inline-block;
+}
+
+.label {
+    line-height: 1.8;
+}
+
+@media (min-width: 768px) {
+    .asset-item {
+        height: 95px;
+    }
 }

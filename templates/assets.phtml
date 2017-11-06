@@ -76,7 +76,7 @@
 <br/>
 <div class="row">
     <?php foreach($data['result'] as $i => $asset) { ?>
-        <div class="col-md-6" style="height:90px;">
+        <div class="col-md-6 asset-item">
             <div class="media">
                 <div class="media-left">
                     <a href="<?php echo raw($basepath) . '/asset/' . url($asset['asset_id']) ?>" class="img-thumbnail">
@@ -87,9 +87,11 @@
                     <h4 class="media-heading">
                         <a href="<?php echo raw($basepath) . '/asset/' . url($asset['asset_id']) ?>"><?php echo esc($asset['title']) ?></a>
                         <small><?php echo esc($asset['version_string']) ?></small>
-                        <?php for ($star=1; $star <= 5; $star++) { ?>
-                            <i class="glyphicon glyphicon-star<?php if($asset['rating'] < $star) echo '-empty'; ?>"></i>
-                        <?php } ?>
+                        <span class="nowrap pull-right">
+                            <?php for ($star=1; $star <= 5; $star++) { ?>
+                                <i class="glyphicon glyphicon-star<?php if($asset['rating'] < $star) echo '-empty'; ?>"></i>
+                            <?php } ?>
+                        </span>
                         <br>
                         <span class="label label-primary"><?php echo esc($asset['category']) ?></span>
                         <span class="label label-danger"><?php echo esc(ucfirst(str_replace('_', ' ', $asset['godot_version']))) ?></span>
@@ -105,7 +107,7 @@
                         <a href="?<?php echo esc(http_build_query([
                             'filter' => $asset['cost'] // isset($params['filter']) ? $params['filter'] . ' ' . $asset['cost'] : $asset['cost']
                         ] + $params)) ?>" title="Search assets with filter '<?php echo esc($asset['cost']) ?>'"><?php echo esc($asset['cost']) ?></a>;
-                        <?php echo esc(explode(" ", $asset['modify_date'])[0]) ?>
+                        <span class="nowrap"><?php echo esc(explode(" ", $asset['modify_date'])[0]) ?></span>
                     </p>
                 </div>
             </div>
