@@ -38,6 +38,7 @@ return $constants = [
         'admin' => 100,
     ]),
     'download_provider' => double_map([
+        'Custom' => -1,
         'GitHub' => 0,
         'GitLab' => 1,
         'BitBucket' => 2,

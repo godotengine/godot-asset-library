@@ -76,9 +76,18 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
         if (isset($c->constants['download_provider'][$body['download_provider']])) {
             $body['download_provider'] = (string) ((int) $c->constants['download_provider'][$body['download_provider']]);
         } else {
-            $body['download_provider'] = 0;
+            $body['download_provider'] = '0';
+        }
+
+        if ($body['download_provider'] == $c->constants['download_provider']['Custom'] && ($bare_asset === null || $bare_asset['download_provider'] != $body['download_provider'])) {
+            $error = $c->utils->ensureLoggedIn($error, $response, $body, $user);
+            $error = $c->utils->errorResponseIfNotUserHasLevel($error, $response, $user, 'moderator', 'You are not authorized to use the Custom provider');
+            if ($error) {
+                return $response;
+            }
         }
     }
+
 
     if (isset($body['issues_url'])) {
         $default_issues_url = null;
@@ -489,24 +498,17 @@ $get_edit = function ($request, $response, $args) {
         }
     }
 
+    if (($asset_edit['download_provider'] ?: $asset_edit['original']['download_provider']) != 'Custom') {
+        if ($asset_edit['download_commit'] == 'master') {
+            $warning .= "Giving 'master' (or any other branch name) as the commit to be downloaded is not recommended, since it would invalidate the asset when you push a new version (since we ensure the version is kept the same via a sha256 hash of the zip). You can try using tags instead.\n";
+        }
+        if (sizeof(preg_grep('/\/|\\|\:|^\.|\ |\^|\~|\?|\*|\[|^\@$|\@\{/', [$asset_edit['download_commit']])) != 0) {
+            $warning .= "The inputted download commit is not a valid git ref, please ensure you aren't giving a full URL. (If your tag includes '/' in its name, consider escaping it as '%2F')\n";
+        }
+    }
+
     if ($warning != null) {
         $asset_edit['warning'] = $warning;
-    }
-    if ($asset_edit['download_commit'] == 'master') {
-        if (isset($asset_edit['warning'])) {
-            $asset_edit['warning'] .= "\n\n";
-        } else {
-            $asset_edit['warning'] = '';
-        }
-        $asset_edit['warning'] .= "Giving 'master' (or any other branch name) as the commit to be downloaded is not recommended, since it would invalidate the asset when you push a new version (since we ensure the version is kept the same via a sha256 hash of the zip). You can try using tags instead.";
-    }
-    if (sizeof(preg_grep('/\/|\\|\:|^\.|\ |\^|\~|\?|\*|\[|^\@$|\@\{/', [$asset_edit['download_commit']])) != 0) {
-        if (isset($asset_edit['warning'])) {
-            $asset_edit['warning'] .= "\n\n";
-        } else {
-            $asset_edit['warning'] = '';
-        }
-        $asset_edit['warning'] .= "The inputted download commit is not a valid git ref, please ensure you aren't giving a full URL. (If your tag includes '/' in its name, consider escaping it as '%2F')";
     }
 
 

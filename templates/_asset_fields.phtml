@@ -68,9 +68,14 @@ $_asset_values = array_merge([
     <label class="col-md-4 control-label required_mark" for="download_provider">Repository host</label>
     <div class="col-md-5">
         <select id="download_provider" name="download_provider" class="form-control">
-            <?php foreach($constants['download_provider'] as $id => $name) if(is_int($id)) { ?>
+            <?php foreach($constants['download_provider'] as $id => $name) if(is_int($id) && $id >= 0) { ?>
                 <option value="<?php echo esc($name) ?>" <?php if($name == $_asset_values['download_provider']) echo 'selected=""'; ?>>
                     <?php echo esc($name) ?>
+                </option>
+            <?php } ?>
+            <?php if((isset($user) && ($user['type'] >= $constants['user_type']['moderator'])) || "Custom" == $_asset_values['download_provider']) { ?>
+                <option value="Custom" <?php if("Custom" == $_asset_values['download_provider']) echo 'selected=""'; ?>>
+                    Custom (Moderator-only)
                 </option>
             <?php } ?>
         </select>
@@ -83,6 +88,9 @@ $_asset_values = array_merge([
     <div class="col-md-5">
         <input id="browse" name="browse_url" type="text" placeholder="Repository URL" class="form-control input-md" required="" value="<?php echo esc($_asset_values['browse_url']) ?>">
         <span class="help-block">The url to browse the asset's files (webpage). Should be similar to <code>https://github.com/&lt;user&gt;/&lt;project&gt;</code> (Might be different depending on your "provider")</span>
+        <?php if(isset($user) && ($user['type'] >= $constants['user_type']['moderator'])) { ?>
+            <span class="help-block">When using the Custom provider, this is used for browsing only.</span>
+        <?php } ?>
     </div>
 </div>
 
@@ -99,6 +107,9 @@ $_asset_values = array_merge([
     <div class="col-md-5">
         <input id="commit" name="download_commit" type="text" placeholder="Download Commit/tag" class="form-control input-md" required="" value="<?php echo esc($_asset_values['download_commit']) ?>">
         <span class="help-block">The commit or tag to download the asset. Should be similar to <code>b1d3172f89b86e52465a74f63a74ac84c491d3e1</code> or <code>v1.0</code>. The final download url would be computed from this.</span>
+        <?php if(isset($user) && ($user['type'] >= $constants['user_type']['moderator'])) { ?>
+            <span class="help-block">When using the Custom provider, this is the download URL.</span>
+        <?php } ?>
     </div>
 </div>
 

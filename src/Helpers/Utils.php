@@ -49,6 +49,11 @@ class Utils
                 }
                 $warning .= "Since cgit might be self-hosted, we can't be sure that \"$repo_url\" is a valid cgit URL. $light_warning_suffix\n";
                 return "$repo_url/snapshot/$commit.zip";
+            case 'Custom':
+                if (sizeof(preg_grep('/^https?:\/\/.+?.zip$/', [$commit])) == 0) {
+                    $warning .= "\"$commit\" doesn't look correct; it should be similar to \"http<s>://<url>.zip\". $warning_suffix\n";
+                }
+                return "$commit";
             default:
                 return "$repo_url/$commit.zip"; // Obviously incorrect, but we would like to have some default case...
         }
