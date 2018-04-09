@@ -21,7 +21,12 @@ if (!defined('FRONTEND')) {
 // Instantiate the app
 $settings = require __DIR__ . '/../src/settings.php';
 $local_settings = require __DIR__ . '/../src/settings-local.php';
-$app = new \Slim\App(array_replace_recursive($settings, $local_settings));
+
+$c = new \Slim\Container(array_replace_recursive($settings, $local_settings));
+$c['foundHandler'] = function ($c) {
+    return new \Slim\Handlers\Strategies\RequestResponseArgs();
+};
+$app = new \Slim\App($c);
 
 // Set up dependencies
 require __DIR__ . '/../src/dependencies.php';
@@ -30,10 +35,7 @@ require __DIR__ . '/../src/dependencies.php';
 require __DIR__ . '/../src/middleware.php';
 
 // Register routes
-
-foreach (glob(__DIR__ . "/../src/routes/*.php") as $filename) {
-    require $filename;
-}
+require __DIR__ . '/../src/routes.php';
 
 // Run app
 $app->run();

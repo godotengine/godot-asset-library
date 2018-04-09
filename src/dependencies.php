@@ -104,3 +104,17 @@ $container['tokens'] = function ($c) {
 $container['utils'] = function ($c) {
     return new Godot\AssetLibrary\Helpers\Utils($c);
 };
+
+// controllers
+$container['AssetController'] = function ($c) {
+    return new Godot\AssetLibrary\Controllers\AssetController($c);
+};
+$container['AssetEditController'] = function ($c) {
+    return new Godot\AssetLibrary\Controllers\AssetEditController($c);
+};
+$container['UserController'] = function ($c) {
+    return new Godot\AssetLibrary\Controllers\UserController($c);
+};
+$container['AuthController'] = function ($c) {
+    return new Godot\AssetLibrary\Controllers\AuthController($c);
+};

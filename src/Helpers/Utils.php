@@ -11,7 +11,7 @@ class Utils
         $this->c = $c;
     }
 
-    public function getComputedDownloadUrl($repo_url, $provider, $commit, &$warning=null) // i.e. browse_url, download_provider, download_commit
+    public function getComputedDownloadUrl($repo_url, $provider, $commit, &$warning = null) // i.e. browse_url, download_provider, download_commit
     {
         $repo_url = rtrim($repo_url, '/');
         if (is_int($provider)) {
@@ -77,7 +77,7 @@ class Utils
         }
     }
 
-    public function getFormattedGodotVersion($internal_id, &$warning=null)
+    public function getFormattedGodotVersion($internal_id, &$warning = null)
     {
         if ($internal_id == $this->c->constants['special_godot_versions']['unknown']) {
             $warning .= "Setting Godot version as \"unknown\" is not recommended, as it would prevent people from finding your asset easily.\n";
@@ -127,24 +127,40 @@ class Utils
         return false;
     }
 
-    public function errorResponseIfNotOwnerOrLevel($currentStatus, &$response, $user, $asset_id, $required_level_name, $message = 'You are not authorized to do this')
+    public function errorResponseIfNotOwnerOrLevel($currentStatus, &$response, $user, $resource_id, $required_level_name, $owner_of = 'asset', $message = 'You are not authorized to do this')
     {
-        if($user === false || $currentStatus) {
+        if ($user === false || $currentStatus) {
             return true;
         }
 
-        $query = $this->c->queries['asset']['get_one'];
-        $query->bindValue(':id', (int) $asset_id, \PDO::PARAM_INT);
-        $query->execute();
+        if ($owner_of === 'asset') {
+            $query = $this->c->queries['asset']['get_one_bare'];
+            $query->bindValue(':asset_id', (int) $resource_id, \PDO::PARAM_INT);
+            $query->execute();
 
-        if($query->rowCount() <= 0) {
-            return $response->withJson(['error' => 'Couldn\'t find asset with id '.$asset_id.'!'], 404);
-        }
+            if ($query->rowCount() <= 0) {
+                return $response->withJson(['error' => 'Couldn\'t find asset with id '.$resource_id.'!'], 404);
+            }
 
-        $asset = $query->fetch();
+            $asset = $query->fetch();
 
-        if($asset['author_id'] != $user['user_id']) {
-            return $this->errorResponseIfNotUserHasLevel(false, $response, $user, $required_level_name, $message);
+            if ($asset['user_id'] !== $user['user_id']) {
+                return $this->errorResponseIfNotUserHasLevel(false, $response, $user, $required_level_name, $message);
+            }
+        } elseif ($owner_of === 'asset_edit') {
+            $query = $this->c->queries['asset_edit']['get_one_bare'];
+            $query->bindValue(':edit_id', (int) $resource_id, \PDO::PARAM_INT);
+            $query->execute();
+
+            if ($query->rowCount() <= 0) {
+                return $response->withJson(['error' => 'Couldn\'t find asset edit with id '.$resource_id.'!'], 404);
+            }
+
+            $asset_edit = $query->fetch();
+
+            if ($asset_edit['user_id'] !== $user['user_id']) {
+                return $this->errorResponseIfNotUserHasLevel(false, $response, $user, $required_level_name, $message);
+            }
         }
 
         return false;
