@@ -21,7 +21,7 @@ $preview_field_names = [
 
 <?php function output_field($data, $name, $categories = []) { ?>
     <?php if (strpos($name, 'url') !== false || strpos($name, 'link') !== false || strpos($name, 'thumbnail') !== false) { ?>
-        <a href="<?php echo esc($data) ?>"><?php echo esc($data) ?></a>
+        <a href="<?php echo esc($data) ?>" rel="nofollow"><?php echo esc($data) ?></a>
         <?php if ($name == 'icon_url') { ?>
             <br><img src="<?php echo esc($data) ?>" width="80" height="80"></a>
         <?php }?>

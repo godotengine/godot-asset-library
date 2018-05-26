@@ -88,6 +88,33 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
         }
     }
 
+    $warning = '';
+    if (isset($body['browse_url'])) {
+        if ((isset($body['download_provider']) && isset($body['download_commit'])) || $bare_asset !== null) {
+            $default_issues_url = $c->utils->getComputedDownloadUrl(
+                $body['browse_url'] ?: $bare_asset['browse_url'],
+                intval($body['download_provider'] ?: $bare_asset['download_provider']),
+                $body['download_commit'] ?: $bare_asset['download_commit'],
+                $warning
+            );
+        }
+    }
+    if (isset($body['icon_url'])) {
+        $icon_url = $body['icon_url'];
+        if (sizeof(preg_grep('/^https?:\/\/.+?\.(png|jpg|jpeg)$/', [$icon_url])) == 0) {
+            $warning .= "\"$icon_url\" doesn't look correct; it should be similar to \"http<s>://<url>.<png/jpg>\". Make sure the icon URL is correct.\n";
+        }
+    }
+
+    if ($warning != '') {
+        $entity = $bare_asset == null ? 'asset' : 'edit';
+        $error = $c->utils->ensureLoggedIn($error, $response, $body, $user);
+        $error = $c->utils->errorResponseIfNotUserHasLevel($error, $response, $user, 'verified', "Due to spam problems, we have to reject your $entity because it uses invalid repository URL: \n$warning \nPlease contact the community administrators if this is not spam.");
+        if ($error) {
+            return $response;
+        }
+    }
+
 
     if (isset($body['issues_url'])) {
         $default_issues_url = null;
@@ -808,6 +835,18 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
         if ($error) {
             return $response;
         }
+    }
+
+    // Mark the user submitting the asset as "verified"
+    $query_verify = $this->queries['user']['promote'];
+
+    $query_verify->bindValue(':id', (int) $asset_edit['user_id'], PDO::PARAM_INT);
+    $query_verify->bindValue(':type', (int) $this->constants['user_type']['verified'], PDO::PARAM_INT);
+
+    $query_verify->execute();
+    $error = $this->utils->errorResponseIfQueryBad(false, $response, $query_verify);
+    if ($error) {
+        return $response;
     }
 
     return $response->withJson([
