@@ -109,7 +109,7 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
     if ($warning != '') {
         $entity = $bare_asset == null ? 'asset' : 'edit';
         $error = $c->utils->ensureLoggedIn($error, $response, $body, $user);
-        $error = $c->utils->errorResponseIfNotUserHasLevel($error, $response, $user, 'verified', "Due to spam problems, we have to reject your $entity because it uses invalid repository URL: \n$warning \nPlease contact the community administrators if this is not spam.");
+        $error = $c->utils->errorResponseIfNotUserHasLevel($error, $response, $user, 'verified', "Due to spam problems, we have to reject your $entity because: \n$warning \nPlease contact the community administrators if this is not spam.");
         if ($error) {
             return $response;
         }
