@@ -262,12 +262,12 @@ function _add_previews_to_edit($c, $error, &$response, $edit_id, $previews, $ass
         $query->bindValue(':edit_id', (int) $edit_id, PDO::PARAM_INT);
 
         foreach ($c->constants['asset_edit_preview_fields'] as $i => $field) {
-            if (!$required) {
+            if (!$required || $field == 'thumbnail') { // thumb is not required
                 if (isset($preview[$field]) && !(isset($original_preview) && $original_preview[$field] == $preview[$field])) {
                     $has_changes = true;
                     $query->bindValue(':' . $field, $preview[$field]);
-                } elseif (!isset($preview[$field]) && !isset($original_preview)) {
-                    $query->bindValue(':' . $field, $preview[$field]);
+                } elseif (!isset($original_preview)) {
+                    $query->bindValue(':' . $field, '');
                 } else {
                     $query->bindValue(':' . $field, null, PDO::PARAM_NULL);
                 }

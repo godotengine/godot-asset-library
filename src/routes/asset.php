@@ -201,6 +201,8 @@ $get_asset = function ($request, $response, $args) {
                 $matches = [];
                 if (preg_match('|youtube.com/watch\\?v=([^&]+)|', $previews[$i]['link'], $matches)) {
                     $previews[$i]['thumbnail'] = 'http://img.youtube.com/vi/'.$matches[1].'/default.jpg';
+                } else {
+                    $previews[$i]['thumbnail'] = $previews[$i]['link'];
                 }
             } else {
                 $previews[$i]['thumbnail'] = $previews[$i]['link'];

@@ -148,7 +148,7 @@ $_asset_values = array_merge([
 <div class="form-group">
     <label class="col-md-4 control-label required_mark" for="description">Description</label>
     <div class="col-md-5">
-        <textarea class="form-control" id="description" name="description" rows="7"><?php echo esc($_asset_values['description']) ?></textarea>
+        <textarea class="form-control" id="description" name="description" required="" rows="7"><?php echo esc($_asset_values['description']) ?></textarea>
         <span class="help-block">The description which would be visible on the asset page</span>
     </div>
 </div>
@@ -179,7 +179,7 @@ $_asset_values = array_merge([
                         <input type="hidden" name="previews[<?php echo $i ?>][enabled]" value="true">
                         <label>
                             <input type="checkbox" name="previews[<?php echo $i ?>][remove]" value="true">
-                            Cancel edit
+                            Remove
                         </label>
 
                     <?php } else { // From base asset ?>
@@ -201,7 +201,7 @@ $_asset_values = array_merge([
                 <?php } else { ?>
                     <input type="hidden" name="previews[<?php echo $i ?>][operation]" value="insert">
                     <label>
-                        <input type="checkbox" name="previews[<?php echo $i ?>][enabled]" value="true">
+                        <input type="checkbox" name="previews[<?php echo $i ?>][enabled]" value="true" onchange="document.getElementById('previews[<?php echo $i ?>][link]').required = this.checked;">
                         Enable
                     </label>
                 <?php } ?>
@@ -231,7 +231,7 @@ $_asset_values = array_merge([
             </div>
 
             <div class="form-group">
-                <label class="col-md-4 control-label required_mark" for="previews[<?php echo $i ?>][thumbnail]">Link to thumbnail (To be removed)</label>
+                <label class="col-md-4 control-label" for="previews[<?php echo $i ?>][thumbnail]">Link to thumbnail</label>
                 <div class="col-md-5">
                     <input id="previews[<?php echo $i ?>][thumbnail]" name="previews[<?php echo $i ?>][thumbnail]" type="text" placeholder="Image Link" class="form-control input-md" value="<?php echo esc($preview['thumbnail']) ?>">
                 </div>
