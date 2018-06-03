@@ -101,7 +101,7 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
     }
     if (isset($body['icon_url'])) {
         $icon_url = $body['icon_url'];
-        if (sizeof(preg_grep('/^https?:\/\/.+?\.(png|jpg|jpeg)$/', [$icon_url])) == 0) {
+        if (sizeof(preg_grep('/^https?:\/\/.+?\.(png|jpg|jpeg)$/i', [$icon_url])) == 0) {
             $warning .= "\"$icon_url\" doesn't look correct; it should be similar to \"http<s>://<url>.<png/jpg>\". Make sure the icon URL is correct.\n";
         }
     }

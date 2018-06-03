@@ -21,36 +21,36 @@ class Utils
         $light_warning_suffix = "Please, doublecheck that the URL and the repository provider are correct.";
         switch ($provider) {
             case 'GitHub':
-                if (sizeof(preg_grep('/^https:\/\/github\.com\/[^\/]+?\/[^\/]+?$/', [$repo_url])) == 0) {
+                if (sizeof(preg_grep('/^https:\/\/github\.com\/[^\/]+?\/[^\/]+?$/i', [$repo_url])) == 0) {
                     $warning .= "\"$repo_url\" doesn't look correct; it should be similar to \"https://github.com/<owner>/<name>\". $warning_suffix\n";
                 }
                 return "$repo_url/archive/$commit.zip";
             case 'GitLab':
-                if (sizeof(preg_grep('/^https:\/\/(gitlab\.com|[^\/]+)\/[^\/]+?\/[^\/]+?$/', [$repo_url])) == 0) {
+                if (sizeof(preg_grep('/^https:\/\/(gitlab\.com|[^\/]+)\/[^\/]+?\/[^\/]+?$/i', [$repo_url])) == 0) {
                     $warning .= "\"$repo_url\" doesn't look correct; it should be similar to \"https://<gitlab instance>/<owner>/<name>\". $warning_suffix\n";
-                } elseif (sizeof(preg_grep('/^https:\/\/(gitlab\.com)\/[^\/]+?\/[^\/]+?$/', [$repo_url])) == 0) {
+                } elseif (sizeof(preg_grep('/^https:\/\/(gitlab\.com)\/[^\/]+?\/[^\/]+?$/i', [$repo_url])) == 0) {
                     $warning .= "\"$repo_url\" might not be correct; it should be similar to \"https://gitlab.com/<owner>/<name>\", unless the asset is hosted on a custom instance of GitLab. $light_warning_suffix\n";
                 }
                 return "$repo_url/repository/archive.zip?ref=$commit";
             case 'BitBucket':
-                if (sizeof(preg_grep('/^https:\/\/bitbucket\.org\/[^\/]+?\/[^\/]+?$/', [$repo_url])) == 0) {
+                if (sizeof(preg_grep('/^https:\/\/bitbucket\.org\/[^\/]+?\/[^\/]+?$/i', [$repo_url])) == 0) {
                     $warning .= "\"$repo_url\" doesn't look correct; it should be similar to \"https://bitbucket.org/<owner>/<name>\". $warning_suffix\n";
                 }
                 return "$repo_url/get/$commit.zip";
             case 'Gogs':
-                if (sizeof(preg_grep('/^https?:\/\/[^\/]+?\/[^\/]+?\/[^\/]+?$/', [$repo_url])) == 0) {
+                if (sizeof(preg_grep('/^https?:\/\/[^\/]+?\/[^\/]+?\/[^\/]+?$/i', [$repo_url])) == 0) {
                     $warning .= "\"$repo_url\" doesn't look correct; it should be similar to \"http<s>://<gogs instance>/<owner>/<name>\". $warning_suffix\n";
                 }
                 $warning .= "Since Gogs might be self-hosted, we can't be sure that \"$repo_url\" is a valid Gogs URL. $light_warning_suffix\n";
                 return "$repo_url/archive/$commit.zip";
             case 'cgit':
-                if (sizeof(preg_grep('/^https?:\/\/[^\/]+?\/[^\/]+?\/[^\/]+?$/', [$repo_url])) == 0) {
+                if (sizeof(preg_grep('/^https?:\/\/[^\/]+?\/[^\/]+?\/[^\/]+?$/i', [$repo_url])) == 0) {
                     $warning .= "\"$repo_url\" doesn't look correct; it should be similar to \"http<s>://<cgit instance>/<owner>/<name>\". $warning_suffix\n";
                 }
                 $warning .= "Since cgit might be self-hosted, we can't be sure that \"$repo_url\" is a valid cgit URL. $light_warning_suffix\n";
                 return "$repo_url/snapshot/$commit.zip";
             case 'Custom':
-                if (sizeof(preg_grep('/^https?:\/\/.+?\.zip$/', [$commit])) == 0) {
+                if (sizeof(preg_grep('/^https?:\/\/.+?\.zip$/i', [$commit])) == 0) {
                     $warning .= "\"$commit\" doesn't look correct; it should be similar to \"http<s>://<url>.zip\". $warning_suffix\n";
                 }
                 return "$commit";
