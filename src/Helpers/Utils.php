@@ -19,6 +19,9 @@ class Utils
         }
         $warning_suffix = "Please, ensure that the URL and the repository provider are correct.";
         $light_warning_suffix = "Please, doublecheck that the URL and the repository provider are correct.";
+        if (sizeof(preg_grep('/^https:\/\/.+\.git$/i', [$repo_url])) != 0) {
+            $warning .= "\"$repo_url\" doesn't look correct; it probably shouldn't end in .git. $warning_suffix\n";
+        }
         switch ($provider) {
             case 'GitHub':
                 if (sizeof(preg_grep('/^https:\/\/github\.com\/[^\/]+?\/[^\/]+?$/i', [$repo_url])) == 0) {
@@ -37,11 +40,13 @@ class Utils
                     $warning .= "\"$repo_url\" doesn't look correct; it should be similar to \"https://bitbucket.org/<owner>/<name>\". $warning_suffix\n";
                 }
                 return "$repo_url/get/$commit.zip";
-            case 'Gogs':
+            case 'Gogs/Gitea':
                 if (sizeof(preg_grep('/^https?:\/\/[^\/]+?\/[^\/]+?\/[^\/]+?$/i', [$repo_url])) == 0) {
                     $warning .= "\"$repo_url\" doesn't look correct; it should be similar to \"http<s>://<gogs instance>/<owner>/<name>\". $warning_suffix\n";
                 }
-                $warning .= "Since Gogs might be self-hosted, we can't be sure that \"$repo_url\" is a valid Gogs URL. $light_warning_suffix\n";
+                if (sizeof(preg_grep('/^https:\/\/notabug.org\/[^\/]+?\/[^\/]+?$/i', [$repo_url])) == 0) {
+                    $warning .= "Since Gogs/Gitea might be self-hosted, we can't be sure that \"$repo_url\" is a valid repository URL. $light_warning_suffix\n";
+                }
                 return "$repo_url/archive/$commit.zip";
             case 'cgit':
                 if (sizeof(preg_grep('/^https?:\/\/[^\/]+?\/[^\/]+?\/[^\/]+?$/i', [$repo_url])) == 0) {
@@ -69,7 +74,7 @@ class Utils
             case 'GitHub':
             case 'GitLab':
             case 'BitBucket':
-            case 'Gogs':
+            case 'Gogs/Gitea':
                 return "$repo_url/issues";
             case 'cgit':
             default:

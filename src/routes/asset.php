@@ -61,8 +61,8 @@ $app->get('/asset', function ($request, $response, $args) {
         } else {
             $godot_version = $this->utils->getUnformattedGodotVersion($params['godot_version']);
             $min_godot_version = floor($godot_version / 10000) * 10000; // Keep just the major version
-            $max_godot_version = $godot_version; // Assume version requested can't handle future patches
-            // $max_godot_version = floor($godot_version / 100) * 100 + 99; // Assume future patches will work
+            $max_godot_version = floor($godot_version / 100) * 100 + 99; // The major was requested, give future patches
+            // $max_godot_version = $godot_version; // Assume version requested can't handle future patches
         }
     }
     if (isset($params['page'])) {

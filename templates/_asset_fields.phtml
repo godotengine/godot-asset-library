@@ -4,9 +4,9 @@
 $_asset_values = array_merge([
     'title' => '',
     'category_id' => '0',
-    'godot_version' => 'unknown',
+    'godot_version' => '',
     'version_string' => '',
-    'download_provider' => '0',
+    'download_provider' => '',
     'download_commit' => '',
     'browse_url' => '',
     'issues_url' => '',
@@ -16,18 +16,32 @@ $_asset_values = array_merge([
     'previews' => [],
 ], $_asset_values);
 ?>
+
 <div class="form-group">
         <label class="col-md-4 control-label required_mark" for="title">Asset Name</label>
         <div class="col-md-5">
-                <input id="title" name="title" type="text" placeholder="Asset Name" class="form-control input-md" required="" value="<?php echo esc($_asset_values['title']) ?>">
-                <span class="help-block">The name of the asset</span>
+                <input id="title" name="title" type="text" placeholder="One-button game creation tool" class="form-control input-md" required="" value="<?php echo esc($_asset_values['title']) ?>">
+                <!-- <span class="help-block">The name of the asset.</span> -->
         </div>
+</div>
+
+<div class="form-group">
+    <label class="col-md-4 control-label required_mark" for="description">Description</label>
+    <div class="col-md-5">
+        <textarea class="form-control" id="description" name="description" placeholder="This tool allows you to make games with the click of a button.&#10;It supports..." required="" rows="7"><?php echo esc($_asset_values['description']) ?></textarea>
+        <!-- <span class="help-block">The description which would be visible on the asset page.</span> -->
+    </div>
 </div>
 
 <div class="form-group">
     <label class="col-md-4 control-label required_mark" for="category">Category</label>
     <div class="col-md-5">
         <select id="category" name="category_id" class="form-control">
+            <?php if(!$_asset_values['category_id']) { ?>
+                <option value="" selected="">
+                    Select...
+                </option>
+            <?php } ?>
             <?php foreach($constants['category_type'] as $type => $type_name) if(is_int($type)) { ?>
                 <optgroup label="<?php echo esc(ucfirst($type_name . 's')) ?>">
                     <?php foreach($categories as $key => $category) if($category['type'] == $type) { ?>
@@ -38,86 +52,7 @@ $_asset_values = array_merge([
                 </optgroup>
             <?php } ?>
         </select>
-        <span class="help-block">The category the asset belongs to</span>
-    </div>
-</div>
-
-<div class="form-group">
-    <label class="col-md-4 control-label required_mark" for="godot_version">Godot version</label>
-    <div class="col-md-5">
-        <select id="godot_version" name="godot_version" class="form-control">
-            <?php foreach($constants['common_godot_versions'] as $version) { ?>
-                <option value="<?php echo esc($version) ?>" <?php if($version == $_asset_values['godot_version']) echo 'selected=""'; ?>>
-                    <?php echo esc(ucfirst(str_replace('_', ' ', $version))) ?>
-                </option>
-            <?php } ?>
-        </select>
-        <span class="help-block">The version of Godot the asset works with</span>
-    </div>
-</div>
-
-<div class="form-group">
-    <label class="col-md-4 control-label required_mark" for="version">Version</label>
-    <div class="col-md-5">
-        <input id="version" name="version_string" type="text" placeholder="Version" class="form-control input-md" required="" value="<?php echo esc($_asset_values['version_string']) ?>">
-        <span class="help-block">The version of the asset</span>
-    </div>
-</div>
-
-<div class="form-group">
-    <label class="col-md-4 control-label required_mark" for="download_provider">Repository host</label>
-    <div class="col-md-5">
-        <select id="download_provider" name="download_provider" class="form-control">
-            <?php foreach($constants['download_provider'] as $id => $name) if(is_int($id) && $id >= 0) { ?>
-                <option value="<?php echo esc($name) ?>" <?php if($name == $_asset_values['download_provider']) echo 'selected=""'; ?>>
-                    <?php echo esc($name) ?>
-                </option>
-            <?php } ?>
-            <?php if((isset($user) && ($user['type'] >= $constants['user_type']['moderator'])) || "Custom" == $_asset_values['download_provider']) { ?>
-                <option value="Custom" <?php if("Custom" == $_asset_values['download_provider']) echo 'selected=""'; ?>>
-                    Custom (Moderator-only)
-                </option>
-            <?php } ?>
-        </select>
-        <span class="help-block">We need to know where your repository is hosted in order to compute the final download URL. If your Git repository provider is missing, you might like to <a href="https://github.com/godotengine/asset-library/issues">open an issue</a> about it.</span>
-    </div>
-</div>
-
-<div class="form-group">
-    <label class="col-md-4 control-label required_mark" for="browse">Repository URL</label>
-    <div class="col-md-5">
-        <input id="browse" name="browse_url" type="text" placeholder="Repository URL" class="form-control input-md" required="" value="<?php echo esc($_asset_values['browse_url']) ?>">
-        <span class="help-block">The url to browse the asset's files (webpage). Should be similar to <code>https://github.com/&lt;user&gt;/&lt;project&gt;</code> (Might be different depending on your "provider")</span>
-        <?php if(isset($user) && ($user['type'] >= $constants['user_type']['moderator'])) { ?>
-            <span class="help-block">When using the Custom provider, this is used for browsing only.</span>
-        <?php } ?>
-    </div>
-</div>
-
-<div class="form-group">
-    <label class="col-md-4 control-label" for="issues">Issues URL</label>
-    <div class="col-md-5">
-        <input id="issues" name="issues_url" type="text" placeholder="Issues URL" class="form-control input-md" value="<?php echo esc($_asset_values['issues_url']) ?>">
-        <span class="help-block">The url to issues list of the  asset. Should be similar to <code>https://github.com/&lt;user&gt;/&lt;project&gt;/issues</code> (Might be different depending on your "provider"). If you use your provider's issue list, you can leave it empty.</span>
-    </div>
-</div>
-
-<div class="form-group">
-    <label class="col-md-4 control-label required_mark" for="commit">Download Commit/tag</label>
-    <div class="col-md-5">
-        <input id="commit" name="download_commit" type="text" placeholder="Download Commit/tag" class="form-control input-md" required="" value="<?php echo esc($_asset_values['download_commit']) ?>">
-        <span class="help-block">The commit or tag to download the asset. Should be similar to <code>b1d3172f89b86e52465a74f63a74ac84c491d3e1</code> or <code>v1.0</code>. The final download url would be computed from this.</span>
-        <?php if(isset($user) && ($user['type'] >= $constants['user_type']['moderator'])) { ?>
-            <span class="help-block">When using the Custom provider, this is the download URL.</span>
-        <?php } ?>
-    </div>
-</div>
-
-<div class="form-group">
-    <label class="col-md-4 control-label required_mark" for="icon">Icon URL</label>
-    <div class="col-md-5">
-        <input id="icon" name="icon_url" type="text" placeholder="Icon URL" class="form-control input-md" required="" value="<?php echo esc($_asset_values['icon_url']) ?>">
-        <span class="help-block">The url to the asset's icon (png or jpg image)</span>
+        <!-- <span class="help-block">The category the asset belongs to.</span> -->
     </div>
 </div>
 
@@ -139,21 +74,108 @@ $_asset_values = array_merge([
                 'BSD-2-Clause' => 'BSD 2-clause License',
                 'BSL-1.0' => 'Boost Software License'
             ] ?>
+            <?php if(!$_asset_values['cost']) { ?>
+                <option value="" selected="">
+                    - Please select -
+                </option>
+            <?php } ?>
             <?php foreach($licenses as $id => $name) { ?>
                 <option value="<?php echo raw($id) ?>" <?php if($id == $_asset_values['cost']) echo 'selected=""'; ?>>
                     <?php echo esc($name) ?>
                 </option>
             <?php } ?>
         </select>
-        <span class="help-block">The license under which the asset is available. Check <a href="https://opensource.org/licenses">opensource.org</a> for a more detailed description of each. <br> In case an OSI-approved license you are using is missing, you might <a href="https://github.com/godotengine/asset-library/issues">open an issue</a> about it.</span>
+        <span class="help-block">The license under which the asset is available. Check <a href="https://opensource.org/licenses">opensource.org</a> for a more detailed description of each. In case an OSI-approved license you are using is missing, you might <a href="https://github.com/godotengine/asset-library/issues">open an issue</a> about it.</span>
+        <span class="help-block"><strong>Note:</strong> The license you specify here should also be included in the repository you are submitting under a standard name, such as LICENSE or LICENSE.md</span>
     </div>
 </div>
 
 <div class="form-group">
-    <label class="col-md-4 control-label required_mark" for="description">Description</label>
+    <label class="col-md-4 control-label required_mark" for="download_provider">Repository host</label>
     <div class="col-md-5">
-        <textarea class="form-control" id="description" name="description" required="" rows="7"><?php echo esc($_asset_values['description']) ?></textarea>
-        <span class="help-block">The description which would be visible on the asset page</span>
+        <select id="download_provider" name="download_provider" class="form-control">
+            <?php if(!$_asset_values['download_provider']) { ?>
+                <option value="" selected="">
+                    Select...
+                </option>
+            <?php } ?>
+            <?php foreach($constants['download_provider'] as $id => $name) if(is_int($id) && $id >= 0) { ?>
+                <option value="<?php echo esc($name) ?>" <?php if($name === $_asset_values['download_provider']) echo 'selected=""'; ?>>
+                    <?php echo esc($name) ?>
+                </option>
+            <?php } ?>
+            <?php if((isset($user) && ($user['type'] >= $constants['user_type']['moderator'])) || "Custom" == $_asset_values['download_provider']) { ?>
+                <option value="Custom" <?php if("Custom" == $_asset_values['download_provider']) echo 'selected=""'; ?>>
+                    Custom (Moderator-only)
+                </option>
+            <?php } ?>
+        </select>
+        <span class="help-block">The site or service hosting your repository. If your repository host is missing, you might like to <a href="https://github.com/godotengine/asset-library/issues">open an issue</a> about it.</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-md-4 control-label required_mark" for="browse">Repository URL</label>
+    <div class="col-md-5">
+        <input id="browse" name="browse_url" type="text" placeholder="https://host.example/user/repository" class="form-control input-md" required="" value="<?php echo esc($_asset_values['browse_url']) ?>">
+        <span class="help-block">The url you use to browse your repository.</span>
+        <span class="help-block"><strong>Note:</strong> Do not give the clone url (the one that ends in <code>.git</code>), but give the one you use to browse your code.</span>
+        <?php if(isset($user) && ($user['type'] >= $constants['user_type']['moderator'])) { ?>
+            <span class="help-block">When using the Custom provider, this is used for browsing only.</span>
+        <?php } ?>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-md-4 control-label" for="issues">Issues URL</label>
+    <div class="col-md-5">
+        <input id="issues" name="issues_url" type="text" placeholder="https://host.example/user/repository/issues" class="form-control input-md" value="<?php echo esc($_asset_values['issues_url']) ?>">
+        <span class="help-block">Optional, in case you are not using the one supplied by the repository host.</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-md-4 control-label required_mark" for="godot_version">Godot version</label>
+    <div class="col-md-5">
+        <select id="godot_version" name="godot_version" class="form-control">
+            <?php if(!$_asset_values['godot_version']) { ?>
+                <option value="" selected="">
+                    Select...
+                </option>
+            <?php } ?>
+            <?php foreach($constants['common_godot_versions'] as $version) { ?>
+                <option value="<?php echo esc($version) ?>" <?php if($version == $_asset_values['godot_version']) echo 'selected=""'; ?>>
+                    <?php echo esc(ucfirst(str_replace('_', ' ', $version))) ?>
+                </option>
+            <?php } ?>
+        </select>
+        <!-- <span class="help-block">The version of Godot the asset works with.</span> -->
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-md-4 control-label required_mark" for="version">Asset Version</label>
+    <div class="col-md-5">
+        <input id="version" name="version_string" type="text" placeholder="e.g. 1.0.0 or 1.0" class="form-control input-md" required="" value="<?php echo esc($_asset_values['version_string']) ?>">
+        <!-- <span class="help-block">A human-readable version of the asset, e.g. <code>1.0</code> or <code>1.0.0</code>.</span> -->
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-md-4 control-label required_mark" for="commit">Download Commit/tag</label>
+    <div class="col-md-5">
+        <input id="commit" name="download_commit" type="text" placeholder="Commit ID or tag" class="form-control input-md" required="" value="<?php echo esc($_asset_values['download_commit']) ?>">
+        <span class="help-block">The commit or tag that should be downloaded. If using a tag name, make sure that you actually created the tag on your repository.</span>
+        <?php if(isset($user) && ($user['type'] >= $constants['user_type']['moderator'])) { ?>
+            <span class="help-block">When using the Custom provider, this is the download URL.</span>
+        <?php } ?>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-md-4 control-label required_mark" for="icon">Icon URL</label>
+    <div class="col-md-5">
+        <input id="icon" name="icon_url" type="text" placeholder="https://host.example/user/repository/raw/icon.(png|jpg)" class="form-control input-md" required="" value="<?php echo esc($_asset_values['icon_url']) ?>">
     </div>
 </div>
 

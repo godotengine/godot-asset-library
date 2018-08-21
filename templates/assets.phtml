@@ -36,9 +36,9 @@
                     Any
                 </option>
 
-                <?php foreach($constants['common_godot_versions'] as $version) { ?>
+                <?php foreach($constants['common_godot_versions'] as $version) if(substr_count($version, '.') != 2) { ?>
                     <option value="<?php echo esc($version) ?>" <?php if(isset($params['godot_version']) && $version == $params['godot_version']) echo 'selected=""'; ?>>
-                        <?php echo esc(ucfirst($version)) ?>
+                        <?php echo esc(ucfirst(str_replace('_', ' ', $version))) ?>
                     </option>
                 <?php } ?>
             </select>

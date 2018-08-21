@@ -3,12 +3,12 @@
     'title' => 'Title',
     'description' => 'Description',
     'category_id' => 'Category',
-    'godot_version' => 'Godot version',
-    'version_string' => 'Version String',
     'cost' => 'License',
+    'download_provider' => 'Repository Provider',
     'browse_url' => 'Repository Url',
     'issues_url' => 'Issues Url',
-    'download_provider' => 'Repository Provider',
+    'godot_version' => 'Godot version',
+    'version_string' => 'Version String',
     'download_commit' => 'Download Commit',
     'download_url' => 'Download Url (Computed)',
     'icon_url' => 'Icon Url',
@@ -32,7 +32,7 @@ $preview_field_names = [
             <br><img src="<?php echo esc($data) ?>" style="max-height:345px"></a>
         <?php }?>
     <?php } elseif($name == 'godot_version') { ?>
-        <?php echo raw(ucfirst(str_replace('_', ' ', $data))) ?>
+        Godot <?php echo raw(ucfirst(str_replace('_', ' ', $data))) ?>
     <?php } elseif($name == 'category_id') { ?>
         <?php echo raw($categories[$data]['name']) ?>
     <?php } elseif($name == 'description') { ?>
