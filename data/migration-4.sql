@@ -1,6 +1,3 @@
 
-ALTER TABLE `as_assets` ADD `godot_version` INT(7) NOT NULL AFTER `category_id`, ADD INDEX `godot_version_index` (`godot_version`);
-UPDATE `as_assets` SET `godot_version` = 20100 WHERE `godot_version` = 0;
-
-ALTER TABLE `as_asset_edits`  ADD `godot_version` INT(7) NULL  AFTER `category_id`,  ADD   INDEX  `godot_version_index` (`godot_version`);
-UPDATE `as_asset_edits` SET `godot_version` = 20100 WHERE `asset_id` = -1;
+ALTER TABLE `as_users` ADD `reset_token` BINARY(32) NULL DEFAULT NULL AFTER `session_token`, ADD INDEX (`reset_token`);
+ALTER TABLE `as_users` CHANGE `session_token` `session_token` BINARY(24) NULL DEFAULT NULL;

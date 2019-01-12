@@ -1,5 +1,3 @@
--- Adminer 4.2.5 MySQL dump
-
 SET NAMES utf8;
 SET time_zone = '+00:00';
 SET foreign_key_checks = 0;
@@ -12,20 +10,22 @@ CREATE TABLE `as_assets` (
   `title` varchar(255) NOT NULL,
   `description` text NOT NULL,
   `category_id` int(11) NOT NULL DEFAULT '6',
+  `godot_version` int(7) NOT NULL,
   `version` int(11) NOT NULL,
   `version_string` varchar(20) NOT NULL,
   `cost` varchar(25) NOT NULL DEFAULT 'GPLv3',
   `rating` int(11) NOT NULL DEFAULT '1',
   `support_level` tinyint(4) NOT NULL,
-  `download_url` varchar(1024) NOT NULL,
+  `download_provider` tinyint(4) NOT NULL,
+  `download_commit` varchar(2048) NOT NULL,
   `download_hash` text NOT NULL,
   `browse_url` varchar(1024) NOT NULL,
+  `issues_url` varchar(1024) NOT NULL,
   `icon_url` varchar(1024) NOT NULL,
   `searchable` tinyint(1) NOT NULL DEFAULT '0',
   `modify_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`asset_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
 
 DROP TABLE IF EXISTS `as_asset_edits`;
 CREATE TABLE `as_asset_edits` (
@@ -35,10 +35,13 @@ CREATE TABLE `as_asset_edits` (
   `title` varchar(255) DEFAULT NULL,
   `description` text,
   `category_id` int(11) DEFAULT NULL,
+  `godot_version` int(7) NOT NULL,
   `version_string` varchar(11) DEFAULT NULL,
   `cost` varchar(25) DEFAULT NULL,
-  `download_url` varchar(1024) DEFAULT NULL,
+  `download_provider` tinyint(4) DEFAULT NULL,
+  `download_commit` varchar(2048) DEFAULT NULL,
   `browse_url` varchar(1024) DEFAULT NULL,
+  `issues_url` varchar(1024) DEFAULT NULL,
   `icon_url` varchar(1024) DEFAULT NULL,
   `status` tinyint(4) NOT NULL DEFAULT '0',
   `reason` text NOT NULL,
@@ -48,8 +51,6 @@ CREATE TABLE `as_asset_edits` (
   KEY `asset_id` (`asset_id`),
   KEY `status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
 DROP TABLE IF EXISTS `as_asset_edit_previews`;
 CREATE TABLE `as_asset_edit_previews` (
   `edit_preview_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -108,10 +109,14 @@ CREATE TABLE `as_users` (
   `password_hash` varchar(64) NOT NULL,
   `type` tinyint(1) NOT NULL DEFAULT '0',
   `session_token` varbinary(24) DEFAULT NULL,
+  `reset_token` binary(24) DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`),
-  UNIQUE KEY `session_token` (`session_token`)
+  UNIQUE KEY `session_token` (`session_token`),
+  KEY `reset_token` (`reset_token`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
--- 2016-07-25 18:15:07
+-- add indexes
+ALTER TABLE `as_assets` ADD INDEX `godot_version_index` (`godot_version`);
+ALTER TABLE `as_asset_edits` ADD INDEX `godot_version_index` (`godot_version`);
+ALTER TABLE `as_users` ADD INDEX (`reset_token`);
