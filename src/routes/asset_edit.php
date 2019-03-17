@@ -4,6 +4,7 @@
 function _submit_asset_edit($c, $response, $body, $user_id, $asset_id=-1)
 {
     $has_changes = false;
+    $asset = null;
 
     $query = $c->queries['asset_edit']['submit'];
     $query->bindValue(':user_id', $user_id, PDO::PARAM_INT);
@@ -44,7 +45,7 @@ function _submit_asset_edit($c, $response, $body, $user_id, $asset_id=-1)
     $id = $c->db->lastInsertId();
 
     if (isset($body['previews'])) {
-        $error = _add_previews_to_edit($c, $error, $response, $id, $body['previews'], null, $asset_id==-1, $has_changes);
+        $error = _add_previews_to_edit($c, $error, $response, $id, $body['previews'], $asset, $asset_id==-1, $has_changes);
 
         if (!$has_changes && $asset_id != -1) {
             $response = $response->withJson([
