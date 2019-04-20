@@ -2,6 +2,65 @@ body {
     font-family: -apple-system, "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
+/* Header */
+
+.navbar-inverse {
+	background-color: #fff;
+    border-color: #eee;
+    box-shadow: 0 0 4px #eee;
+}
+
+.navbar-inverse .navbar-nav > li > a {
+	color: #9d9d9d;
+    transition: 300ms;
+}
+
+.navbar-inverse .navbar-nav > li > a:focus, .navbar-inverse .navbar-nav > li > a:hover {
+	color: #555;
+    background-color: #f5f5f5;
+}
+
+.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:focus, .navbar-inverse .navbar-nav > .active > a:hover {
+	color: #fff;
+	background-color: #59f;
+}
+
+.navbar-inverse .navbar-brand {
+	color: #8c8c8c;
+	background-color: #f5f5f5;
+	transition: 300ms;
+}
+
+.navbar-inverse .navbar-brand:focus, .navbar-inverse .navbar-brand:hover {
+	color: #7b7b7b;
+	background-color: #f0f0f0;
+}
+
+.navbar-inverse .navbar-toggle {
+	border: 1px solid #d0d0d0;
+}
+
+.navbar-inverse .navbar-toggle .icon-bar {
+	background-color: #555;
+}
+
+.navbar-inverse .navbar-toggle:focus, .navbar-inverse .navbar-toggle:hover {
+	border: 1px solid #555;
+	background-color: #555;
+}
+
+.navbar-inverse .navbar-toggle:focus .icon-bar, .navbar-inverse .navbar-toggle:hover .icon-bar {
+	background-color: #fff;
+}
+
+.navbar-inverse .navbar-collapse, .navbar-inverse .navbar-form {
+
+    border-color: #e0e0e0;
+
+}
+
+/* end Header */
+
 .form-search .form-group {
     margin-bottom: 0.2em;
     margin-right: 40px;
