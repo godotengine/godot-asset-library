@@ -2,7 +2,7 @@ body {
     font-family: -apple-system, "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
-/* Header */
+/* header */
 
 .navbar-inverse {
 	background-color: #fff;
@@ -59,7 +59,7 @@ body {
 
 }
 
-/* end Header */
+/* end header */
 
 .form-search .form-group {
     margin-bottom: 0.2em;
