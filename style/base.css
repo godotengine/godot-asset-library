@@ -9,13 +9,12 @@ form:focus-within .form-search, form .form-search:hover {
 .form-search {
     padding: 10px;
     display: none;
-    transition: 300ms;
-    border: 1px solid #ddd;
-    border-top: none;
-    margin-bottom: 10px;
+    border-bottom: 1px solid #ddd;
     position: absolute;
     background: #fff;
     z-index: 100;
+    left: 0;
+    width: 100%;
 }
 
 .form-search .form-group label {
@@ -24,7 +23,14 @@ form:focus-within .form-search, form .form-search:hover {
 
 .form-search .form-group {
     margin-bottom: 0.2em;
-    margin-right: 40px;
+}
+
+.form-search .form-group > label:first-child {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+    margin-top: 15px;
+    width: 100%;
 }
 
 @media screen and (max-width: 768px) {
@@ -43,8 +49,7 @@ form:focus-within .form-search, form .form-search:hover {
             display: flex;
         }
         .form-search .form-group {
-            margin-right: 1em;
-            margin-left: 1em;
+            width: 25%;
             flex-shrink: 0;
             display: block;
         }
