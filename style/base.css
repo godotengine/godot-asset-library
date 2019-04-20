@@ -2,6 +2,34 @@ body {
     font-family: -apple-system, "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
+# Header
+.navbar-inverse {
+    background-color: #fff;
+    border-color: #eee;
+    box-shadow: 0 0 4px #eee;
+}
+
+.navbar-inverse .navbar-nav > li > a {
+
+    color: #9d9d9d;
+    transition: 300ms;
+
+}
+
+.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:focus, .navbar-inverse .navbar-nav > .active > a:hover {
+
+    color: #fff;
+    background-color: #59f;
+
+}
+
+.navbar-inverse .navbar-nav > li > a {
+
+    color: #9d9d9d;
+    transition: 300ms;
+
+}
+
 .form-search .form-group {
     margin-bottom: 0.2em;
     margin-right: 40px;
