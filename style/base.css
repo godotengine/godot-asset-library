@@ -2,6 +2,26 @@ body {
     font-family: -apple-system, "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
+form:focus-within .form-search, form .form-search:hover {
+    display: block;
+}
+
+.form-search {
+    padding: 10px;
+    display: none;
+    transition: 300ms;
+    border: 1px solid #ddd;
+    border-top: none;
+    margin-bottom: 10px;
+    position: absolute;
+    background: #fff;
+    z-index: 100;
+}
+
+.form-search .form-group label {
+	font-weight: normal;
+}
+
 .form-search .form-group {
     margin-bottom: 0.2em;
     margin-right: 40px;
@@ -16,15 +36,20 @@ body {
 @supports (display: flex) {
     @media screen and (min-width: 768px) {
         .form-search {
-            display: flex;
             justify-content: space-between;
             flex-flow: wrap;
+        }
+        form:focus-within .form-search, form .form-search:hover {
+            display: flex;
         }
         .form-search .form-group {
             margin-right: 1em;
             margin-left: 1em;
             flex-shrink: 0;
             display: block;
+        }
+        .form-search .form-group label {
+            width: 100%;
         }
     }
 }
