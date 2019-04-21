@@ -103,11 +103,11 @@
                     </h4>
 
                     <p class="text-muted">
-                        Submitted by user <a href="?user=<?php echo esc($asset['author']) ?>" title="Search assets by '<?php echo esc($asset['author']) ?>'"><?php echo esc($asset['author']) ?></a>;
+                        <a href="?user=<?php echo esc($asset['author']) ?>" title="Search assets by '<?php echo esc($asset['author']) ?>'"><i class="glyphicon glyphicon-user"></i> <?php echo esc($asset['author']) ?></a>
                         <a href="?<?php echo esc(http_build_query([
                             'filter' => $asset['cost'] // isset($params['filter']) ? $params['filter'] . ' ' . $asset['cost'] : $asset['cost']
-                        ] + $params)) ?>" title="Search assets with filter '<?php echo esc($asset['cost']) ?>'"><?php echo esc($asset['cost']) ?></a>;
-                        <span class="nowrap"><?php echo esc(explode(" ", $asset['modify_date'])[0]) ?></span>
+                        ] + $params)) ?>" title="Search assets with filter '<?php echo esc($asset['cost']) ?>'"><?php echo esc($asset['cost']) ?></a>
+                        <span class="nowrap"><i class="glyphicon glyphicon-calendar"></i> <?php echo esc(explode(" ", $asset['modify_date'])[0]) ?></span>
                     </p>
                 </div>
             </div>
