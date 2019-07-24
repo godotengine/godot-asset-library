@@ -10,10 +10,6 @@
             <?php if (!$data['searchable']) { ?></del><?php } ?>
             <small><?php echo esc($data['version_string']) ?></small>
 
-            <?php for ($star=1; $star <= 5; $star++) { ?>
-                <i class="glyphicon glyphicon-star<?php if($data['rating'] < $star) echo '-empty'; ?>"></i>
-            <?php } ?>
-
             <?php if (!$data['searchable']) { ?>
                 <span class="label label-default">Deleted</span>
             <?php } ?>
