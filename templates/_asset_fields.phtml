@@ -36,7 +36,7 @@ $_asset_values = array_merge([
 <div class="form-group">
     <label class="col-md-4 control-label required_mark" for="category">Category</label>
     <div class="col-md-5">
-        <select id="category" name="category_id" class="form-control">
+        <select id="category" name="category_id" class="form-control" required="">
             <?php if(!$_asset_values['category_id']) { ?>
                 <option value="" selected="">
                     Select...
@@ -59,7 +59,7 @@ $_asset_values = array_merge([
 <div class="form-group">
     <label class="col-md-4 control-label required_mark" for="license">License</label>
     <div class="col-md-5">
-        <select id="license" name="cost" class="form-control">
+        <select id="license" name="cost" class="form-control" required="">
             <?php $licenses = [
                 'MIT' => 'MIT',
                 'MPL-2.0' => 'MPL-2.0',
@@ -81,7 +81,7 @@ $_asset_values = array_merge([
             ] ?>
             <?php if(!$_asset_values['cost']) { ?>
                 <option value="" selected="">
-                    - Please select -
+                    Select...
                 </option>
             <?php } ?>
             <?php foreach($licenses as $id => $name) { ?>
@@ -98,7 +98,7 @@ $_asset_values = array_merge([
 <div class="form-group">
     <label class="col-md-4 control-label required_mark" for="download_provider">Repository host</label>
     <div class="col-md-5">
-        <select id="download_provider" name="download_provider" class="form-control">
+        <select id="download_provider" name="download_provider" class="form-control" required="">
             <?php if(!$_asset_values['download_provider']) { ?>
                 <option value="" selected="">
                     Select...
@@ -123,8 +123,8 @@ $_asset_values = array_merge([
     <label class="col-md-4 control-label required_mark" for="browse">Repository URL</label>
     <div class="col-md-5">
         <input id="browse" name="browse_url" type="text" placeholder="https://host.example/user/repository" class="form-control input-md" required="" value="<?php echo esc($_asset_values['browse_url']) ?>">
-        <span class="help-block">The url you use to browse your repository.</span>
-        <span class="help-block"><strong>Note:</strong> Do not give the clone url (the one that ends in <code>.git</code>), but give the one you use to browse your code.</span>
+        <span class="help-block">The URL you use to browse your repository.</span>
+        <span class="help-block"><strong>Note:</strong> Do not give the clone URL (the one that ends in <code>.git</code>), but give the one you use to browse your code.</span>
         <?php if(isset($user) && ($user['type'] >= $constants['user_type']['moderator'])) { ?>
             <span class="help-block">When using the Custom provider, this is used for browsing only.</span>
         <?php } ?>
@@ -142,7 +142,7 @@ $_asset_values = array_merge([
 <div class="form-group">
     <label class="col-md-4 control-label required_mark" for="godot_version">Godot version</label>
     <div class="col-md-5">
-        <select id="godot_version" name="godot_version" class="form-control">
+        <select id="godot_version" name="godot_version" class="form-control" required="">
             <?php if(!$_asset_values['godot_version']) { ?>
                 <option value="" selected="">
                     Select...
