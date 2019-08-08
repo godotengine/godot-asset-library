@@ -147,6 +147,10 @@ $_asset_values = array_merge([
                 <option value="" selected="">
                     Select...
                 </option>
+            <?php } elseif(!in_array($_asset_values['godot_version'], $constants['common_godot_versions'])) { ?>
+                <option value="<?php echo esc($_asset_values['godot_version']) ?>" selected="">
+                    <?php echo esc(ucfirst($_asset_values['godot_version'])) ?>
+                </option>
             <?php } ?>
             <?php foreach($constants['common_godot_versions'] as $version) { ?>
                 <option value="<?php echo esc($version) ?>" <?php if($version == $_asset_values['godot_version']) echo 'selected=""'; ?>>
