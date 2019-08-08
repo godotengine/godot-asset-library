@@ -199,8 +199,8 @@ $get_asset = function ($request, $response, $args) {
         if (!isset($previews[$i]['thumbnail']) || $previews[$i]['thumbnail'] == '') {
             if ($previews[$i]['type'] == 'video') {
                 $matches = [];
-                if (preg_match('|youtube.com/watch\\?v=([^&]+)|', $previews[$i]['link'], $matches)) {
-                    $previews[$i]['thumbnail'] = 'http://img.youtube.com/vi/'.$matches[1].'/default.jpg';
+                if (preg_match('|youtube\.com/watch\?v=([^&]+)|', $previews[$i]['link'], $matches)) {
+                    $previews[$i]['thumbnail'] = 'https://img.youtube.com/vi/'.$matches[1].'/default.jpg';
                 } else {
                     $previews[$i]['thumbnail'] = $previews[$i]['link'];
                 }
