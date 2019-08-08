@@ -84,7 +84,7 @@ return [
             SET user_id=:user_id, title=:title, description=:description, category_id=:category_id, godot_version=:godot_version,
             version_string=:version_string, cost=:cost,
             download_provider=:download_provider, download_commit=:download_commit, download_hash=:download_hash, browse_url=:browse_url, issues_url=:issues_url, icon_url=:icon_url,
-            version=0+:update_version, rating=0, searchable=TRUE',
+            version=0+:update_version, support_level=:support_level, rating=0, searchable=TRUE',
 
         'apply_edit' => 'UPDATE `as_assets`
             SET title=COALESCE(:title, title), description=COALESCE(:description, description), category_id=COALESCE(:category_id, category_id),  godot_version=COALESCE(:godot_version, godot_version), version_string=COALESCE(:version_string, version_string), cost=COALESCE(:cost, cost),

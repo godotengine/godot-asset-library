@@ -182,17 +182,26 @@ $preview_field_names = [
         <?php } elseif($data['status'] == 'in_review') { ?>
             <form class="form-inline" action="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>/accept" method="post">
                 <?php include("_csrf.phtml") ?>
+                <button type="submit" class="btn btn-success">Accept</button>
                 <div class="form-group panel">
-                    <button type="submit" class="btn btn-success">Accept</button>
                     <label class="control-label" for="hash">Hash:</label>
                     <input type="text" class="form-control" id="hash" name="hash">
+                    <?php if($data['asset_id'] == -1) { ?>
+                        <label class="control-label" for="support_level">Support level:</label>
+                        <select id="support_level" name="support_level" class="form-control btn btn-default">
+                            <?php foreach($constants['support_level'] as $id => $name) if(is_int($id)) { ?>
+                                <option value="<?php echo esc($name) ?>" <?php if($name == 'community') echo 'selected=""'; ?>>
+                                    <?php echo esc(ucfirst($name)) ?>
+                                </option>
+                            <?php } ?>
+                        </select>
+                    <?php } ?>
                 </div>
             </form>
-
             <form class="form-inline" action="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>/reject" method="post">
                 <?php include("_csrf.phtml") ?>
+                <button type="submit" class="btn btn-danger">Reject</button>
                 <div class="form-group panel">
-                    <button type="submit" class="btn btn-danger">Reject</button>
                     <label class="control-label" for="reason" required>Reason:</label>
                     <input type="text" class="form-control" id="reason" name="reason">
                 </div>

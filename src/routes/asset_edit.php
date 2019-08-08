@@ -720,6 +720,13 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
     if ((int) $asset_edit['asset_id'] === -1) {
         $query = $this->queries['asset']['apply_creational_edit'];
         $query->bindValue(':user_id', (int) $asset_edit['user_id'], PDO::PARAM_INT);
+
+        $support_level = $this->constants['support_level']['community'];
+        if (isset($body['support_level']) && isset($this->constants['support_level'][$body['support_level']])) {
+            $support_level = (int) $this->constants['support_level'][$body['support_level']];
+        }
+
+        $query->bindValue(':support_level', (int) $support_level, PDO::PARAM_INT);
     } else {
         $query = $this->queries['asset']['apply_edit'];
         $query->bindValue(':asset_id', (int) $asset_edit['asset_id'], PDO::PARAM_INT);
@@ -767,6 +774,8 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
         }
     }
 
+    $this->db->beginTransaction();
+
     // Update the status to prevent race conditions
     $query_status = $this->queries['asset_edit']['set_status_and_reason'];
 
@@ -778,6 +787,7 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
     $error = $this->utils->errorResponseIfQueryBad(false, $response, $query_status);
     $error = $this->utils->errorResponseIfQueryNoResults(false, $response, $query_status); // Important: Ensure that something was actually changed
     if ($error) {
+        $this->db->rollback();
         return $response;
     }
 
@@ -785,6 +795,7 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
     $query->execute();
     $error = $this->utils->errorResponseIfQueryBad(false, $response, $query);
     if ($error) {
+        $this->db->rollback();
         return $response;
     }
 
@@ -801,6 +812,7 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
 
         $error = $this->utils->errorResponseIfQueryBad(false, $response, $query_update_id);
         if ($error) {
+            $this->db->rollback();
             return $response;
         }
         $query_update_id->closeCursor();
@@ -834,6 +846,7 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
         $query_apply_preview->execute();
         $error = $this->utils->errorResponseIfQueryBad(false, $response, $query_apply_preview);
         if ($error) {
+            $this->db->rollback();
             return $response;
         }
     }
@@ -847,8 +860,11 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
     $query_verify->execute();
     $error = $this->utils->errorResponseIfQueryBad(false, $response, $query_verify);
     if ($error) {
+        $this->db->rollback();
         return $response;
     }
+
+    $this->db->commit();
 
     return $response->withJson([
         'id' => $asset_edit['asset_id'],
