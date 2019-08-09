@@ -27,12 +27,15 @@ $app->get('/configure', function ($request, $response, $args) {
             'session' => base64_encode($id),
         ]);
 
+        $uri = $request->getUri();
+        $uri = $uri->withPath((FRONTEND ? $uri->getBasePath() : dirname($uri->getBasePath())) . '/login')
+                   ->withQuery('')
+                   ->withFragment(urlencode($token));
+
         return $response->withJson([
             'categories' => $query->fetchAll(),
             'token' => $token,
-            'login_url' => $_SERVER['HTTP_HOST'] .
-                (FRONTEND ? dirname($request->getUri()->getBasePath()) : $request->getUri()->getBasePath()) .
-                '/login#' . urlencode($token),
+            'login_url' => (string) $uri,
             // ^ TODO: Make those routes actually work
         ], 200);
     } else {
@@ -208,9 +211,10 @@ $app->post('/forgot_password', function ($request, $response, $args) {
             return $response;
         }
 
-        $reset_link = $request->getUri()->getScheme() . '://' . $_SERVER['HTTP_HOST'] .
-            (FRONTEND ? $request->getUri()->getBasePath() : dirname($request->getUri()->getBasePath())) .
-            '/reset_password?token=' . urlencode($token);
+        $reset_link = $request->getUri();
+        $base_path = (FRONTEND ? $reset_link->getBasePath() : dirname($reset_link->getBasePath()));
+        $reset_link = $reset_link->withPath($base_path . '/reset_password')
+                                 ->withQuery('token=' . urlencode($token));
 
         $mail = $this->mail->__invoke(); // Since its a function closure, we have to invoke it with magic methods
         $mail->addAddress($user['email'], $user['username']);
@@ -218,7 +222,7 @@ $app->post('/forgot_password', function ($request, $response, $args) {
         $mail->Subject = "Password reset requested for $user[username]";
         $mail->Body = $this->renderer->fetch('reset_password_email.phtml', [
             'user' => $user,
-            'link' => $reset_link,
+            'link' => (string) $reset_link,
         ]);
         $mail->AltBody = "Reset your ($user[username]'s) password: $reset_link\n";
         if (!$mail->send()) {
