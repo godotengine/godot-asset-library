@@ -146,7 +146,7 @@ if (FRONTEND) {
         if (isset($result['token'])) {
             $response = $this->cookies['responseCookies']->set($response, $this->cookies['setCookie']('token')
                 ->withValue($result['token'])
-                ->withDomain($_SERVER['HTTP_HOST'])
+                ->withDomain($request->getUri()->getHost())
                 ->withPath($request->getUri()->getBasePath())
                 ->withHttpOnly(true)
             );
