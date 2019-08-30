@@ -155,18 +155,26 @@ class Utils
         return false;
     }
 
-    public function errorResponseIfMissingOrNotString($currentStatus, &$response, $object, $property)
+    public function errorResponseIfMissingOrNotString($currentStatus, &$response, $object, array $properties)
     {
         if ($currentStatus) {
             return true;
         }
 
-        if (!isset($object[$property]) || !is_string($object[$property]) || $object[$property] == "") {
+        $errors = [];
+        foreach ($properties as $property) {
+            if (!isset($object[$property]) || !is_string($object[$property]) || $object[$property] == "") {
+                $errors[] = '"' . $property . '" is required and must be a string';
+            }
+        }
+
+        if (count($errors) > 0) {
             $response = $response->withJson([
-                'error' => $property . ' is required, and must be a string'
+                'error' => join(', ', $errors)
             ], 400);
             return true;
         }
+
         return false;
     }
 
@@ -203,7 +211,7 @@ class Utils
 
     public function ensureLoggedIn($currentStatus, &$response, $body, &$user, &$token_data = null, $reset = false)
     {
-        $currentStatus = $this->errorResponseIfMissingOrNotString($currentStatus, $response, $body, 'token');
+        $currentStatus = $this->errorResponseIfMissingOrNotString($currentStatus, $response, $body, ['token']);
         if ($currentStatus) {
             return true;
         }

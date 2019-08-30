@@ -50,9 +50,7 @@ $app->post('/register', function ($request, $response, $args) {
     $query = $this->queries['user']['register'];
     $query_check = $this->queries['user']['get_by_username'];
 
-    $error = $this->utils->errorResponseIfMissingOrNotString(false, $response, $body, 'username');
-    $error = $this->utils->errorResponseIfMissingOrNotString($error, $response, $body, 'email');
-    $error = $this->utils->errorResponseIfMissingOrNotString($error, $response, $body, 'password');
+    $error = $this->utils->errorResponseIfMissingOrNotString(false, $response, $body, ['username', 'email', 'password']);
     if ($error) {
         return $response;
     }
@@ -95,8 +93,7 @@ $app->post('/login', function ($request, $response, $args) {
     $body = $request->getParsedBody();
     $query = $this->queries['user']['get_by_username'];
 
-    $error = $this->utils->errorResponseIfMissingOrNotString(false, $response, $body, 'username');
-    $error = $this->utils->errorResponseIfMissingOrNotString($error, $response, $body, 'password');
+    $error = $this->utils->errorResponseIfMissingOrNotString(false, $response, $body, ['username', 'password']);
     if ($error) {
         return $response;
     }
@@ -179,7 +176,7 @@ if (FRONTEND) {
 $app->post('/forgot_password', function ($request, $response, $args) {
     $body = $request->getParsedBody();
 
-    $error = $this->utils->errorResponseIfMissingOrNotString(false, $response, $body, 'email');
+    $error = $this->utils->errorResponseIfMissingOrNotString(false, $response, $body, ['email']);
     if ($error) {
         return $response;
     }
@@ -256,7 +253,7 @@ $app->post('/reset_password', function ($request, $response, $args) {
     $body = $request->getParsedBody();
 
     $error = $this->utils->ensureLoggedIn(false, $response, $body, $user, $token_data, true);
-    $error = $this->utils->errorResponseIfMissingOrNotString(false, $response, $body, 'password');
+    $error = $this->utils->errorResponseIfMissingOrNotString(false, $response, $body, ['password']);
     if ($error) {
         return $response;
     }
@@ -291,8 +288,7 @@ $app->post('/change_password', function ($request, $response, $args) {
     $body = $request->getParsedBody();
 
     $error = $this->utils->ensureLoggedIn(false, $response, $body, $user, $token_data);
-    $error = $this->utils->errorResponseIfMissingOrNotString(false, $response, $body, 'new_password');
-    $error = $this->utils->errorResponseIfMissingOrNotString($error, $response, $body, 'old_password');
+    $error = $this->utils->errorResponseIfMissingOrNotString(false, $response, $body, ['new_password', 'old_password']);
     if ($error) {
         return $response;
     }

@@ -185,7 +185,7 @@ $preview_field_names = [
                 <button type="submit" class="btn btn-success">Accept</button>
                 <div class="form-group panel">
                     <label class="control-label" for="hash">Hash:</label>
-                    <input type="text" class="form-control" id="hash" name="hash">
+                    <input type="text" class="form-control" id="hash" name="hash" pattern="[a-f0-9]{64}" title="64 lowercase hexadecimal digits">
                     <?php if($data['asset_id'] == -1) { ?>
                         <label class="control-label" for="support_level">Support level:</label>
                         <select id="support_level" name="support_level" class="form-control btn btn-default">
