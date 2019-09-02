@@ -9,7 +9,6 @@ $app->get('/asset', function ($request, $response, $args) {
     $filter = '%';
     $username = '%';
     $order_column = 'modify_date';
-    $order_direction = 'desc';
     $support_levels = [];
     $page_size = 10;
     $max_page_size = 500;
@@ -82,7 +81,16 @@ $app->get('/asset', function ($request, $response, $args) {
             $order_column = $column_mapping[$params['sort']];
         }
     }
+
+    // Sorting should be reversed by default only for dates, not strings
+    $reverse = $order_column === 'modify_date';
     if (isset($params['reverse'])) {
+        $reverse = !$reverse;
+    }
+
+    if ($reverse) {
+        $order_direction = 'desc';
+    } else {
         $order_direction = 'asc';
     }
 
