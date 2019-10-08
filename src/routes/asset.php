@@ -10,7 +10,7 @@ $app->get('/asset', function ($request, $response, $args) {
     $username = '%';
     $order_column = 'modify_date';
     $support_levels = [];
-    $page_size = 10;
+    $page_size = 20;
     $max_page_size = 500;
     $page_offset = 0;
     $min_godot_version = 0;
