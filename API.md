@@ -130,7 +130,7 @@ Get a list of categories (needed for filtering assets) and potentially a login U
 ```http
 ?type=(any|addon|project)
 &category=(category id)
-&support=(official|comunity|testing)
+&support=(official|community|testing)
 &filter=(search text)
 &user=(submitter username)
 &godot_version=(major).(minor).(patch)
