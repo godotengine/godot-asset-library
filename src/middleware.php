@@ -140,6 +140,7 @@ if (FRONTEND) {
                 }
 
                 $response = $this->renderer->render($response, $template_names[$queryUri] . '.phtml', $params);
+                $response = $response->withHeader('Content-Type', 'text/html');
             }
         }
 
