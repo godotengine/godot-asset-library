@@ -3,9 +3,11 @@
                 <div class="col-md-12">
                     <hr/>
                     <p>
-                        Copyright &copy; <?php echo esc(date("Y")); ?> The Godot Engine community - MIT licensed <br>                        
-                        <a href="https://godotengine.org/asset-library/change_password">Change Password</a>
-                        
+                        Copyright &copy; <?php echo esc(date("Y")); ?> The Godot Engine community - MIT licensed 
+                        <?if(isset($user)):?>
+                            <br><a href="https://godotengine.org/asset-library/change_password">Change Password</a>
+                        <?php endif; ?>
+
                         <?php if(file_exists('.git/HEAD')) { $HEAD_contents = file_get_contents('.git/HEAD');?>
                             <?php if(preg_match('/^ref: (.+)$/m', $HEAD_contents, $ref_matches)) {
                                 $ref = $ref_matches[1];
