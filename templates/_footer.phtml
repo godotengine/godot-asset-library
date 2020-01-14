@@ -3,7 +3,9 @@
                 <div class="col-md-12">
                     <hr/>
                     <p>
-                        Copyright &copy; <?php echo esc(date("Y")); ?> The Godot Engine community - MIT licensed
+                        Copyright &copy; <?php echo esc(date("Y")); ?> The Godot Engine community - MIT licensed <br>                        
+                        <a href="https://godotengine.org/asset-library/change_password">Change Password</a>
+                        
                         <?php if(file_exists('.git/HEAD')) { $HEAD_contents = file_get_contents('.git/HEAD');?>
                             <?php if(preg_match('/^ref: (.+)$/m', $HEAD_contents, $ref_matches)) {
                                 $ref = $ref_matches[1];
@@ -22,7 +24,6 @@
                         <a href="https://github.com/godotengine/asset-library">GitHub repository</a> |
                         <a href="https://github.com/godotengine/asset-library/issues">Issues</a> |
                         <a href="https://godotengine.org">Godot Engine homepage</a>
-                        <a href="https://godotengine.org/asset-library/change_password">Change Password</a>
                     </p>
                 </div>
             </div>
