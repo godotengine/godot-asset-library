@@ -5,7 +5,7 @@
                     <p>
                         Copyright &copy; <?php echo esc(date("Y")); ?> The Godot Engine community - MIT licensed
                         <?php if(isset($user)) { ?>
-                            <br><a href="https://godotengine.org/asset-library/change_password">Change Password</a>
+                            <br><a href="<?php echo raw($basepath) ?>/change_password">Change Password</a>
                         <?php } ?>
 
                         <?php if(file_exists('.git/HEAD')) { $HEAD_contents = file_get_contents('.git/HEAD');?>
