@@ -44,7 +44,7 @@ class Utils
                 if (sizeof(preg_grep('/^https?:\/\/[^\/]+?\/[^\/]+?\/[^\/]+?$/i', [$repo_url])) == 0) {
                     $warning .= "\"$repo_url\" doesn't look correct; it should be similar to \"http<s>://<gogs instance>/<owner>/<name>\". $warning_suffix\n";
                 }
-                if (sizeof(preg_grep('/^https:\/\/notabug.org\/[^\/]+?\/[^\/]+?$/i', [$repo_url])) == 0) {
+                if (sizeof(preg_grep('/^https:\/\/(notabug\.org|codeberg\.org)\/[^\/]+?\/[^\/]+?$/i', [$repo_url])) == 0) {
                     $warning .= "Since Gogs/Gitea might be self-hosted, we can't be sure that \"$repo_url\" is a valid repository URL. $light_warning_suffix\n";
                 }
                 return "$repo_url/archive/$commit.zip";
