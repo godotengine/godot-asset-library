@@ -101,7 +101,7 @@ $app->get('/asset', function ($request, $response, $args) {
 
     $query = $this->queries['asset']['search'];
     $query->bindValue(':category', $category);
-    $query->bindValue(':category_type', $category_type, PDO::PARAM_INT);
+    $query->bindValue(':category_type', $category_type);
     $query->bindValue(':min_godot_version', $min_godot_version, PDO::PARAM_INT);
     $query->bindValue(':max_godot_version', $max_godot_version, PDO::PARAM_INT);
     $query->bindValue(':support_levels_regex', $support_levels);
@@ -119,8 +119,8 @@ $app->get('/asset', function ($request, $response, $args) {
     }
 
     $query_count = $this->queries['asset']['search_count'];
-    $query_count->bindValue(':category', $category, PDO::PARAM_INT);
-    $query_count->bindValue(':category_type', $category_type, PDO::PARAM_INT);
+    $query_count->bindValue(':category', $category);
+    $query_count->bindValue(':category_type', $category_type);
     $query_count->bindValue(':min_godot_version', $min_godot_version, PDO::PARAM_INT);
     $query_count->bindValue(':max_godot_version', $max_godot_version, PDO::PARAM_INT);
     $query_count->bindValue(':support_levels_regex', $support_levels);
@@ -183,7 +183,7 @@ $get_asset = function ($request, $response, $args) {
                 } elseif ($column==="type" || $column==="link" || $column==="thumbnail") {
                     $previews[count($previews) - 1][$column] = $value;
                 } elseif ($column==="category_type") {
-                    $asset_info["type"] = $this->constants['category_type'][(int) $value];
+                    $asset_info["type"] = $this->constants['category_type'][$value];
                 } elseif ($column==="support_level") {
                     $asset_info["support_level"] = $this->constants['support_level'][(int) $value];
                 } elseif ($column==="download_provider") {

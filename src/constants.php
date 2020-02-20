@@ -22,8 +22,8 @@ return $constants = [
         'update' => 2,
     ]),
     'category_type' => double_map([
-        'addon' => 0,
-        'project' => 1,
+        'addon' => '0',
+        'project' => '1',
         'any' => '%',
     ]),
     'support_level' => double_map([
