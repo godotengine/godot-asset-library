@@ -1,10 +1,9 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "hash": "fe9d8448cf88e49ab27e84658f60344e",
     "content-hash": "7ac77b62852c9070ba6775e36d905434",
     "packages": [
         {
@@ -32,7 +31,8 @@
                 "MIT"
             ],
             "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
-            "time": "2014-12-30 15:22:37"
+            "abandoned": "psr/container",
+            "time": "2014-12-30T15:22:37+00:00"
         },
         {
             "name": "dflydev/fig-cookies",
@@ -84,7 +84,7 @@
                 "psr-7",
                 "psr7"
             ],
-            "time": "2016-03-28 09:10:18"
+            "time": "2016-03-28T09:10:18+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -162,7 +162,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2016-07-29 03:23:52"
+            "time": "2016-07-29T03:23:52+00:00"
         },
         {
             "name": "nikic/fast-route",
@@ -205,7 +205,7 @@
                 "router",
                 "routing"
             ],
-            "time": "2016-06-12 19:08:51"
+            "time": "2016-06-12T19:08:51+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -253,28 +253,45 @@
                 "pseudorandom",
                 "random"
             ],
-            "time": "2016-04-03 06:00:07"
+            "time": "2016-04-03T06:00:07+00:00"
         },
         {
             "name": "phpmailer/phpmailer",
-            "version": "v5.2.16",
+            "version": "v5.2.27",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPMailer/PHPMailer.git",
-                "reference": "1d85f9ef3ecfc42bbc4f3c70d5e37ca9a65f629a"
+                "reference": "dde1db116511aa4956389d75546c5be4c2beb2a6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/1d85f9ef3ecfc42bbc4f3c70d5e37ca9a65f629a",
-                "reference": "1d85f9ef3ecfc42bbc4f3c70d5e37ca9a65f629a",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/dde1db116511aa4956389d75546c5be4c2beb2a6",
+                "reference": "dde1db116511aa4956389d75546c5be4c2beb2a6",
                 "shasum": ""
             },
             "require": {
+                "ext-ctype": "*",
                 "php": ">=5.0.0"
             },
             "require-dev": {
-                "phpdocumentor/phpdocumentor": "*",
-                "phpunit/phpunit": "4.7.*"
+                "doctrine/annotations": "1.2.*",
+                "jms/serializer": "0.16.*",
+                "phpdocumentor/phpdocumentor": "2.*",
+                "phpunit/phpunit": "4.8.*",
+                "symfony/debug": "2.8.*",
+                "symfony/filesystem": "2.8.*",
+                "symfony/translation": "2.8.*",
+                "symfony/yaml": "2.8.*",
+                "zendframework/zend-cache": "2.5.1",
+                "zendframework/zend-config": "2.5.1",
+                "zendframework/zend-eventmanager": "2.5.1",
+                "zendframework/zend-filter": "2.5.1",
+                "zendframework/zend-i18n": "2.5.1",
+                "zendframework/zend-json": "2.5.1",
+                "zendframework/zend-math": "2.5.1",
+                "zendframework/zend-serializer": "2.5.*",
+                "zendframework/zend-servicemanager": "2.5.*",
+                "zendframework/zend-stdlib": "2.5.1"
             },
             "suggest": {
                 "league/oauth2-google": "Needed for Google XOAUTH2 authentication"
@@ -313,7 +330,7 @@
                 }
             ],
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
-            "time": "2016-06-06 09:09:37"
+            "time": "2018-11-15T22:32:31+00:00"
         },
         {
             "name": "pimple/pimple",
@@ -359,7 +376,7 @@
                 "container",
                 "dependency injection"
             ],
-            "time": "2015-09-11 15:10:35"
+            "time": "2015-09-11T15:10:35+00:00"
         },
         {
             "name": "psr/http-message",
@@ -409,7 +426,7 @@
                 "request",
                 "response"
             ],
-            "time": "2016-08-06 14:39:51"
+            "time": "2016-08-06T14:39:51+00:00"
         },
         {
             "name": "psr/log",
@@ -447,7 +464,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2012-12-21 11:40:51"
+            "time": "2012-12-21T11:40:51+00:00"
         },
         {
             "name": "slim/csrf",
@@ -497,7 +514,7 @@
                 "middleware",
                 "slim"
             ],
-            "time": "2016-06-08 18:26:56"
+            "time": "2016-06-08T18:26:56+00:00"
         },
         {
             "name": "slim/php-view",
@@ -546,7 +563,7 @@
                 "template",
                 "view"
             ],
-            "time": "2016-03-04 09:48:50"
+            "time": "2016-03-04T09:48:50+00:00"
         },
         {
             "name": "slim/slim",
@@ -616,7 +633,7 @@
                 "micro",
                 "router"
             ],
-            "time": "2016-07-26 15:12:13"
+            "time": "2016-07-26T15:12:13+00:00"
         }
     ],
     "packages-dev": [],
