@@ -11,7 +11,7 @@ The following is a set of guidelines for contributing to the Godot Engine's [off
 
 ## Table Of Contents
 
-[Code of Conduct](#code-of-conduct)
+- [Code of Conduct](#code-of-conduct)
 
 [I don't want to read this whole thing, I just have a question!](#i-dont-want-to-read-this-whole-thing-i-just-have-a-question)
 
