@@ -19,7 +19,7 @@ The following is a set of guidelines for contributing to the Godot Engine's [off
   - [The Godot Asset Library](#the-godot-asset-library)
 
 - [How Can I Contribute?](#how-can-i-contribute)
-  * [Reporting Bugs](#reporting-bugs-and-suggesting-enhancements)
+  - [Reporting Bugs](#reporting-bugs-and-suggesting-enhancements)
   * [Code Contributions and Pull Requests](#code-contributions-and-pull-requests)
 
 ## Code of Conduct
