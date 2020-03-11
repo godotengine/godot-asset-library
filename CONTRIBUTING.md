@@ -4,7 +4,7 @@ First off, thanks for taking the time to contribute! :tada::+1:
 
 The following is a set of guidelines for contributing to the Godot Engine's [official asset library web front end](https://godotengine.org/asset-library) and its REST API. These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
 
-### :warning: Two important notes before we dive into the details ###
+### :warning: Two important notes before we dive into the details
 
 1. Issues with the asset library front end included in the Godot Engine should be reported in the [Godot Engine repository](https://github.com/godotengine/godot/issues?q=is%3Aissue+is%3Aopen+asset+label%3Atopic%3Aassetlib).
 2. Issues with individual assets should be reported in the separate issue trackers of the respective assets, usually linked on the asset pages under the "Submit an issue" button.
