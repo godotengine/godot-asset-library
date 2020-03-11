@@ -18,7 +18,7 @@ The following is a set of guidelines for contributing to the Godot Engine's [off
 - [What should I know before I get started?](#what-should-i-know-before-i-get-started)
   - [The Godot Asset Library](#the-godot-asset-library)
 
-[How Can I Contribute?](#how-can-i-contribute)
+- [How Can I Contribute?](#how-can-i-contribute)
   * [Reporting Bugs](#reporting-bugs-and-suggesting-enhancements)
   * [Code Contributions and Pull Requests](#code-contributions-and-pull-requests)
 
