@@ -104,6 +104,10 @@ return [
             SET support_level=:support_level
             WHERE asset_id=:asset_id',
 
+        'set_download_hash' => 'UPDATE `as_assets`
+            SET download_hash=:download_hash
+            WHERE asset_id=:asset_id',
+
         'delete' => 'UPDATE `as_assets` SET searchable=FALSE WHERE asset_id=:asset_id',
         'undelete' => 'UPDATE `as_assets` SET searchable=TRUE WHERE asset_id=:asset_id'
     ],

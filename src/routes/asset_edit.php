@@ -877,7 +877,7 @@ $app->post('/asset/edit/{id:[0-9]+}/review', function ($request, $response, $arg
     $body = $request->getParsedBody();
 
     $error = $this->utils->ensureLoggedIn(false, $response, $body, $user);
-    $error = $this->utils->errorResponseIfNotUserHasLevel($error, $response, $user, 'moderator', 'You are not authorized to put in review this asset edit');
+    $error = $this->utils->errorResponseIfNotUserHasLevel($error, $response, $user, 'moderator', 'You are not authorized to put this asset edit in review');
     if ($error) {
         return $response;
     }

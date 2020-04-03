@@ -55,32 +55,6 @@
         <i class="glyphicon glyphicon-list"></i> Recent Edits
     </a>
 </p>
-<?php if(isset($user) && ($user['type'] >= $constants['user_type']['moderator'])) { ?>
-    <form class="form-inline" style="display: inline-block" action="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/support_level" method="post">
-        <?php include("_csrf.phtml") ?>
-        <div class="btn-group">
-            <select id="support_level" name="support_level" class="form-control btn btn-default">
-                <?php foreach($constants['support_level'] as $id => $name) if(is_int($id)) { ?>
-                    <option value="<?php echo esc($name) ?>" <?php if($name == $data['support_level']) echo 'selected=""'; ?>>
-                        <?php echo esc(ucfirst($name)) ?>
-                    </option>
-                <?php } ?>
-            </select>
-            <button type="submit" class="btn btn-warning">Change support level</button>
-        </div>
-    </form>
-    <?php if ($data['searchable']) { ?>
-        <form class="form-inline" style="display: inline-block" action="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/delete" method="post">
-            <?php include("_csrf.phtml") ?>
-            <button type="submit" class="btn btn-danger" onclick="javascript:return window.confirm('Do you really want to delete this asset?');">Remove from library</button>
-        </form>
-    <?php } else { ?>
-        <form class="form-inline" style="display: inline-block" action="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/undelete" method="post">
-            <?php include("_csrf.phtml") ?>
-            <button type="submit" class="btn btn-info" onclick="javascript:return window.confirm('Do you want to restore this asset?');">Restore to library</button>
-        </form>
-    <?php } ?>
-<?php } ?>
 <p class="text-muted">Sha256 Hash: <code style="word-break: break-word;"><?php echo esc($data['download_hash']) ?></code></p>
 <hr/>
 <div class="row">
@@ -99,4 +73,48 @@
         </div>
         <?php } ?>
 </div>
+<?php if(isset($user) && ($user['type'] >= $constants['user_type']['moderator'])) { ?>
+    <div class="panel panel-danger">
+        <div class="panel-heading">
+            Admin tools
+        </div>
+        <div class="panel-body">
+            <form class="form" style="margin-bottom: 1em;" action="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/support_level" method="post">
+                <?php include("_csrf.phtml") ?>
+                <div class="input-group">
+                    <span class="input-group-btn">
+                        <button type="submit" class="btn btn-default">Change support level</button>
+                    </span>
+                    <select id="support_level" name="support_level" class="form-control">
+                        <?php foreach($constants['support_level'] as $id => $name) if(is_int($id)) { ?>
+                            <option value="<?php echo esc($name) ?>" <?php if($name == $data['support_level']) echo 'selected=""'; ?>>
+                                <?php echo esc(ucfirst($name)) ?>
+                            </option>
+                        <?php } ?>
+                    </select>
+                </div>
+            </form>
+            <form class="form" style="margin-bottom: 1em;" action="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/download_hash" method="post">
+                <?php include("_csrf.phtml") ?>
+                <div class="input-group">
+                    <span class="input-group-btn">
+                        <button type="submit" class="btn btn-default">Change hash to</button>
+                    </span>
+                    <input type="text" id="hash" name="hash" class="form-control" placeholder="SHA256 hashsum">
+                </div>
+            </form>
+            <?php if ($data['searchable']) { ?>
+                <form class="form" style="margin-bottom: 1em;" action="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/delete" method="post">
+                    <?php include("_csrf.phtml") ?>
+                    <button type="submit" class="btn btn-danger" onclick="javascript:return window.confirm('Do you really want to delete this asset?');">Remove from library</button>
+                </form>
+            <?php } else { ?>
+                <form class="form" style="margin-bottom: 1em;" action="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/undelete" method="post">
+                    <?php include("_csrf.phtml") ?>
+                    <button type="submit" class="btn btn-info" onclick="javascript:return window.confirm('Do you want to restore this asset?');">Restore to library</button>
+                </form>
+            <?php } ?>
+        </div>
+    </div>
+<?php } ?>
 <?php include("_footer.phtml") ?>
