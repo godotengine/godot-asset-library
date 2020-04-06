@@ -234,7 +234,7 @@ $app->post('/asset/{id:[0-9]+}/support_level', function ($request, $response, $a
 
     $error = $this->utils->ensureLoggedIn(false, $response, $body, $user);
     $error = $this->utils->errorResponseIfNotUserHasLevel($error, $response, $user, 'moderator');
-    $error = $this->utils->errorResponseIfMissingOrNotString($error, $response, $body, 'support_level');
+    $error = $this->utils->errorResponseIfMissingOrNotString($error, $response, $body, ['support_level']);
     if ($error) {
         return $response;
     }

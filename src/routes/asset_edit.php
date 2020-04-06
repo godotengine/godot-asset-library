@@ -112,7 +112,7 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
         $error = $c->utils->ensureLoggedIn($error, $response, $body, $user);
         $error = $c->utils->errorResponseIfNotUserHasLevel($error, $response, $user, 'verified', "Due to spam problems, we have to reject your $entity because: \n$warning \nPlease contact the community administrators if this is not spam.");
         if ($error) {
-            return $response;
+            return $error;
         }
     }
 
@@ -143,7 +143,17 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
         $body['godot_version'] = (string) $c->utils->getUnformattedGodotVersion($body['godot_version']);
     }
 
-    foreach ($c->constants['asset_edit_fields'] as $i => $field) {
+    // Validate fields first.
+    if ($required && $bare_asset === null) {
+        // For issue URLs a default value is present, so, no need to error out.
+        $validate_fields = array_diff($c->constants['asset_edit_fields'], ['issues_url']);
+        $error = $c->utils->errorResponseIfMissingOrNotString($error, $response, $body, $validate_fields);
+        if ($error) {
+            return $error;
+        }
+    }
+
+    foreach ($c->constants['asset_edit_fields'] as $field) {
         if (!$required) {
             if (isset($body[$field]) && ($bare_asset === null || $bare_asset[$field] != $body[$field])) {
                 $has_changes = true;
@@ -153,7 +163,7 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
             }
         } else {
             if ($bare_asset === null) {
-                if ($field == 'issues_url') { // Default value present, so, no need to error out
+                if ($field == 'issues_url') { // Default value present.
                     if (isset($body[$field])) {
                         $has_changes = true;
                         $query->bindValue(':' . $field, $body[$field]);
@@ -161,10 +171,7 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
                         $query->bindValue(':' . $field, '', PDO::PARAM_NULL);
                     }
                 } else {
-                    $error = $c->utils->errorResponseIfMissingOrNotString($error, $response, $body, $field);
-                    if (!$error) {
-                        $query->bindValue(':' . $field, $body[$field]);
-                    }
+                    $query->bindValue(':' . $field, $body[$field]);
                 }
             } else { // "Required" (so, non-null), but there is a base asset, so we can support incremental changes
                 if (isset($body[$field])) {
@@ -174,10 +181,6 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
                     $query->bindValue(':' . $field, $bare_asset[$field]);
                 }
             }
-        }
-
-        if ($error) {
-            return $error;
         }
     }
 
@@ -195,13 +198,13 @@ function _add_previews_to_edit($c, $error, &$response, $edit_id, $previews, $ass
             continue;
         }
         if ($required || !isset($preview['edit_preview_id'])) {
-            $has_changes = true;
-            $query = $c->queries['asset_edit']['add_preview'];
-
-            $error = $c->utils->errorResponseIfMissingOrNotString($error, $response, $preview, 'operation');
+            $error = $c->utils->errorResponseIfMissingOrNotString($error, $response, $preview, ['operation']);
             if ($error) {
                 return $error;
             }
+
+            $has_changes = true;
+            $query = $c->queries['asset_edit']['add_preview'];
 
             $operation = $c->constants['edit_preview_operation']['insert'];
 
@@ -213,7 +216,7 @@ function _add_previews_to_edit($c, $error, &$response, $edit_id, $previews, $ass
             if ($operation == $c->constants['edit_preview_operation']['insert']) {
                 $query->bindValue(':preview_id', -1, PDO::PARAM_INT);
             } else {
-                $error = $c->utils->errorResponseIfMissingOrNotString($error, $response, $preview, 'preview_id');
+                $error = $c->utils->errorResponseIfMissingOrNotString($error, $response, $preview, ['preview_id']);
                 if ($error) {
                     return $error;
                 }
@@ -254,7 +257,7 @@ function _add_previews_to_edit($c, $error, &$response, $edit_id, $previews, $ass
             continue;
         } else {
             $query = $c->queries['asset_edit']['update_preview'];
-            $error = $c->utils->errorResponseIfMissingOrNotString($error, $response, $preview, 'edit_preview_id');
+            $error = $c->utils->errorResponseIfMissingOrNotString($error, $response, $preview, ['edit_preview_id']);
             if ($error) {
                 return $error;
             }
@@ -262,8 +265,18 @@ function _add_previews_to_edit($c, $error, &$response, $edit_id, $previews, $ass
         }
         $query->bindValue(':edit_id', (int) $edit_id, PDO::PARAM_INT);
 
-        foreach ($c->constants['asset_edit_preview_fields'] as $i => $field) {
-            if (!$required || $field == 'thumbnail') { // thumb is not required
+        // Validate fields first.
+        if ($required) {
+            // Thumb is not required.
+            $validate_fields = array_diff($c->constants['asset_edit_preview_fields'], ['thumbnail']);
+            $error = $c->utils->errorResponseIfMissingOrNotString($error, $response, $preview, $validate_fields);
+            if ($error) {
+                return $error;
+            }
+        }
+
+        foreach ($c->constants['asset_edit_preview_fields'] as $field) {
+            if (!$required || $field == 'thumbnail') { // Thumb is not required.
                 if (isset($preview[$field]) && !(isset($original_preview) && $original_preview[$field] == $preview[$field])) {
                     $has_changes = true;
                     $query->bindValue(':' . $field, $preview[$field]);
@@ -273,14 +286,8 @@ function _add_previews_to_edit($c, $error, &$response, $edit_id, $previews, $ass
                     $query->bindValue(':' . $field, null, PDO::PARAM_NULL);
                 }
             } else {
-                $error = $c->utils->errorResponseIfMissingOrNotString($error, $response, $preview, $field);
-                if (!$error) {
-                    $query->bindValue(':' . $field, $preview[$field]);
-                }
+                $query->bindValue(':' . $field, $preview[$field]);
             }
-        }
-        if ($error) {
-            return $error;
         }
 
         $query->execute();
@@ -744,7 +751,7 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
     }
 
     if ($update_version) {
-        $error = $this->utils->errorResponseIfMissingOrNotString(false, $response, $body, 'hash');
+        $error = $this->utils->errorResponseIfMissingOrNotString(false, $response, $body, ['hash']);
         if ($error) {
             return $response;
         }
@@ -927,7 +934,7 @@ $app->post('/asset/edit/{id:[0-9]+}/reject', function ($request, $response, $arg
 
     $error = $this->utils->ensureLoggedIn(false, $response, $body, $user);
     $error = $this->utils->errorResponseIfNotUserHasLevel($error, $response, $user, 'moderator', 'You are not authorized to reject this asset edit');
-    $error = $this->utils->errorResponseIfMissingOrNotString($error, $response, $body, 'reason');
+    $error = $this->utils->errorResponseIfMissingOrNotString($error, $response, $body, ['reason']);
     if ($error) {
         return $response;
     }
