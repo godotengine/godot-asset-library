@@ -67,7 +67,7 @@ $preview_field_names = [
 
 <?php if(isset($data['warning'])) { ?>
     <div class="alert alert-warning" role="alert">
-        <?php foreach (explode("\n", $data['warning']) as $warning) if ($warning != '') { ?>
+        <?php foreach ($data['warning'] as $warning) { ?>
             <strong>Warning:</strong> <?php echo esc($warning) ?> <br><br>
         <?php } ?>
         <em>If you think that this warning is incorrect, you can always <a href="https://github.com/godotengine/asset-library/issues">open an issue</a>.</em>

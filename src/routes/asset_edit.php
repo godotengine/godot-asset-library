@@ -10,7 +10,7 @@ function _submit_asset_edit($c, $response, $body, $user_id, $asset_id=-1)
     $query->bindValue(':user_id', $user_id, PDO::PARAM_INT);
     $query->bindValue(':asset_id', $asset_id, PDO::PARAM_INT);
     if ($asset_id == -1) {
-        $error = _insert_asset_edit_fields($c, false, $response, $query, $body, true, null);
+        $error = _insert_asset_edit_fields($c, false, $response, $query, $body, true, null, false);
         if ($error) {
             return $response;
         }
@@ -26,7 +26,7 @@ function _submit_asset_edit($c, $response, $body, $user_id, $asset_id=-1)
 
         $asset = $query_asset->fetchAll()[0];
 
-        $error = _insert_asset_edit_fields($c, false, $response, $query, $body, false, $asset, $has_changes);
+        $error = _insert_asset_edit_fields($c, false, $response, $query, $body, false, $asset, false, $has_changes);
         if ($error) {
             return $response;
         }
@@ -67,7 +67,7 @@ function _submit_asset_edit($c, $response, $body, $user_id, $asset_id=-1)
     ], 200);
 }
 
-function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $required=false, $bare_asset=null, &$has_changes=false)
+function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $required=false, $bare_asset=null, $existing_edit=false, &$has_changes=false)
 {
     if ($error) {
         return true;
@@ -89,28 +89,30 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
         }
     }
 
-    $warning = '';
+    $warning = null;
+    $light_warning = null;
     if (isset($body['browse_url'])) {
         if ((isset($body['download_provider']) && isset($body['download_commit'])) || $bare_asset !== null) {
-            $default_issues_url = $c->utils->getComputedDownloadUrl(
+            $c->utils->getComputedDownloadUrl(
                 $body['browse_url'] ?: $bare_asset['browse_url'],
-                intval($body['download_provider'] ?: $bare_asset['download_provider']),
+                intval($body['download_provider'] != null ? $body['download_provider'] : $bare_asset['download_provider']),
                 $body['download_commit'] ?: $bare_asset['download_commit'],
-                $warning
+                $warning, $light_warning
             );
         }
     }
     if (isset($body['icon_url'])) {
         $icon_url = $body['icon_url'];
         if (sizeof(preg_grep('/^https?:\/\/.+?\.(png|jpg|jpeg)$/i', [$icon_url])) == 0) {
-            $warning .= "\"$icon_url\" doesn't look correct; it should be similar to \"http<s>://<url>.<png/jpg>\". Make sure the icon URL is correct.\n";
+            $warning[] = "\"$icon_url\" doesn't look correct; it should be similar to \"http<s>://<url>.<png/jpg>\". Make sure the icon URL is correct.\n";
         }
     }
 
-    if ($warning != '') {
-        $entity = $bare_asset == null ? 'asset' : 'edit';
+    if ($warning != null) {
+        $warning_string = implode('\n', $warning);
+        $entity = ($existing_edit ? 'modification of a new ' : '') . ($bare_asset == null ? 'asset' : 'edit');
         $error = $c->utils->ensureLoggedIn($error, $response, $body, $user);
-        $error = $c->utils->errorResponseIfNotUserHasLevel($error, $response, $user, 'verified', "Due to spam problems, we have to reject your $entity because: \n$warning \nPlease contact the community administrators if this is not spam.");
+        $error = $c->utils->errorResponseIfNotUserHasLevel($error, $response, $user, 'verified', "Due to spam problems, we have to reject your $entity because: \n$warning_string \nPlease contact the community administrators if this is not spam.");
         if ($error) {
             return $response;
         }
@@ -127,7 +129,7 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
         } elseif ($bare_asset !== null) {
             $default_issues_url = $c->utils->getDefaultIssuesUrl(
                 $body['browse_url'] ?: $bare_asset['browse_url'],
-                intval($body['download_provider'] ?: $bare_asset['download_provider'])
+                intval($body['download_provider'] != null ? $body['download_provider'] : $bare_asset['download_provider'])
             );
         }
         if ($default_issues_url !== null && $default_issues_url == $body['issues_url']) {
@@ -410,6 +412,7 @@ $get_edit = function ($request, $response, $args) {
     }
 
     $warning = null;
+    $light_warning = null;
 
     $output = $query->fetchAll();
 
@@ -457,7 +460,7 @@ $get_edit = function ($request, $response, $args) {
     }
 
     if (!$has_changes) {
-        $warning .= "No changes are present.";
+        $warning[] = "No changes are present.";
     }
 
     if ($asset_edit['asset_id'] != -1) {
@@ -495,7 +498,7 @@ $get_edit = function ($request, $response, $args) {
                 $asset_edit['browse_url'] ?: $asset_edit['original']['browse_url'],
                 $asset_edit['download_provider'] ?: $asset_edit['original']['download_provider'],
                 $asset_edit['download_commit'] ?: $asset_edit['original']['download_commit'],
-                $warning
+                $warning, $light_warning
             );
         } else {
             $asset_edit['download_url'] = null;
@@ -509,7 +512,7 @@ $get_edit = function ($request, $response, $args) {
         }
 
         if ($asset_edit['godot_version'] != null) {
-            $asset_edit['godot_version'] = $this->utils->getFormattedGodotVersion((int) $asset_edit['godot_version'], $warning);
+            $asset_edit['godot_version'] = $this->utils->getFormattedGodotVersion((int) $asset_edit['godot_version'], $warning, $light_warning);
         }
 
         $asset_edit['original']['download_url'] = $this->utils->getComputedDownloadUrl($asset_edit['original']['browse_url'], $asset_edit['original']['download_provider'], $asset_edit['original']['download_commit']);
@@ -518,25 +521,16 @@ $get_edit = function ($request, $response, $args) {
             $asset_edit['original']['issues_url'] = $this->utils->getDefaultIssuesUrl($asset_edit['original']['browse_url'], $asset_edit['original']['download_provider']);
         }
     } else {
-        $asset_edit['download_url'] = $this->utils->getComputedDownloadUrl($asset_edit['browse_url'], $asset_edit['download_provider'], $asset_edit['download_commit'], $warning);
-        $asset_edit['godot_version'] = $this->utils->getFormattedGodotVersion((int) $asset_edit['godot_version'], $warning);
+        $asset_edit['download_url'] = $this->utils->getComputedDownloadUrl($asset_edit['browse_url'], $asset_edit['download_provider'], $asset_edit['download_commit'], $warning, $light_warning);
+        $asset_edit['godot_version'] = $this->utils->getFormattedGodotVersion((int) $asset_edit['godot_version'], $warning, $light_warning);
 
         if ($asset_edit['issues_url'] === '') {
             $asset_edit['issues_url'] = $this->utils->getDefaultIssuesUrl($asset_edit['browse_url'], $asset_edit['download_provider']);
         }
     }
 
-    if (($asset_edit['download_provider'] ?: $asset_edit['original']['download_provider']) != 'Custom') {
-        if ($asset_edit['download_commit'] == 'master') {
-            $warning .= "Giving 'master' (or any other branch name) as the commit to be downloaded is not recommended, since it would invalidate the asset when you push a new version (since we ensure the version is kept the same via a sha256 hash of the zip). You can try using tags instead.\n";
-        }
-        if (sizeof(preg_grep('/\/|\\|\:|^\.|\ |\^|\~|\?|\*|\[|^\@$|\@\{/', [$asset_edit['download_commit']])) != 0) {
-            $warning .= "The inputted download commit is not a valid git ref, please ensure you aren't giving a full URL. (If your tag includes '/' in its name, consider escaping it as '%2F')\n";
-        }
-    }
-
-    if ($warning != null) {
-        $asset_edit['warning'] = $warning;
+    if ($warning != null || $light_warning != null) {
+        $asset_edit['warning'] = array_merge($warning ?: [], $light_warning ?: []);
     }
 
 
@@ -646,12 +640,12 @@ $app->post('/asset/edit/{id:[0-9]+}', function ($request, $response, $args) {
 
         $asset = $query_asset->fetchAll()[0];
 
-        $error = _insert_asset_edit_fields($this, false, $response, $query, $body, false, $asset);
+        $error = _insert_asset_edit_fields($this, false, $response, $query, $body, false, $asset, true);
         if ($error) {
             return $response;
         }
     } else {
-        $error = _insert_asset_edit_fields($this, false, $response, $query, $body, true, $asset_edit); // Edit of new asset, everything must be non-null
+        $error = _insert_asset_edit_fields($this, false, $response, $query, $body, true, $asset_edit, true); // Edit of new asset, everything must be non-null
         if ($error) {
             return $response;
         }
