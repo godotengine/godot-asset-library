@@ -171,10 +171,11 @@ $_asset_values = array_merge([
 </div>
 
 <div class="form-group">
-    <label class="col-md-4 control-label required_mark" for="commit">Download Commit/tag</label>
+    <label class="col-md-4 control-label required_mark" for="commit">Download Commit</label>
     <div class="col-md-5">
-        <input id="commit" name="download_commit" type="text" placeholder="Commit ID or tag" class="form-control input-md" required="" value="<?php echo esc($_asset_values['download_commit']) ?>">
-        <span class="help-block">The commit or tag that should be downloaded. If using a tag name, make sure that you actually created the tag on your repository.</span>
+        <input id="commit" name="download_commit" type="text" placeholder="Commit hash" class="form-control input-md" required="" value="<?php echo esc($_asset_values['download_commit']) ?>" <?php if(isset($user) && ($user['type'] < $constants['user_type']['moderator'])) { ?> pattern="[a-f0-9]{40}([a-f0-9]{24})?" <?php } ?> >
+        <span class="help-block">The commit hash that should be downloaded. If using a tag name, make sure that you actually created the tag on your repository.</span>
+        <span class="help-block">Expected format: 40 or 64 hexadecimal digits, fully specifying a git commit.</span>
         <?php if(isset($user) && ($user['type'] >= $constants['user_type']['moderator'])) { ?>
             <span class="help-block">When using the Custom provider, this is the download URL.</span>
         <?php } ?>

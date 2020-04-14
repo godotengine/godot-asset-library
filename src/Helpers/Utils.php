@@ -23,8 +23,9 @@ class Utils
             $warning[] = "\"$repo_url\" doesn't look correct; it probably shouldn't end in .git. $warning_suffix";
         }
         if ($provider != 'Custom') {
-            if (sizeof(preg_grep('/\/|\\|\:|^\.|\ |\^|\~|\?|\*|\[|^\@$|\@\{/', [$commit])) != 0) {
-                $light_warning[] = "The inputted download commit is not a valid git ref; please ensure you aren't giving a full URL. (If your tag includes '/' in its name, consider escaping it as '%2F')\n";
+            // Git commits are either 40 (SHA1) or 64 (SHA2) hex characters
+            if (sizeof(preg_grep('/^[a-f0-9]{40}([a-f0-9]{24})?$/', [$commit])) == 0) {
+                $warning[] = "Using git tags or branches is no longer supported. Please give a full git commit hash instead.\n";
             }
         }
         switch ($provider) {
