@@ -23,9 +23,6 @@ class Utils
             $warning[] = "\"$repo_url\" doesn't look correct; it probably shouldn't end in .git. $warning_suffix";
         }
         if ($provider != 'Custom') {
-            if ($commit == 'master') {
-                $light_warning[] = "Giving 'master' (or any other branch name) as the commit to be downloaded is not recommended, since it would invalidate the asset when you push a new version (as we ensure the version is kept the same via a sha256 hash of the zip). You can try using tags instead.\n";
-            }
             if (sizeof(preg_grep('/\/|\\|\:|^\.|\ |\^|\~|\?|\*|\[|^\@$|\@\{/', [$commit])) != 0) {
                 $light_warning[] = "The inputted download commit is not a valid git ref; please ensure you aren't giving a full URL. (If your tag includes '/' in its name, consider escaping it as '%2F')\n";
             }

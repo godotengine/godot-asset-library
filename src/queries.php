@@ -71,7 +71,7 @@ return [
                 OR username LIKE :filter
             )',
 
-        'get_one' => 'SELECT asset_id, category_type, title, username as author, user_id as author_id, version, version_string, category, category_id, godot_version, rating, cost, description, support_level, download_provider, download_commit, download_hash, browse_url, issues_url, icon_url, preview_id, `as_asset_previews`.type, link, thumbnail, searchable, modify_date FROM `as_assets`
+        'get_one' => 'SELECT asset_id, category_type, title, username as author, user_id as author_id, version, version_string, category, category_id, godot_version, rating, cost, description, support_level, download_provider, download_commit, browse_url, issues_url, icon_url, preview_id, `as_asset_previews`.type, link, thumbnail, searchable, modify_date FROM `as_assets`
             LEFT JOIN `as_categories` USING (category_id)
             LEFT JOIN `as_users` USING (user_id)
             LEFT JOIN `as_asset_previews` USING (asset_id)
@@ -83,12 +83,12 @@ return [
         'apply_creational_edit' => 'INSERT INTO `as_assets`
             SET user_id=:user_id, title=:title, description=:description, category_id=:category_id, godot_version=:godot_version,
             version_string=:version_string, cost=:cost,
-            download_provider=:download_provider, download_commit=:download_commit, download_hash=:download_hash, browse_url=:browse_url, issues_url=:issues_url, icon_url=:icon_url,
+            download_provider=:download_provider, download_commit=:download_commit, browse_url=:browse_url, issues_url=:issues_url, icon_url=:icon_url,
             version=0+:update_version, support_level=:support_level, rating=0, searchable=TRUE',
 
         'apply_edit' => 'UPDATE `as_assets`
             SET title=COALESCE(:title, title), description=COALESCE(:description, description), category_id=COALESCE(:category_id, category_id),  godot_version=COALESCE(:godot_version, godot_version), version_string=COALESCE(:version_string, version_string), cost=COALESCE(:cost, cost),
-            download_provider=COALESCE(:download_provider, download_provider), download_commit=COALESCE(:download_commit, download_commit), download_hash=COALESCE(:download_hash, download_hash), browse_url=COALESCE(:browse_url, browse_url), issues_url=COALESCE(:issues_url, issues_url), icon_url=COALESCE(:icon_url, icon_url),
+            download_provider=COALESCE(:download_provider, download_provider), download_commit=COALESCE(:download_commit, download_commit), browse_url=COALESCE(:browse_url, browse_url), issues_url=COALESCE(:issues_url, issues_url), icon_url=COALESCE(:icon_url, icon_url),
             version=version+:update_version
             WHERE asset_id=:asset_id',
 
@@ -102,10 +102,6 @@ return [
 
         'set_support_level' => 'UPDATE `as_assets`
             SET support_level=:support_level
-            WHERE asset_id=:asset_id',
-
-        'set_download_hash' => 'UPDATE `as_assets`
-            SET download_hash=:download_hash
             WHERE asset_id=:asset_id',
 
         'delete' => 'UPDATE `as_assets` SET searchable=FALSE WHERE asset_id=:asset_id',

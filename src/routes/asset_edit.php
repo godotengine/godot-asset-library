@@ -737,36 +737,7 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
         }
     }
 
-    if ($update_version) {
-        $error = $this->utils->errorResponseIfMissingOrNotString(false, $response, $body, 'hash');
-        if ($error) {
-            return $response;
-        }
-
-        $body['hash'] = trim($body['hash']);
-        if (sizeof(preg_grep('/^[a-f0-9]{64}$/', [$body['hash']])) == 0) {
-            return $response->withJson([
-                'error' => 'Invalid hash given. Expected 64 lowercase hexadecimal digits.',
-            ]);
-        }
-
-        $query->bindValue(':update_version', 1, PDO::PARAM_INT);
-        $query->bindValue(':download_hash', $body['hash']);
-    } else {
-        if (isset($body['hash']) && trim($body['hash']) != '') {
-            $body['hash'] = trim($body['hash']);
-            if (sizeof(preg_grep('/^[a-f0-9]{64}$/', [$body['hash']])) == 0) {
-                return $response->withJson([
-                    'error' => 'Invalid hash given. Expected either nothing or 64 lowercase hexadecimal digits.',
-                ]);
-            }
-            $query->bindValue(':update_version', 1, PDO::PARAM_INT);
-            $query->bindValue(':download_hash', $body['hash']);
-        } else {
-            $query->bindValue(':update_version', 0, PDO::PARAM_INT);
-            $query->bindValue(':download_hash', null, PDO::PARAM_NULL);
-        }
-    }
+    $query->bindValue(':update_version', (int) $update_version, PDO::PARAM_INT);
 
     $this->db->beginTransaction();
 

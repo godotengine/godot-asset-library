@@ -268,43 +268,6 @@ $app->post('/asset/{id:[0-9]+}/support_level', function ($request, $response, $a
     ], 200);
 });
 
-// Change download hash of an asset
-$app->post('/asset/{id:[0-9]+}/download_hash', function ($request, $response, $args) {
-    $body = $request->getParsedBody();
-
-    $error = $this->utils->ensureLoggedIn(false, $response, $body, $user);
-    $error = $this->utils->errorResponseIfNotUserHasLevel($error, $response, $user, 'moderator');
-    $error = $this->utils->errorResponseIfMissingOrNotString($error, $response, $body, 'hash');
-    if ($error) {
-        return $response;
-    }
-
-    $body['hash'] = trim($body['hash']);
-    if (sizeof(preg_grep('/^[a-f0-9]{64}$/', [$body['hash']])) == 0) {
-        return $response->withJson([
-            'error' => 'Invalid hash given. Expected 64 lowercase hexadecimal digits.',
-        ]);
-    }
-
-
-    $query = $this->queries['asset']['set_download_hash'];
-
-    $query->bindValue(':asset_id', (int) $args['id'], PDO::PARAM_INT);
-    $query->bindValue(':download_hash', $body['hash']);
-
-    $query->execute();
-
-    $error = $this->utils->errorResponseIfQueryBad(false, $response, $query);
-    if ($error) {
-        return $response;
-    }
-
-    return $response->withJson([
-        'changed' => true,
-        'url' => 'asset/' . $args['id'],
-    ], 200);
-});
-
 /*
  * Delete asset from library
  */
