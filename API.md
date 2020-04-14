@@ -223,6 +223,7 @@ Example result:
 
 Notes:
 * The `cost` field is the license. Other asset libraries may put the price there and supply a download URL which requires authentication.
+* The `download_hash` field is always empty and is kept for compatibility only.
 * The download URL is generated based on the download commit and the browse URL.
 
 <div id="api-post-asset-id-delete"></div>
@@ -405,7 +406,6 @@ Moderator-only. Put an edit in review. It is impossible to change it after this.
 ```json
 {
   "token": "…",
-  "hash": "new sha256 hash"
 }
 ```
 Successful result: the asset edit, without the original asset.

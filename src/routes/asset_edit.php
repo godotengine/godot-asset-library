@@ -101,10 +101,22 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
             );
         }
     }
+
     if (isset($body['icon_url'])) {
         $icon_url = $body['icon_url'];
         if (sizeof(preg_grep('/^https?:\/\/.+?\.(png|jpg|jpeg)$/i', [$icon_url])) == 0) {
-            $warning[] = "\"$icon_url\" doesn't look correct; it should be similar to \"http<s>://<url>.<png/jpg>\". Make sure the icon URL is correct.\n";
+            $warning[] = "\"$icon_url\" doesn't look correct; it should be similar to \"http<s>://<url>.<png/jpg>\". Make sure the icon URL is correct.";
+        }
+    }
+
+    if (isset($body['download_commit'])) {
+        // Git commits are either 40 (SHA1) or 64 (SHA2) hex characters
+        if (sizeof(preg_grep('/^[a-f0-9]{40}([a-f0-9]{24})?$/', [$body['download_commit']])) == 0) {
+            $error = $c->utils->ensureLoggedIn($error, $response, $body, $user);
+            $error = $c->utils->errorResponseIfNotUserHasLevel($error, $response, $user, 'moderator', 'Using git tags or branches is no longer supported. Please give a full git commit hash instead.');
+            if ($error) {
+                return $response;
+            }
         }
     }
 
@@ -737,36 +749,7 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
         }
     }
 
-    if ($update_version) {
-        $error = $this->utils->errorResponseIfMissingOrNotString(false, $response, $body, 'hash');
-        if ($error) {
-            return $response;
-        }
-
-        $body['hash'] = trim($body['hash']);
-        if (sizeof(preg_grep('/^[a-f0-9]{64}$/', [$body['hash']])) == 0) {
-            return $response->withJson([
-                'error' => 'Invalid hash given. Expected 64 lowercase hexadecimal digits.',
-            ]);
-        }
-
-        $query->bindValue(':update_version', 1, PDO::PARAM_INT);
-        $query->bindValue(':download_hash', $body['hash']);
-    } else {
-        if (isset($body['hash']) && trim($body['hash']) != '') {
-            $body['hash'] = trim($body['hash']);
-            if (sizeof(preg_grep('/^[a-f0-9]{64}$/', [$body['hash']])) == 0) {
-                return $response->withJson([
-                    'error' => 'Invalid hash given. Expected either nothing or 64 lowercase hexadecimal digits.',
-                ]);
-            }
-            $query->bindValue(':update_version', 1, PDO::PARAM_INT);
-            $query->bindValue(':download_hash', $body['hash']);
-        } else {
-            $query->bindValue(':update_version', 0, PDO::PARAM_INT);
-            $query->bindValue(':download_hash', null, PDO::PARAM_NULL);
-        }
-    }
+    $query->bindValue(':update_version', (int) $update_version, PDO::PARAM_INT);
 
     $this->db->beginTransaction();
 

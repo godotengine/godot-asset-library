@@ -18,7 +18,6 @@ CREATE TABLE `as_assets` (
   `support_level` tinyint(4) NOT NULL,
   `download_provider` tinyint(4) NOT NULL,
   `download_commit` varchar(2048) NOT NULL,
-  `download_hash` text NOT NULL,
   `browse_url` varchar(1024) NOT NULL,
   `issues_url` varchar(1024) NOT NULL,
   `icon_url` varchar(1024) NOT NULL,
