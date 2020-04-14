@@ -219,6 +219,7 @@ $get_asset = function ($request, $response, $args) {
     }
 
     $asset_info['previews'] = $previews;
+    $asset_info['download_hash'] = '';
 
     return $response->withJson($asset_info, 200);
 };
