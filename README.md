@@ -2,6 +2,8 @@
 
 REST API and frontend for Godot Engine's [official asset library](https://godotengine.org/asset-library).
 
+[Endpoints](./API.md)
+
 ## Installation
 
 Run the following commands to get a running installation of the project:
