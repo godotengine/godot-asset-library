@@ -33,7 +33,7 @@
 
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
+    <nav class="navbar navbar-default navbar-static-top" role="navigation">
         <div class="container">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
@@ -43,7 +43,8 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="<?php echo raw($basepath) ?>">Godot Asset Library</a>
+                <a class="navbar-brand" href="https://godotengine.org" style="padding: 7px;"><img alt="Godot" src="<?php echo raw($basepath) ?>/assets/logo.svg" height="100%" style="display: inline"> </a>
+                <a class="navbar-brand" href="<?php echo raw($basepath) ?>" style="padding: 14px;">| Asset Library</a>
             </div>
 
             <?php global $gPaths; $gPaths = [$basepath, $path];
