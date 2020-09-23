@@ -59,14 +59,13 @@ return $constants = [
         9999999 => 'custom_build'
     ]),
     'common_godot_versions' => [
-        // '1.0',
-        // '1.1',
         '2.0',
         '2.1',
         '2.2',
         '3.0',
         '3.1',
         '3.2',
+        '4.0',
         'unknown',
         'custom_build',
     ]
