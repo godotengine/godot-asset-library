@@ -16,6 +16,10 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <?php if (strpos($path, '/edit') !== false) { ?>
+    <!-- Don't index edit pages in search engines -->
+    <meta name="robots" content="noindex">
+    <?php } ?>
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title><?php if(!empty($data['title'])){ echo(esc($data['title'].' - ')); } ?>Godot Asset Library</title>
 
