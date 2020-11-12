@@ -1,5 +1,15 @@
 # Godot's Asset Library
 
+___
+
+**Note:** This asset library backend and frontend is now in maintenace mode.
+Feel free to submit bug fixes and small improvements, but please refrain from
+working on large features. New development occurs in
+[godot-asset-library-laravel](https://github.com/Calinou/godot-asset-library-laravel)
+which will eventually be deployed as the official asset library.
+
+___
+
 REST API and frontend for Godot Engine's [official asset library](https://godotengine.org/asset-library).
 
 [Endpoints](./API.md)
