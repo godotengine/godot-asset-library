@@ -55,7 +55,7 @@
 </p>
 <p>
     Change items per page to: <span class="btn-group btn-group-xs" role="group" aria-label="Page size">
-        <?php foreach ([20, 50, 100, 200, 500] as $amount) { ?>
+        <?php foreach ([40, 100, 200, 500] as $amount) { ?>
             <a href="?<?php echo esc(http_build_query(['max_results' => $amount, 'page' => floor($data['page'] * $data['page_length'] / $amount)] + $params)) ?>" class="btn btn-default" aria-label="Per page">
                 <?php echo raw($amount); ?>
             </a>
