@@ -37,7 +37,7 @@ return [
         // Auth configuration
         'auth' => [
             'secret' => 'somerandomstringshouldbeputhere', // Check settings-local.php
-            'tokenExpirationTime' => 3600 * 24 * 7, // week
+            'tokenExpirationTime' => 3600 * 24 * 180, // 6 months
             'tokenSessionBytesLength' => 24, // If set to something which isn't 24, change DB schema
             'tokenResetBytesLength' => 32, // If set to something which isn't 32, change DB schema
             'bcryptOptions' => [
