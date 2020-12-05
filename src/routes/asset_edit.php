@@ -322,7 +322,7 @@ $app->get('/asset/edit', function ($request, $response, $args) {
     $filter = '%';
     $username = '%';
     $statuses = [];
-    $page_size = 20;
+    $page_size = 40;
     $max_page_size = 500;
     $page_offset = 0;
     if (isset($params['asset'])) {
