@@ -72,6 +72,7 @@ $app->get('/asset', function ($request, $response, $args) {
     if (isset($params['sort'])) {
         $column_mapping = [
             'rating' => 'rating',
+            'license' => 'cost',
             'cost' => 'cost',
             'name' => 'title',
             'updated' => 'modify_date'
