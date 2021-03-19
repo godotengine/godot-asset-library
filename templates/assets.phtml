@@ -48,7 +48,7 @@
             <select id="sort" name="sort" class="form-control">
                 <?php if(!isset($params['sort'])) $params['sort'] = 'updated'; foreach(['cost', 'name', 'updated'] as $id => $order) { ?>
                     <option value="<?php echo esc($order) ?>" <?php if(isset($params['sort']) && $order == $params['sort']) echo 'selected=""'; ?>>
-                        <?php echo ($order == 'cost' ) ?  "License" : esc(ucfirst($order)); ?>
+                        <?php echo $order === 'cost' ? "License" : esc(ucfirst($order)); ?>
                     </option>
                 <?php } ?>
             </select>
