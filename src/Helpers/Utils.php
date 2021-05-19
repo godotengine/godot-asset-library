@@ -35,10 +35,10 @@ class Utils
                 }
                 return "$repo_url/archive/$commit.zip";
             case 'GitLab':
-                if (sizeof(preg_grep('/^https:\/\/(gitlab\.com|[^\/]+)\/[^\/]+?\/[^\/]+?$/i', [$repo_url])) == 0) {
-                    $warning[] = "\"$repo_url\" doesn't look correct; it should be similar to \"https://<gitlab instance>/<owner>/<name>\". $warning_suffix";
-                } elseif (sizeof(preg_grep('/^https:\/\/(gitlab\.com)\/[^\/]+?\/[^\/]+?$/i', [$repo_url])) == 0) {
-                    $light_warning[] = "\"$repo_url\" might not be correct; it should be similar to \"https://gitlab.com/<owner>/<name>\", unless the asset is hosted on a custom instance of GitLab. $light_warning_suffix";
+                if (sizeof(preg_grep('/^https:\/\/(gitlab\.com|[^\/]+)\/[^\/]+?\/[^\/]+?(?:[^\/]+\/?)*$/i', [$repo_url])) == 0) {
+                    $warning[] = "\"$repo_url\" doesn't look correct; it should be similar to \"https://<gitlab instance>/<owner>/<optional groups>/<name>\". $warning_suffix";
+                } elseif (sizeof(preg_grep('/^https:\/\/(gitlab\.com)\/[^\/]+?\/[^\/]+?(?:[^\/]+\/?)*$/i', [$repo_url])) == 0) {
+                    $light_warning[] = "\"$repo_url\" might not be correct; it should be similar to \"https://gitlab.com/<owner>/<optional groups>/<name>\", unless the asset is hosted on a custom instance of GitLab. $light_warning_suffix";
                 }
                 return "$repo_url/-/archive/$commit.zip";
             case 'BitBucket':
