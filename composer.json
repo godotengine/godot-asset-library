@@ -5,7 +5,7 @@
         "slim/csrf": "^0.7.0",
         "monolog/monolog": "^1.17",
         "slim/php-view": "^2.0",
-        "phpmailer/phpmailer": "^5.2"
+        "phpmailer/phpmailer": "^6.5"
     },
 
     "autoload": {
