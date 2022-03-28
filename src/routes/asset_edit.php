@@ -344,7 +344,7 @@ $app->get('/asset/edit', function ($request, $response, $args) {
         }
     }
     if (isset($params['filter'])) {
-        $filter = '%'.preg_replace('/[[:punct:]]+/', '%', $params['filter']).'%';
+        $filter = '%'.preg_replace('/[[:punct:]]+/', '%', trim($params['filter'])).'%';
     }
     if (isset($params['user'])) {
         $username = $params['user'];
