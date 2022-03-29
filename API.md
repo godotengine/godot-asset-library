@@ -170,8 +170,9 @@ Example response:
 Get a list of assets.
 
 Some notes:
+* Leading and trailing whitespace in `filter` is trimmed on the server side.
 * For legacy purposes, not supplying godot version would list only 2.1 assets, while not supplying type would list only addons.
-* To specify multiple support levels, join them with `+`, e.g. `support=official+community`
+* To specify multiple support levels, join them with `+`, e.g. `support=official+community`.
 * Godot version can be specified as you see fit, for example, `godot_version=3.1` or `godot_version=3.1.5`. Currently, the patch version is disregarded, but may be honored in the future.
 
 <div id="api-get-asset-id"></div>
