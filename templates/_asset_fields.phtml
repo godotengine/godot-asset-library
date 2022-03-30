@@ -110,13 +110,13 @@ $_asset_values = array_merge([
                     <?php echo esc($name) ?>
                 </option>
             <?php } ?>
-            <?php if((isset($user) && ($user['type'] >= $constants['user_type']['moderator'])) || "Custom" == $_asset_values['download_provider']) { ?>
-                <option value="Custom" <?php if("Custom" == $_asset_values['download_provider']) echo 'selected=""'; ?>>
-                    Custom (Moderator-only)
-                </option>
-            <?php } ?>
+            <option value="Custom" <?php if("Custom" == $_asset_values['download_provider']) echo 'selected=""'; ?>>
+                Custom
+            </option>
         </select>
-        <span class="help-block">The site or service hosting your repository. If your repository host is missing, you might like to <a href="https://github.com/godotengine/asset-library/issues">open an issue</a> about it.</span>
+        <span class="help-block">The site or service hosting your repository.<br>
+        The <strong>Custom</strong> download provider can be used to link to premade ZIP archives, such as those uploaded on GitHub Releases. This is useful for GDNative/GDExtension add-ons which contain precompiled binaries. This can also be useful when <a href="https://stackoverflow.com/questions/14783127/git-archive-export-with-submodules-git-archive-all-recursive">including submodules in the ZIP</a> is desired (as submodules are <em>not</em> included in automatically generated ZIPs from GitHub or GitLab).<br>
+        If your repository host is missing, you might like to <a href="https://github.com/godotengine/asset-library/issues">open an issue</a> about it.</span>
     </div>
 </div>
 
@@ -126,9 +126,7 @@ $_asset_values = array_merge([
         <input id="browse" name="browse_url" type="text" placeholder="https://host.example/user/repository" class="form-control input-md" required="" value="<?php echo esc($_asset_values['browse_url']) ?>">
         <span class="help-block">The URL you use to browse your repository.</span>
         <span class="help-block"><strong>Note:</strong> Do not give the clone URL (the one that ends in <code>.git</code>), but give the one you use to browse your code.</span>
-        <?php if(isset($user) && ($user['type'] >= $constants['user_type']['moderator'])) { ?>
-            <span class="help-block">When using the Custom provider, this is used for browsing only.</span>
-        <?php } ?>
+        <span class="help-block">When using the <strong>Custom</strong> download provider, this is used for browsing only.</span>
     </div>
 </div>
 
@@ -136,7 +134,7 @@ $_asset_values = array_merge([
     <label class="col-md-4 control-label" for="issues">Issues URL</label>
     <div class="col-md-5">
         <input id="issues" name="issues_url" type="text" placeholder="https://host.example/user/repository/issues" class="form-control input-md" value="<?php echo esc($_asset_values['issues_url']) ?>">
-        <span class="help-block">Optional, in case you are not using the one supplied by the repository host.</span>
+        <span class="help-block">Optional, in case you are not using the one supplied by the repository host. Leave empty if unsure.</span>
     </div>
 </div>
 
@@ -172,13 +170,11 @@ $_asset_values = array_merge([
 </div>
 
 <div class="form-group">
-    <label class="col-md-4 control-label required_mark" for="commit">Download Commit</label>
+    <label class="col-md-4 control-label required_mark" for="commit">Download Commit/URL</label>
     <div class="col-md-5">
-        <input id="commit" name="download_commit" type="text" placeholder="Commit hash" class="form-control input-md" required="" value="<?php echo esc($_asset_values['download_commit']) ?>" <?php if(isset($user) && ($user['type'] < $constants['user_type']['moderator'])) { ?> pattern="[a-f0-9]{40}([a-f0-9]{24})?" <?php } ?> >
-        <span class="help-block">The commit hash that should be downloaded. Expects 40 or 64 hexadecimal digits fully specifying a git commit.</span>
-        <?php if(isset($user) && ($user['type'] >= $constants['user_type']['moderator'])) { ?>
-            <span class="help-block">When using the Custom provider, this is the download URL.</span>
-        <?php } ?>
+        <input id="commit" name="download_commit" type="text" placeholder="Git commit hash (or download URL if using Custom download provider)" class="form-control input-md" required="" value="<?php echo esc($_asset_values['download_commit']) ?>">
+        <span class="help-block">The commit hash that should be downloaded. Expects 40 or 64 hexadecimal digits <em>fully</em> specifying a Git commit.</span>
+        <span class="help-block">When using the <strong>Custom</strong> download provider, this must be set to the full download URL instead of a commit hash.</span>
     </div>
 </div>
 

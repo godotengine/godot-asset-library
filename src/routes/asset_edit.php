@@ -79,14 +79,6 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
         } else {
             $body['download_provider'] = '0';
         }
-
-        if ($body['download_provider'] == $c->constants['download_provider']['Custom'] && ($bare_asset === null || $bare_asset['download_provider'] != $body['download_provider'])) {
-            $error = $c->utils->ensureLoggedIn($error, $response, $body, $user);
-            $error = $c->utils->errorResponseIfNotUserHasLevel($error, $response, $user, 'moderator', 'You are not authorized to use the Custom provider');
-            if ($error) {
-                return $response;
-            }
-        }
     }
 
     $warning = null;
@@ -110,12 +102,14 @@ function _insert_asset_edit_fields($c, $error, &$response, $query, $body, $requi
     }
 
     if (isset($body['download_commit'])) {
-        // Git commits are either 40 (SHA1) or 64 (SHA2) hex characters
-        if (sizeof(preg_grep('/^[a-f0-9]{40}([a-f0-9]{24})?$/', [$body['download_commit']])) == 0) {
-            $error = $c->utils->ensureLoggedIn($error, $response, $body, $user);
-            $error = $c->utils->errorResponseIfNotUserHasLevel($error, $response, $user, 'moderator', 'Using git tags or branches is no longer supported. Please give a full git commit hash instead.');
-            if ($error) {
-                return $response;
+        if (!isset($body['download_provider']) || isset($body['download_provider']) && $body['download_provider'] != $c->constants['download_provider']['Custom']) {
+            // Git commits are either 40 (SHA1) or 64 (SHA2) hex characters
+            if (sizeof(preg_grep('/^[a-f0-9]{40}([a-f0-9]{24})?$/', [$body['download_commit']])) == 0) {
+                $error = $c->utils->ensureLoggedIn($error, $response, $body, $user);
+                $error = $c->utils->errorResponseIfNotUserHasLevel($error, $response, $user, 'moderator', 'Using git tags or branches is no longer supported. Please give a full git commit hash instead.');
+                if ($error) {
+                    return $response;
+                }
             }
         }
     }
