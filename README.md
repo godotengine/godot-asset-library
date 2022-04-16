@@ -2,7 +2,7 @@
 
 ___
 
-**Note:** This asset library backend and frontend is now in maintenace mode.
+**Note:** This asset library backend and frontend is now in maintenance mode.
 Feel free to submit bug fixes and small improvements, but please refrain from
 working on large features. New development occurs in
 [godot-asset-library-laravel](https://github.com/Calinou/godot-asset-library-laravel)
