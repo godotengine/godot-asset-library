@@ -1,0 +1,505 @@
+openapi: "3.0.2"
+
+info:
+  title: Godot Asset Library
+  description: Godot Engine's asset library
+  version: "1.0.0"
+
+servers:
+  - url: "https://godotengine.org/asset-library/api"
+
+tags:
+  - name: assets
+    description: Assets
+
+  - name: configure
+    description: Configuration
+
+paths:
+  /asset:
+    get:
+      tags: [assets]
+      summary: List assets
+      description: Return a paginated list of assets.
+
+      parameters:
+      - $ref: "#/components/parameters/typeParam"
+      - $ref: "#/components/parameters/categoryParam"
+      - $ref: "#/components/parameters/supportParam"
+      - $ref: "#/components/parameters/filterParam"
+      - $ref: "#/components/parameters/userParam"
+      - $ref: "#/components/parameters/godotVersionParam"
+      - $ref: "#/components/parameters/maxResultsParam"
+      - $ref: "#/components/parameters/pageParam"
+      - $ref: "#/components/parameters/offsetParam"
+      - $ref: "#/components/parameters/sortParam"
+      - $ref: "#/components/parameters/reverseParam"
+
+      responses:
+        200:
+          description: Successful operation
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/PaginatedAssetList"
+              examples:
+                PaginatedAssetListExample1:
+                  $ref: "#/components/examples/PaginatedAssetListExample"
+
+  /asset/{id}:
+    get:
+      tags: [assets]
+      summary: Get information about an asset
+      description: Get information about a single asset.
+
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The asset's unique identifier.
+          schema:
+            type: integer
+
+      responses:
+        200:
+          description: Successful operation
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/AssetDetails"
+              examples:
+                AssedDetailsExample1:
+                  $ref: "#/components/examples/AssetDetailsExample"
+        404:
+          description: Asset not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+        422:
+          description: Invalid request body
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+
+  /configure:
+    get:
+      tags: [configure]
+      summary: Fetch categories
+      description: Returns category names and IDs (used for editor integration).
+
+      parameters:
+      - $ref: "#/components/parameters/typeParam"
+      - $ref: "#/components/parameters/sessionParam"
+
+      responses:
+        200:
+          description: Successful operation
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Category"
+
+        422:
+          description: Invalid request body
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+
+components:
+  parameters:
+    typeParam:
+      in: query
+      name: type
+      required: false
+      schema:
+        type: string
+        default: any
+        enum:
+          - any
+          - addon
+          - project
+    categoryParam:
+      in: query
+      name: category
+      required: false
+      schema:
+        type: number
+    supportParam:
+      in: query
+      name: support
+      required: false
+      schema:
+        type: string
+        enum:
+          - official
+          - community
+          - testing
+    filterParam:
+      in: query
+      name: filter
+      required: false
+      schema:
+        type: string
+    userParam:
+      in: query
+      name: user
+      required: false
+      schema:
+        type: string
+    godotVersionParam:
+      in: query
+      name: godot_version
+      required: false
+      schema:
+        type: string
+        pattern: '^\d{1}.\d{1}.\d{1}$'
+    maxResultsParam:
+      in: query
+      name: max_results
+      required: false
+      schema:
+        type: number
+        minimum: 1
+        maximum: 500
+    pageParam:
+      in: query
+      name: page
+      required: false
+      schema:
+        type: number
+    offsetParam:
+      in: query
+      name: offset
+      required: false
+      schema:
+        type: number
+    sortParam:
+      in: query
+      name: sort
+      required: false
+      schema:
+        type: string
+        enum:
+          - rating
+          - cost
+          - name
+          - updated
+    reverseParam:
+      in: query
+      name: reverse
+      required: false
+      schema:
+        type: boolean
+    sessionParam:
+      in: query
+      name: session
+      required: false
+      schema:
+        type: boolean
+
+  schemas:
+    AssetSummary:
+      type: object
+      description: |
+        A resource provided by the asset library (add-on, project, ...).
+        These properties are returned both when requesting a list of assets or a specific asset.
+      properties:
+        asset_id:
+          type: integer
+          description: The asset's unique identifier.
+        type:
+          type: string
+          description: The asset's type, can be "addon" or "project".
+        author:
+          type: string
+          description: The author's username.
+        author_id:
+          type: integer
+          description: The author's unique identifier.
+        category:
+          type: string
+          description: The category the asset belongs to.
+        category_id:
+          type: integer
+          description: The unique identifier of the category the asset belongs to.
+        download_provider:
+          type: string
+        download_commit:
+          type: string
+        download_hash:
+          type: string
+          default: ''
+          description: >
+            The asset's SHA-256 hash for the latest version.
+            **Note:** This is currently always an empty string as asset versions' hashes aren't computed and stored yet.
+        cost:
+          type: string
+          description: >
+            The asset's license as a [SPDX license identifier](https://spdx.org/licenses/).
+            For compatibility reasons, this field is called `cost` instead of `license`.
+        godot_version:
+          type: string
+          description: >
+            The Godot version the asset's latest version is intended for (in `major.minor` format).<br>
+            This field is present for compatibility reasons with the Godot editor.
+            See also the `versions` array.
+        icon_url:
+          type: string
+          format: url
+          description: The asset's icon URL (should always be a PNG image).
+        is_archived:
+          type: boolean
+          description: >
+            If `true`, the asset is marked as archived by its author.
+            When archived, it can't receive any further reviews but can still be
+            unarchived at any time by the author.
+        issues_url:
+          type: string
+          format: url
+          description: >
+            The asset's issue reporting URL (typically associated with
+            the Git repository specified in `browse_url`).
+        modify_date:
+          type: string
+          format: date-time
+          description: >
+            The date on which the asset entry was last updated.
+            Note that entries can be edited independently of new asset versions being released.
+        rating:
+          type: integer
+          description: >
+            The asset's rating (unused). For compatibility reasons, a value of 0 is always returned.
+            You most likely want `score` instead.
+        support_level:
+          type: string
+          enum: [official, community, testing]
+          description: The asset's support level.
+        title:
+          type: string
+          description: The asset's title (usually less than 50 characters).
+        version:
+          type: integer
+          description: >
+            The asset revision number (starting from 1).<br>
+            Every time the asset is edited (for anyone and for any reason),
+            this number is incremented by 1.
+        version_string:
+          type: string
+          description: >
+            The version string of the latest version (free-form, but usually `major.minor`
+            or `major.minor.patch`).<br>
+            This field is present for compatibility reasons with the Godot editor.
+            See also the `versions` array.
+        searchable:
+          type: string
+        previews:
+          type: array
+          items: 
+            $ref: "#/components/schemas/AssetPreview"
+
+    PaginatedAssetList:
+      description: A paginated list of assets.
+      allOf:
+        - $ref: "#/components/schemas/PaginationResult"
+        - type: object
+          properties:
+            result:
+              type: array
+              items: { $ref: "#/components/schemas/AssetSummary" }
+
+    AssetPreview:
+      description: |
+        ABCD.
+      type: object
+      properties:
+        preview_id:
+          type: string
+        type:
+          type: string
+        link:
+          type: string
+          format: url
+        thumbnail:
+          type: string
+          format: url
+
+    AssetDetails:
+      description: |
+        A resource provided by the asset library (add-on, project, ...).<br>
+        These properties are only returned when requesting a specific asset,
+        not a list of assets.
+      allOf:
+        - $ref: "#/components/schemas/AssetSummary"
+        - type: object
+          properties:
+            browse_url:
+              type: string
+              format: url
+              description: The asset's browsable repository URL.
+            description:
+              type: string
+              description: The asset's full description.
+            download_url:
+              type: string
+              format: url
+              description: >
+                The download link of the asset's latest version (should always point to a ZIP archive).<br>
+                This field is present for compatibility reasons with the Godot editor.
+                See also the `versions` array.
+
+    AssetVersion:
+      type: object
+      description: An asset version.
+      properties:
+        created_at:
+          type: string
+          format: date-time
+          description: The version's release date.
+        download_url:
+          type: string
+          format: url
+          description: >
+            The version's custom download URL (if any). Will be an empty string
+            if not set.
+        godot_version:
+          type: string
+          description: >
+            The minor Godot version the asset version was declared to be
+            compatible with (in `major.minor` format).
+        version_string:
+          type: string
+          description: The version identifier.
+
+    Category:
+      type: object
+      description: >
+        A category in which assets belong to. An asset can only belong to
+        one category at a time.
+      properties:
+        id:
+          type: integer
+          description: The category's unique identifier.
+        name:
+          type: string
+          description: The category's name.
+        type:
+          type: integer
+          description: The category's type (0 = Add-ons, 1 = Projects).
+
+    PaginationResult:
+      type: object
+      description: Properties which describe the results of the pagination requested.
+      properties:
+        page:
+          type: integer
+          description: The requested page number.
+        page_length:
+          type: integer
+          description: >
+            The requested page length.<br>
+            **Note:** This can be higher than the total amount of items returned.
+        pages:
+          type: integer
+          description: >
+            The total number of pages available.<br>
+            **Note:** If requesting a page higher than this value, a successful
+            response will be returned (status code 200) but no items will be listed.
+        total_items:
+          type: integer
+          description: The total number of items available.
+
+    NotFoundError:
+      type: object
+      description: The requested resource was not found.
+      properties:
+        error:
+          type: string
+          description: A generic error message.
+
+    TraceError:
+      type: object
+      properties:
+        file:
+          type: string
+        line: 
+          type: integer
+        function:
+          type: string
+        class:
+          type: string
+        type:
+          type: string
+
+    ValidationError:
+      type: object
+      description: An error returned by Laravel.
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+            description: Messages describing why the validation of the field failed.
+        message:
+          type: string
+          description: A generic error message.
+
+  examples:
+    AssetDetailsExample:
+      value:
+        asset_id: '1'
+        type: addon
+        title: Snake
+        author: test
+        author_id: '1'
+        version: '1'
+        version_string: alpha
+        category: 2D Tools
+        category_id: '1'
+        godot_version: '2.1'
+        rating: '0'
+        cost: GPLv3
+        description: Lorem ipsum…
+        support_level: testing
+        download_provider: GitHub
+        download_commit: master
+        download_hash: "(sha256 hash of the downloaded zip)"
+        browse_url: https://github.com/…
+        issues_url: https://github.com/…/issues
+        icon_url: https://….png
+        searchable: '1'
+        modify_date: '2018-08-21 15:49:00'
+        download_url: https://github.com/…/archive/master.zip
+        previews:
+        - preview_id: '1'
+          type: video
+          link: https://www.youtube.com/watch?v=…
+          thumbnail: https://img.youtube.com/vi/…/default.jpg
+        - preview_id: '2'
+          type: image
+          link: https://….png
+          thumbnail: https://….png
+  
+    PaginatedAssetListExample:
+      value:
+        result:
+        - asset_id: '1'
+          title: Snake
+          author: test
+          author_id: '1'
+          category: 2D Tools
+          category_id: '1'
+          godot_version: '2.1'
+          rating: '0'
+          cost: GPLv3
+          support_level: testing
+          icon_url: https://….png
+          version: '1'
+          version_string: alpha
+          modify_date: '2018-08-21 15:49:00'
+        page: 0
+        pages: 0
+        page_length: 10
+        total_items: 1
