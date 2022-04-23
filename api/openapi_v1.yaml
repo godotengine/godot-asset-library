@@ -58,7 +58,7 @@ paths:
           required: true
           description: The asset's unique identifier.
           schema:
-            type: integer
+            type: string
 
       responses:
         200:
@@ -126,7 +126,7 @@ components:
       name: category
       required: false
       schema:
-        type: number
+        type: string
     supportParam:
       in: query
       name: support
@@ -161,7 +161,7 @@ components:
       name: max_results
       required: false
       schema:
-        type: number
+        type: string
         minimum: 1
         maximum: 500
     pageParam:
@@ -169,13 +169,13 @@ components:
       name: page
       required: false
       schema:
-        type: number
+        type: string
     offsetParam:
       in: query
       name: offset
       required: false
       schema:
-        type: number
+        type: string
     sortParam:
       in: query
       name: sort
@@ -208,7 +208,7 @@ components:
         These properties are returned both when requesting a list of assets or a specific asset.
       properties:
         asset_id:
-          type: integer
+          type: string
           description: The asset's unique identifier.
         type:
           type: string
@@ -217,13 +217,13 @@ components:
           type: string
           description: The author's username.
         author_id:
-          type: integer
+          type: string
           description: The author's unique identifier.
         category:
           type: string
           description: The category the asset belongs to.
         category_id:
-          type: integer
+          type: string
           description: The unique identifier of the category the asset belongs to.
         download_provider:
           type: string
@@ -269,7 +269,7 @@ components:
             The date on which the asset entry was last updated.
             Note that entries can be edited independently of new asset versions being released.
         rating:
-          type: integer
+          type: string
           description: >
             The asset's rating (unused). For compatibility reasons, a value of 0 is always returned.
             You most likely want `score` instead.
@@ -281,11 +281,11 @@ components:
           type: string
           description: The asset's title (usually less than 50 characters).
         version:
-          type: integer
+          type: string
           description: >
-            The asset revision number (starting from 1).<br>
+            The asset revision string (starting from 1).<br>
             Every time the asset is edited (for anyone and for any reason),
-            this number is incremented by 1.
+            this string is incremented by 1.
         version_string:
           type: string
           description: >
@@ -380,13 +380,13 @@ components:
         one category at a time.
       properties:
         id:
-          type: integer
+          type: string
           description: The category's unique identifier.
         name:
           type: string
           description: The category's name.
         type:
-          type: integer
+          type: string
           description: The category's type (0 = Add-ons, 1 = Projects).
 
     PaginationResult:
@@ -395,7 +395,7 @@ components:
       properties:
         page:
           type: integer
-          description: The requested page number.
+          description: The requested page string.
         page_length:
           type: integer
           description: >
@@ -404,12 +404,12 @@ components:
         pages:
           type: integer
           description: >
-            The total number of pages available.<br>
+            The total string of pages available.<br>
             **Note:** If requesting a page higher than this value, a successful
             response will be returned (status code 200) but no items will be listed.
         total_items:
           type: integer
-          description: The total number of items available.
+          description: The total string of items available.
 
     NotFoundError:
       type: object
@@ -425,7 +425,7 @@ components:
         file:
           type: string
         line: 
-          type: integer
+          type: string
         function:
           type: string
         class:
