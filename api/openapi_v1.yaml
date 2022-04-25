@@ -10,12 +10,121 @@ servers:
 
 tags:
   - name: assets
-    description: Assets
+    description: Assets API
+  
+  - name: assetsEdit
+    description: Assets Edit API
 
   - name: configure
-    description: Configuration
+    description: Configuration API
+  
+  - name: auth
+    description: Authentication API
 
 paths:
+  /register:
+    post:
+      tags: [auth]
+      summary: Register a user
+      description: Register a user, given a username, password, and email.
+
+      requestBody:
+        description: Username, Password and Email to register
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDetails'
+
+      responses:
+        200:
+          description: Successful operation
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/RegisterSuccessfulResult"
+
+  /login:
+    post:
+      tags: [auth]
+      summary: Login as a given user
+      description: Login as a given user. Results in a token which can be used for authenticated requests.
+
+      requestBody:
+        description: Username and Passaword to login with
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsernamePassword'
+
+      responses:
+        200:
+          description: Successful operation
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/LoginSuccessfulResult"
+        403:
+          description: Forbidden
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/LoginForbiddenResult"
+        404:
+          description: Not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/LoginNotFoundResult"
+
+  /logout:
+    post:
+      tags: [auth]
+      summary: Logout a user
+      description: Logout a user, given a token. The token is invalidated in the process.
+
+      requestBody:
+        description: Username and Passaword to login with
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+
+      responses:
+        200:
+          description: Successful operation
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/LogoutSuccessfulResult"
+
+  /change_password:
+    post:
+      tags: [auth]
+      summary: Change a user's password
+      description: Change a user's password. The token is invalidated in the process.
+
+      requestBody:
+        description: Old and New password. The authentication token is mandatory.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePassword'
+
+      responses:
+        200:
+          description: Successful operation
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/ChangePwdSuccessfulResult"
+
   /asset:
     get:
       tags: [assets]
@@ -46,6 +155,31 @@ paths:
                 PaginatedAssetListExample1:
                   $ref: "#/components/examples/PaginatedAssetListExample"
 
+    post:
+      tags: [assetsEdit]
+      summary: Update information about an asset
+      description: Update information about a single asset.
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssetDetails"
+
+      responses:
+        200:
+          description: Successful operation
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  id:
+                    description: The id of the updated asset
+                    type: string
+
+
   /asset/{id}:
     get:
       tags: [assets]
@@ -75,13 +209,269 @@ paths:
           content:
             "application/json":
               schema:
-                $ref: "#/components/schemas/NotFoundError"
+                $ref: "#/components/schemas/AssetNotFound"
         422:
           description: Invalid request body
           content:
             "application/json":
               schema:
                 $ref: "#/components/schemas/ValidationError"
+
+    post:
+      tags: [assetsEdit]
+      summary: Update information about an asset
+      description: Update information about a single asset.
+
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The asset's unique identifier.
+          schema:
+            type: string
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssetDetails"
+
+      responses:
+        200:
+          description: Successful operation
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  id:
+                    description: The id of the updated asset
+                    type: string
+
+  /asset/{id}/delete:
+    post:
+      tags: [assets]
+      summary: Soft-delete an asset
+      description: Soft-delete an asset. Useable by moderators and the owner of the asset.
+
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The asset's unique identifier.
+          schema:
+            type: string
+
+      requestBody:
+        description: The token for the authenticated user
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+
+      responses:
+        200:
+          description: Successful operation
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/SuccessfulAssetOperation"
+
+  /asset/{id}/support_level:
+    post:
+      tags: [assets]
+      summary: Change the support level of an asset
+      description: API used by moderators to change the support level of an asset.
+
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The asset's unique identifier.
+          schema:
+            type: string
+
+      requestBody:
+        description: The token for the authenticated user
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                support_Level:
+                  type: string
+
+      responses:
+        200:
+          description: Successful operation
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/SuccessfulAssetOperation"
+
+  /asset/edit/{id}:
+    get:
+      tags: [assetsEdit]
+      summary: Returns a previously-submitted asset edit
+      description: Returns a previously-submitted asset edit. All fields with null are unchanged, and will stay the same as in the original. The previews array is merged from the new and original previews.
+
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The edit's unique identifier.
+          schema:
+            type: string
+
+      responses:
+        200:
+          description: Successful operation
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/EditDetails"
+
+    post:
+      tags: [assetsEdit]
+      summary: Update information about an asset
+      description: Update information about a single asset.
+
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The asset's unique identifier.
+          schema:
+            type: string
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssetDetails"
+
+      responses:
+        200:
+          description: Successful operation
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  id:
+                    description: The id of the updated asset
+                    type: string
+
+  /asset/edit/{id}/review:
+    post:
+      tags: [assetsEdit]
+      summary: Put an edit in review
+      description: Moderator-only. Put an edit in review. It is impossible to change it after this.
+
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The edit's unique identifier.
+          schema:
+            type: string
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  description: The authentication token
+                  type: string
+
+      responses:
+        200:
+          description: Successful operation
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/EditSummary"
+
+  /asset/edit/{id}/accept:
+    post:
+      tags: [assetsEdit]
+      summary: Apply an edit previously put in review
+      description: Moderator-only. Apply an edit previously put in review.
+
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The edit's unique identifier.
+          schema:
+            type: string
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  description: The authentication token
+                  type: string
+
+      responses:
+        200:
+          description: Successful operation
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/EditSummary"
+
+  /asset/edit/{id}/reject:
+    post:
+      tags: [assetsEdit]
+      summary: Reject an edit previously put in review
+      description: Moderator-only. Reject an edit previously put in review.
+
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The edit's unique identifier.
+          schema:
+            type: string
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  description: The authentication token
+                  type: string
+                reason:
+                  description: The reason why the edit was rejected
+                  type: string
+
+      responses:
+        200:
+          description: Successful operation
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/EditSummary"
 
   /configure:
     get:
@@ -200,7 +590,107 @@ components:
       schema:
         type: boolean
 
+
   schemas:
+    RegisterSuccessfulResult:
+      type: object
+      properties:
+        registered:
+          type: boolean
+        username:
+          type: string
+  
+    LoginSuccessfulResult:
+      type: object
+      properties:
+        authenticated:
+          type: boolean
+        username:
+          type: string
+        token:
+          type: string
+        url:
+          type: string
+  
+    LogoutSuccessfulResult:
+      type: object
+      properties:
+        authenticated:
+          type: boolean
+        token:
+          type: string
+  
+    ChangePwdSuccessfulResult:
+      type: object
+      properties:
+        token:
+          type: string
+  
+    LoginForbiddenResult:
+      allOf:
+      - $ref: "#/components/schemas/Error"
+      - type: object
+        properties:
+          authenticated:
+            type: boolean
+  
+    LoginNotFoundResult:
+      allOf:
+      - $ref: "#/components/schemas/Error"
+  
+    UsernamePassword:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string       
+  
+    UserDetails:
+      allOf:
+      - $ref: "#/components/schemas/UsernamePassword"
+      - type: object
+        properties:
+          email:
+            type: string
+  
+    ChangePassword:
+      type: object
+      properties:
+        token:
+          type: string
+        old_password:
+          type: string
+        new_password:
+          type: string
+  
+    SuccessfulAssetOperation:
+      type: object
+      properties:
+        changed:
+          type: boolean
+  
+    EditSummary:
+      type: object
+      properties:
+        edit_id:
+          type: string
+        status:
+          type: string
+        reason:
+          type: string
+        warning:
+          type: string
+  
+    EditDetails:
+      allOf:
+        - $ref: "#/components/schemas/EditSummary"
+        - $ref: "#/components/schemas/AssetSummary"
+        - type: object
+          properties:
+            original:
+              $ref: "#/components/schemas/AssetDetails"
+  
     AssetSummary:
       type: object
       description: |
@@ -411,7 +901,11 @@ components:
           type: integer
           description: The total string of items available.
 
-    NotFoundError:
+    AssetNotFound:
+      allOf:
+      - $ref: "#/components/schemas/Error"
+
+    Error:
       type: object
       description: The requested resource was not found.
       properties:
