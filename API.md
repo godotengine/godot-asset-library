@@ -224,7 +224,7 @@ Example result:
 
 Notes:
 * The `cost` field is the license. Other asset libraries may put the price there and supply a download URL which requires authentication.
-* The `download_hash` field is always empty and is kept for compatibility only.
+* In the official asset library, the `download_hash` field is always empty and is kept for compatibility only. The editor will skip hash checks if `download_hash` is an empty string. Third-party asset libraries may specify a SHA-256 hash to be used by the editor to verify the download integrity.
 * The download URL is generated based on the download commit and the browse URL.
 
 <div id="api-post-asset-id-delete"></div>
