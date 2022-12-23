@@ -4,6 +4,17 @@ info:
   title: Godot Asset Library
   description: Godot Engine's asset library
   version: "1.0.0"
+  termsOfService: https://github.com/godotengine/.github/blob/master/CODE_OF_CONDUCT.md
+  contact:
+    name: Contact the author
+    url: https://github.com/fenix-hub
+  license:
+    name: MIT License
+    url: https://github.com/godotengine/godot-asset-library/blob/master/LICENSE.txt
+
+externalDocs:
+  description: Markdown version
+  url: https://github.com/fenix-hub/godot-asset-library/blob/swagger/API.md
 
 servers:
   - url: "https://godotengine.org/asset-library/api"
@@ -90,10 +101,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                token:
-                  type: string
+              $ref: "#/components/schemas/AuthToken"
 
       responses:
         200:
@@ -165,7 +173,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AssetDetails"
+              allOf:
+              - $ref: "#/components/schemas/AuthToken"
+              - $ref: "#/components/schemas/AssetDetails"
 
       responses:
         200:
@@ -235,7 +245,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AssetDetails"
+              allOf:
+                - $ref: "#/components/schemas/AuthToken"
+                - $ref: "#/components/schemas/AssetDetails"
 
       responses:
         200:
@@ -269,10 +281,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                token:
-                  type: string
+              $ref: "#/components/schemas/AuthToken"
 
       responses:
         200:
@@ -302,12 +311,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                token:
-                  type: string
-                support_Level:
-                  type: string
+              allOf:
+                - $ref: "#/components/schemas/AuthToken"
+                - type: object
+                  properties:
+                    token:
+                      type: string
+                    support_level:
+                      type: string
 
       responses:
         200:
@@ -390,11 +401,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                token:
-                  description: The authentication token
-                  type: string
+              $ref: "#/components/schemas/AuthToken"
 
       responses:
         200:
@@ -423,12 +430,8 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                token:
-                  description: The authentication token
-                  type: string
-
+              $ref: "#/components/schemas/AuthToken"
+  
       responses:
         200:
           description: Successful operation
@@ -456,14 +459,13 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                token:
-                  description: The authentication token
-                  type: string
-                reason:
-                  description: The reason why the edit was rejected
-                  type: string
+              allOf:
+                - $ref: "#/components/schemas/AuthToken"
+                - type: object
+                  properties:
+                    reason:
+                      description: The reason why the edit was rejected
+                      type: string
 
       responses:
         200:
@@ -592,6 +594,14 @@ components:
 
 
   schemas:
+    AuthToken:
+      type: object
+      properties:
+        token:
+          type: string
+      required:
+        - token
+  
     RegisterSuccessfulResult:
       type: object
       properties:
@@ -697,6 +707,9 @@ components:
         A resource provided by the asset library (add-on, project, ...).
         These properties are returned both when requesting a list of assets or a specific asset.
       properties:
+        token:
+          type: string
+          description: The Token obtained thorugh a login.
         asset_id:
           type: string
           description: The asset's unique identifier.
