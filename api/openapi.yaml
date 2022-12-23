@@ -730,6 +730,8 @@ components:
           description: The unique identifier of the category the asset belongs to.
         download_provider:
           type: string
+          enum: [Custom, GitHub, GitLab, BitBucket, Gogs/Gitea, cgit]
+          description: The download provider where the plugin source is hosted.
         download_commit:
           type: string
         download_hash:
