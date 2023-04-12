@@ -43,7 +43,7 @@ return $constants = [
         'GitHub' => 0,
         'GitLab' => 1,
         'BitBucket' => 2,
-        'Gogs/Gitea' => 3,
+        'Gogs/Gitea/Codeberg' => 3,
         'cgit' => 4,
     ]),
     'asset_edit_fields' => [
