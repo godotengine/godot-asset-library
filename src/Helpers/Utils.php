@@ -46,12 +46,12 @@ class Utils
                     $warning[] = "\"$repo_url\" doesn't look correct; it should be similar to \"https://bitbucket.org/<owner>/<name>\". $warning_suffix";
                 }
                 return "$repo_url/get/$commit.zip";
-            case 'Gogs/Gitea':
+            case 'Gogs/Gitea/Codeberg':
                 if (sizeof(preg_grep('/^https?:\/\/[^\/]+?\/[^\/]+?\/[^\/]+?$/i', [$repo_url])) == 0) {
                     $warning[] = "\"$repo_url\" doesn't look correct; it should be similar to \"http<s>://<gogs instance>/<owner>/<name>\". $warning_suffix";
                 }
                 if (sizeof(preg_grep('/^https:\/\/(notabug\.org|codeberg\.org)\/[^\/]+?\/[^\/]+?$/i', [$repo_url])) == 0) {
-                    $light_warning[] = "Since Gogs/Gitea might be self-hosted, we can't be sure that \"$repo_url\" is a valid repository URL. $light_warning_suffix";
+                    $light_warning[] = "Since Gogs/Gitea/Codeberg might be self-hosted, we can't be sure that \"$repo_url\" is a valid repository URL. $light_warning_suffix";
                 }
                 return "$repo_url/archive/$commit.zip";
             case 'cgit':
@@ -80,7 +80,7 @@ class Utils
             case 'GitHub':
             case 'GitLab':
             case 'BitBucket':
-            case 'Gogs/Gitea':
+            case 'Gogs/Gitea/Codeberg':
                 return "$repo_url/issues";
             case 'cgit':
             default:
