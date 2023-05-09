@@ -180,29 +180,48 @@ $preview_field_names = [
                 <button type="submit" class="btn btn-primary">Put in queue</button>
             </form>
         <?php } elseif($data['status'] == 'in_review') { ?>
-            <form class="form-inline" action="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>/accept" method="post">
+
+            <form class="form-horizontal" action="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>/accept" method="post">
                 <?php include("_csrf.phtml") ?>
-                <button type="submit" class="btn btn-success">Accept</button>
-                <div class="form-group panel">
-                    <?php if($data['asset_id'] == -1) { ?>
-                        <label class="control-label" for="support_level">Support level:</label>
-                        <select id="support_level" name="support_level" class="form-control btn btn-default">
-                            <?php foreach($constants['support_level'] as $id => $name) if(is_int($id)) { ?>
-                                <option value="<?php echo esc($name) ?>" <?php if($name == 'community') echo 'selected=""'; ?>>
-                                    <?php echo esc(ucfirst($name)) ?>
-                                </option>
-                            <?php } ?>
-                        </select>
-                    <?php } ?>
+
+                <button type="submit" class="btn btn-success col-md-1">Accept</button>
+
+                <div class="form-group col-md-11">
+                    <div class="input-group col-md-12">
+
+                        <?php if($data['asset_id'] == -1) { ?>
+                            <label class="control-label col-md-2" for="support_level">Support level:</label>
+                            
+                            <div class="col-md-10">
+                                <select id="support_level" name="support_level" class="form-control btn btn-default">
+                                    <?php foreach($constants['support_level'] as $id => $name) if(is_int($id)) { ?>
+                                        <option value="<?php echo esc($name) ?>" <?php if($name == 'community') echo 'selected=""'; ?>>
+                                            <?php echo esc(ucfirst($name)) ?>
+                                        </option>
+                                    <?php } ?>
+                                </select>
+                            </div>
+                        <?php } ?>
+                    </div>
                 </div>
+
             </form>
-            <form class="form-inline" action="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>/reject" method="post">
+
+            <form class="form-horizontal" action="<?php echo raw($basepath) ?>/asset/edit/<?php echo url($data['edit_id']) ?>/reject" method="post">
                 <?php include("_csrf.phtml") ?>
-                <button type="submit" class="btn btn-danger">Reject</button>
-                <div class="form-group panel">
-                    <label class="control-label" for="reason" required>Reason:</label>
-                    <textarea class="form-control" id="reason" name="reason"></textarea>
+
+                <button type="submit" class="btn btn-danger col-md-1">Reject</button>
+
+                <div class="form-group col-md-11">
+                    <div class="input-group col-md-12">
+                        <label class="control-label col-md-2" for="reason" required>Reason:</label>
+                        
+                        <div class="col-md-10">
+                            <textarea class="form-control" id="reason" name="reason" rows="4"></textarea>
+                        </div>
+                    </div>
                 </div>
+
             </form>
         <?php } ?>
     <?php } ?>
