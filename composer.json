@@ -1,18 +1,11 @@
 {
-    "config": {
-        "platform": {
-            "php": "7.3.31"
-        }
-    },
-
     "require": {
         "slim/slim": "^3.0",
         "dflydev/fig-cookies": "^1.0",
         "slim/csrf": "^0.7.0",
         "monolog/monolog": "^1.17",
         "slim/php-view": "^2.0",
-        "phpmailer/phpmailer": "^5.2",
-        "twig/twig": "^3.6"
+        "phpmailer/phpmailer": "^5.2"
     },
 
     "autoload": {
