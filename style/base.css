@@ -53,3 +53,97 @@ body {
         height: 95px;
     }
 }
+
+.asset-search-container {
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
+}
+@media (max-width: 768px) {
+    .asset-search-container {
+        flex-direction: column;
+    }
+}
+
+.asset-search-container > form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 220px;
+    min-width: 220px;
+}
+@media (max-width: 768px) {
+    .asset-search-container > form {
+        width: 100%;
+    }
+}
+
+.asset-search-container > form > * + * {
+    border-top: 1px solid black;
+    padding-top: 16px;
+}
+
+.asset-search-container > form .form-actions > a {
+    width: 100%;
+}
+
+.asset-search-container > form .form-search {
+    display: flex;
+    gap: 16px;
+    flex-flow: column;
+}
+
+.asset-search-container > form .form-search .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+}
+
+.asset-search-container > form .form-search .form-group label:first-child {
+    font-size: 106%;
+}
+
+.asset-search-container > form .form-search .form-checkbox {
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.asset-search-container > form .form-search .form-checkbox input[type=checkbox] {
+    vertical-align: text-top;
+}
+
+.asset-search-container > form .form-search select {
+    cursor: pointer;
+}
+
+.asset-search-container > form .form-search .form-highlighted {
+    border-radius: 4px;
+    padding: 4px 8px;
+}
+
+.asset-search-container > form .form-search .form-highlighted > .form-checkbox {
+    margin: 0;
+}
+
+.asset-search-results {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.pagination-container {
+    text-align: center;
+}
+
+.pagination-stats {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+@media (max-width: 768px) {
+    .pagination-stats {
+        flex-direction: column;
+    }
+}

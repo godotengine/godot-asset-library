@@ -1,4 +1,4 @@
-<nav aria-label="Page navigation">
+<nav class="pagination-container" aria-label="Page navigation">
     <ul class="pagination">
 
         <?php if($data['page'] - 1 >= 0) { ?>
@@ -50,15 +50,18 @@
         <?php } ?>
     </ul>
 </nav>
-<p>
-    <?php echo esc($data['page_length']) ?> item<?php if($data['page_length'] != 1) echo 's' ?> per page, <?php echo esc($data['total_items']) ?> item<?php if($data['total_items'] != 1) echo 's' ?> total.
-</p>
-<p>
-    Change items per page to: <span class="btn-group btn-group-xs" role="group" aria-label="Page size">
-        <?php foreach ([40, 100, 200, 500] as $amount) { ?>
-            <a href="?<?php echo esc(http_build_query(['max_results' => $amount, 'page' => floor($data['page'] * $data['page_length'] / $amount)] + $params)) ?>" class="btn btn-default" aria-label="Per page">
-                <?php echo raw($amount); ?>
-            </a>
-        <?php } ?>
-    </span>
-</p>
+
+<div class="pagination-stats">
+    <div>
+        Items per page: <span class="btn-group btn-group-xs" role="group" aria-label="Page size">
+            <?php foreach ([40, 100, 200, 500] as $amount) { ?>
+                <a href="?<?php echo esc(http_build_query(['max_results' => $amount, 'page' => floor($data['page'] * $data['page_length'] / $amount)] + $params)) ?>" class="btn btn-default <?php if($data['page_length'] == $amount) echo 'active' ?>" aria-label="Per page">
+                    <?php echo raw($amount); ?>
+                </a>
+            <?php } ?>
+        </span>
+    </div>
+    <div>
+        <?php echo esc($data['page_length']) ?> item<?php if($data['page_length'] != 1) echo 's' ?> per page, <?php echo esc($data['total_items']) ?> item<?php if($data['total_items'] != 1) echo 's' ?> total.
+    </div>
+</div>
