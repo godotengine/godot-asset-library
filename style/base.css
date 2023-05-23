@@ -133,6 +133,10 @@ body {
     width: 100%;
 }
 
+.asset-search-results > .row {
+    height: 100%;
+}
+
 .pagination-container {
     text-align: center;
 }
