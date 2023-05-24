@@ -1,5 +1,20 @@
 body {
     font-family: -apple-system, "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex-grow: 1;
+}
+
+footer {
+    padding-bottom: 12px;
+}
+
+.logo-dark {
+    display: none;
 }
 
 .form-search .form-group {
@@ -149,5 +164,158 @@ body {
 @media (max-width: 768px) {
     .pagination-stats {
         flex-direction: column;
+    }
+}
+
+@media(prefers-color-scheme: dark) {
+    :root {
+        --base-color-text: hsla(200, 00%, 100%, 0.85);
+        --link-color: #80B0DB;
+        --link-underline-color: #94c2ef;
+        --primary-background-color: #25282b;
+        --secondary-background-color: #333639;
+        --highlight-background-color: #505356;
+        --input-background-color: #3b3e40;
+        --success-background-color: #527c41;
+        --danger-background-color: #ab1e1b;
+        --notice-background-color: #3a57ad;
+        --warning-background-color: #b5761b;
+        --base-box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+    }
+
+    body {
+        background-color: var(--primary-background-color);
+        color: var(--base-color-text)
+    }
+
+    footer {
+        padding-top: 40px;
+        margin-top: 20px;
+        background-color: var(--secondary-background-color);
+        border: none;
+    }
+
+    footer hr,
+    .logo-light {
+        display: none;
+    }
+
+    .logo-dark {
+        display: initial;
+    }
+
+    .navbar-default {
+        background-color: var(--secondary-background-color);
+        border: none;
+        box-shadow: var(--base-box-shadow);
+    }
+
+    .navbar-default .navbar-brand,
+    .navbar-default .navbar-nav > li > a {
+        color: var(--base-color-text)
+    }
+
+    .navbar-default .navbar-nav > li > a:focus,
+    .navbar-default .navbar-nav > li > a:hover,
+    .navbar-default .navbar-brand:focus,
+    .navbar-default .navbar-brand:hover {
+        color: white;
+        text-decoration: underline;
+    }
+
+    .navbar-default .navbar-nav > .active > a,
+    .navbar-default .navbar-nav > .active > a:focus,
+    .navbar-default .navbar-nav > .active > a:hover {
+        background-color: var(--highlight-background-color);
+        color: var(--base-color-text)
+    }
+
+    .form-control {
+        background-color: var(--input-background-color);
+        color: var(--base-color-text)
+    }
+
+    .form-control:focus {
+        border-color: white;
+    }
+
+    .img-thumbnail {
+        background: none;
+        border: none;
+    }
+
+    legend,
+    h4 small,
+    .help-block,
+    .text-muted {
+        color: var(--base-color-text)
+    }
+
+    a,
+    .btn-link {
+        color: var(--link-color);
+    }
+
+    a:focus,
+    a:hover,
+    .btn-link:focus,
+    .btn-link:hover {
+        color: var(--link-underline-color);
+    }
+
+    .btn-danger {
+        background-color: var(--danger-background-color);
+        border-color: var(--danger-background-color);
+    }
+
+    .btn-success {
+        background-color: var(--success-background-color);
+        border-color: var(--success-background-color);
+    }
+
+    .btn-warning {
+        background-color: var(--warning-background-color);
+        border-color: var(--warning-background-color);
+    }
+
+    .btn-primary {
+        background-color: var(--notice-background-color);
+        border-color: var(--notice-background-color);
+    }
+
+    code,
+    .bg-info,
+    .pagination > .active > a,
+    .label-primary {
+        background-color: var(--notice-background-color);
+        color: white;
+    }
+
+    .panel {
+        background-color: var(--secondary-background-color);
+        border: none;
+    }
+
+    .panel-default > .panel-heading {
+        background-color: var(--highlight-background-color);
+        color: white;
+    }
+
+    .label-danger,
+    .panel-danger > .panel-heading,
+    .table > tbody > tr > td.danger {
+        background-color: var(--danger-background-color);
+        color: white;
+    }
+
+    .label-success,
+    .panel-success > .panel-heading,
+    .table > tbody > tr > td.success {
+        background-color: var(--success-background-color);
+        color: white;
+    }
+
+    .table > tbody > tr > td.active {
+        background-color: var(--primary-background-color);
     }
 }

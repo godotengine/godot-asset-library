@@ -25,10 +25,11 @@
 
     <!-- Bootstrap -->
     <link href="<?php echo raw($bowerpath) ?>/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="<?php echo raw($basepath) ?>/style/base.css?2" rel="stylesheet">
+    <link href="<?php echo raw($basepath) ?>/style/base.css?3" rel="stylesheet">
 </head>
 
 <body>
+    <header>
     <!-- Navigation -->
     <nav class="navbar navbar-default navbar-static-top" role="navigation">
         <div class="container">
@@ -40,7 +41,8 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="https://godotengine.org" style="padding: 7px;"><img alt="Godot" src="<?php echo raw($basepath) ?>/assets/logo.svg" height="100%" style="display: inline"> </a>
+                <a class="navbar-brand logo-light" href="https://godotengine.org" style="padding: 7px;"><img alt="Godot" src="<?php echo raw($basepath) ?>/assets/logo.svg" height="100%" style="display: inline"> </a>
+                <a class="navbar-brand logo-dark" href="https://godotengine.org" style="padding: 7px;"><img alt="Godot" src="<?php echo raw($basepath) ?>/assets/logo_dark.svg" height="100%" style="display: inline"> </a>
                 <a class="navbar-brand" href="<?php echo raw($basepath) ?>" style="padding: 14px;">| Asset Library</a>
             </div>
 
@@ -75,4 +77,5 @@
         </div>
         <!-- /.container -->
     </nav>
-    <div class="container">
+    </header>
+    <main class="container">
