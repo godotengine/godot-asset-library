@@ -3,7 +3,7 @@
 <div class="asset-search-container">
     <form method="get" action="asset">
         <div class="input-group">
-            <input type="text" class="form-control" name="filter" placeholder="Search for..." value="<?php if(isset($params['filter'])) echo esc($params['filter']) ?>">
+            <input type="text" class="form-control" name="filter" placeholder="Search for..." aria-label="Search for assets" value="<?php if(isset($params['filter'])) echo esc($params['filter']) ?>">
             <span class="input-group-btn">
                 <button class="btn btn-primary" type="submit">Search</button>
             </span>
@@ -39,8 +39,8 @@
                 <?php } ?>
             </div>
             <div class="form-group">
-                <label>Godot version</label>
-                <select id="category" name="godot_version" class="form-control">
+                <label for="godot_version">Godot version</label>
+                <select id="godot_version" name="godot_version" class="form-control">
                     <option value="">
                         Any
                     </option>
