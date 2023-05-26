@@ -178,6 +178,7 @@ footer {
         --input-background-color: #3b3e40;
         --success-background-color: #527c41;
         --danger-background-color: #ab1e1b;
+        --info-background-color: #1d87a6;
         --notice-background-color: #3a57ad;
         --warning-background-color: #b5761b;
         --base-box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
@@ -244,6 +245,10 @@ footer {
         border: none;
     }
 
+    .asset-search-container > form > * + * {
+        border-top-color: white;
+    }
+
     legend,
     h4 small,
     .help-block,
@@ -261,6 +266,42 @@ footer {
     .btn-link:focus,
     .btn-link:hover {
         color: var(--link-underline-color);
+    }
+
+    .pagination > li > a,
+    .btn-default {
+        background-color: var(--input-background-color);
+        border-color: var(--base-color-text);
+        color: var(--base-color-text);
+    }
+
+    .pagination > li > a:hover,
+    .pagination > li > a:focus,
+    .pagination > li > a:active,
+    .btn-default:focus,
+    .btn-default:hover,
+    .btn-default:active {
+        background-color: var(--highlight-background-color);
+        color: var(--base-color-text);
+    }
+
+    .pagination > .disabled > a,
+    .pagination > .active > a,
+    .btn-default.active {
+        color: white;
+        pointer-events: none;
+        z-index: -1 !important;
+    }
+
+    .pagination > .disabled > a {
+        background-color: var(--highlight-background-color);
+        border-color: var(--highlight-background-color);
+    }
+
+    .pagination > .active > a,
+    .btn-default.active {
+        background-color: var(--notice-background-color);
+        border-color: var(--notice-background-color);
     }
 
     .btn-danger {
@@ -283,9 +324,15 @@ footer {
         border-color: var(--notice-background-color);
     }
 
+    .btn-primary:hover,
+    .btn-primary:focus,
+    .btn-primary:active {
+        background-color: var(--info-background-color);
+        border-color: var(--info-background-color);
+    }
+
     code,
     .bg-info,
-    .pagination > .active > a,
     .label-primary {
         background-color: var(--notice-background-color);
         color: white;
@@ -298,6 +345,13 @@ footer {
 
     .panel-default > .panel-heading {
         background-color: var(--highlight-background-color);
+        color: white;
+    }
+
+    .label-info,
+    .panel-info > .panel-heading,
+    .table > tbody > tr > td.info {
+        background-color: var(--info-background-color);
         color: white;
     }
 
