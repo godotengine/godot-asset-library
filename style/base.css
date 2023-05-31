@@ -17,9 +17,35 @@ footer {
     display: none;
 }
 
+form:focus-within .form-search, form .form-search:hover {
+    display: block;
+}
+
+.form-search {
+    padding: 10px;
+    display: none;
+    border-bottom: 1px solid #ddd;
+    position: absolute;
+    background: #fff;
+    z-index: 100;
+    left: 0;
+    width: 100%;
+}
+
+.form-search .form-group label {
+	font-weight: normal;
+}
+
 .form-search .form-group {
     margin-bottom: 0.2em;
-    margin-right: 40px;
+}
+
+.form-search .form-group > label:first-child {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+    margin-top: 15px;
+    width: 100%;
 }
 
 @media screen and (max-width: 768px) {
@@ -31,15 +57,19 @@ footer {
 @supports (display: flex) {
     @media screen and (min-width: 768px) {
         .form-search {
-            display: flex;
             justify-content: space-between;
             flex-flow: wrap;
         }
+        form:focus-within .form-search, form .form-search:hover {
+            display: flex;
+        }
         .form-search .form-group {
-            margin-right: 1em;
-            margin-left: 1em;
+            width: 25%;
             flex-shrink: 0;
             display: block;
+        }
+        .form-search .form-group label {
+            width: 100%;
         }
     }
 }
