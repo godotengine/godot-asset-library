@@ -133,6 +133,7 @@ Get a list of categories (needed for filtering assets) and potentially a login U
 &support=(official|community|testing)
 &filter=(search text)
 &user=(submitter username)
+&cost=(license)
 &godot_version=(major).(minor).(patch)
 &max_results=(number 1…500)
 &page=(number, pages to skip) OR &offset=(number, rows to skip)
