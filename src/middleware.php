@@ -100,7 +100,6 @@ if (FRONTEND) {
                 $params = [
                     'data' => $result,
                     'basepath' => $request->getUri()->getBasePath(). '',
-                    'bowerpath' => $request->getUri()->getBasePath() . '/bower_components',
                     'path' => $path,
                     'params' => $request->getQueryParams(),
                     'query' => $request->getUri()->getQuery(),
