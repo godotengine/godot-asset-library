@@ -53,6 +53,20 @@
                 </select>
             </div>
             <div class="form-group">
+                <label for="license">License</label>
+                <select id="license" name="cost" class="form-control">
+                    <option value="">
+                        Any
+                    </option>
+
+                    <?php foreach($constants['licenses'] as $id => $license) { ?>
+                        <option value="<?php echo url($id) ?>" <?php if(isset($params['cost']) && $id == $params['cost']) echo 'selected=""'; ?>>
+                            <?php echo esc($license) ?>
+                        </option>
+                    <?php } ?>
+                </select>
+            </div>
+            <div class="form-group">
                 <label for="sort">Order by</label>
                 <select id="sort" name="sort" class="form-control">
                     <?php if(!isset($params['sort'])) $params['sort'] = 'updated'; foreach(['cost', 'name', 'updated'] as $id => $order) { ?>
@@ -112,9 +126,7 @@
 
                             <p class="text-muted">
                                 Submitted by user <a href="?user=<?php echo esc($asset['author']) ?>" title="Search assets by '<?php echo esc($asset['author']) ?>'"><?php echo esc($asset['author']) ?></a>;
-                                <a href="?<?php echo esc(http_build_query([
-                                    'filter' => $asset['cost'] // isset($params['filter']) ? $params['filter'] . ' ' . $asset['cost'] : $asset['cost']
-                                ] + $params)) ?>" title="Search assets with filter '<?php echo esc($asset['cost']) ?>'"><?php echo esc($asset['cost']) ?></a>;
+                                <?php echo esc($asset['cost']) ?>;
                                 <span class="nowrap"><?php echo esc(explode(" ", $asset['modify_date'])[0]) ?></span>
                             </p>
                         </div>

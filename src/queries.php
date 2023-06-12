@@ -29,7 +29,7 @@ return [
             LEFT JOIN `as_categories` USING (category_id)
 
             WHERE searchable = TRUE AND category_id LIKE :category AND category_type LIKE :category_type
-            AND support_level RLIKE :support_levels_regex AND username LIKE :username
+            AND support_level RLIKE :support_levels_regex AND username LIKE :username AND cost LIKE :cost
             AND godot_version <= :max_godot_version AND godot_version >= :min_godot_version
             AND (
                 title LIKE :filter
@@ -63,7 +63,7 @@ return [
             LEFT JOIN `as_users` USING (user_id)
             LEFT JOIN `as_categories` USING (category_id)
             WHERE searchable = TRUE AND category_id LIKE :category AND category_type LIKE :category_type
-            AND support_level RLIKE :support_levels_regex AND username LIKE :username
+            AND support_level RLIKE :support_levels_regex AND username LIKE :username AND cost LIKE :cost
             AND godot_version <= :max_godot_version AND godot_version >= :min_godot_version
             AND (
                 title LIKE :filter

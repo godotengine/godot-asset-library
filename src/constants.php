@@ -71,5 +71,25 @@ return $constants = [
         '4.0',
         'unknown',
         'custom_build',
+    ],
+    'licenses' => [
+        'MIT' => 'MIT',
+        'MPL-2.0' => 'MPL-2.0',
+        'GPLv3' => 'GPL v3',
+        'GPLv2' => 'GPL v2',
+        'LGPLv3' => 'LGPL v3',
+        'LGPLv2.1' => 'LGPL v2.1',
+        'LGPLv2' => 'LGPL v2',
+        'AGPLv3' => 'AGPL v3',
+        'Apache-2.0' => 'Apache 2.0',
+        'CC0' => 'CC0 1.0 Universal',
+        'CC-BY-4.0' => 'CC BY 4.0 International',
+        'CC-BY-3.0' => 'CC BY 3.0 Unported',
+        'CC-BY-SA-4.0' => 'CC BY-SA 4.0 International',
+        'CC-BY-SA-3.0' => 'CC BY-SA 3.0 Unported',
+        'BSD-2-Clause' => 'BSD 2-clause License',
+        'BSD-3-Clause' => 'BSD 3-clause License',
+        'BSL-1.0' => 'Boost Software License',
+        'Unlicense' => 'The Unlicense License'
     ]
 ];

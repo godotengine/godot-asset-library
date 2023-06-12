@@ -8,6 +8,7 @@ $app->get('/asset', function ($request, $response, $args) {
     $category = '%';
     $filter = '%';
     $username = '%';
+    $cost = '%';
     $order_column = 'modify_date';
     $support_levels = [];
     $page_size = 40;
@@ -49,6 +50,9 @@ $app->get('/asset', function ($request, $response, $args) {
     }
     if (isset($params['user'])) {
         $username = $params['user'];
+    }
+    if (isset($params['cost']) && $params['cost'] != "") {
+        $cost = $params['cost'];
     }
     if (isset($params['max_results'])) {
         $page_size = min(abs((int) $params['max_results']), $max_page_size);
@@ -107,6 +111,7 @@ $app->get('/asset', function ($request, $response, $args) {
     $query->bindValue(':support_levels_regex', $support_levels);
     $query->bindValue(':filter', $filter);
     $query->bindValue(':username', $username);
+    $query->bindValue(':cost', $cost);
     $query->bindValue(':order', $order_column);
     $query->bindValue(':order_direction', $order_direction);
     $query->bindValue(':page_size', $page_size, PDO::PARAM_INT);
@@ -126,6 +131,7 @@ $app->get('/asset', function ($request, $response, $args) {
     $query_count->bindValue(':support_levels_regex', $support_levels);
     $query_count->bindValue(':filter', $filter);
     $query_count->bindValue(':username', $username);
+    $query_count->bindValue(':cost', $cost);
     $query_count->execute();
 
     $error = $this->utils->errorResponseIfQueryBad(false, $response, $query_count);
