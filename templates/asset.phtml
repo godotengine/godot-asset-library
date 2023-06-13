@@ -15,10 +15,10 @@
             <?php } ?>
 
             <span class="label label-primary"><?php echo esc($data['category']) ?></span>
-            <span class="label label-danger"><?php echo esc(ucfirst(str_replace('_', ' ', $data['godot_version']))) ?></span>
+            <span class="label label-info"><?php echo esc(ucfirst(str_replace('_', ' ', $data['godot_version']))) ?></span>
             <span class="label label-<?php echo raw([
-                'official' => 'success',
-                'community' => 'info',
+                'official' => 'danger',
+                'community' => 'success',
                 'testing' => 'default',
             ][$data['support_level']]) ?>"><?php echo esc(ucfirst($data['support_level'])) ?></span>
         </h4>
