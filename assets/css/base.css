@@ -70,6 +70,30 @@ footer {
     line-height: 1.8;
 }
 
+.asset-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.asset-tools {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.asset-tools .panel {
+    margin-bottom: 0;
+}
+
+.flex-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
 .asset-search-container {
     display: flex;
     flex-direction: row;

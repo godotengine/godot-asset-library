@@ -24,11 +24,11 @@ return [
         'list' => 'SELECT category_id as id, category as name, category_type as type FROM `as_categories` WHERE category_type LIKE :category_type ORDER BY category_id',
     ],
     'asset' => [
-        'search' => 'SELECT asset_id, title, username as author, user_id as author_id, category, category_id, godot_version, rating, cost, support_level, icon_url, version, version_string, modify_date FROM `as_assets`
+        'search' => 'SELECT asset_id, title, searchable, username as author, user_id as author_id, category, category_id, godot_version, rating, cost, support_level, icon_url, version, version_string, modify_date FROM `as_assets`
             LEFT JOIN `as_users` USING (user_id)
             LEFT JOIN `as_categories` USING (category_id)
 
-            WHERE searchable = TRUE AND category_id LIKE :category AND category_type LIKE :category_type
+            WHERE (searchable = TRUE OR user_id = :user_id) AND category_id LIKE :category AND category_type LIKE :category_type
             AND support_level RLIKE :support_levels_regex AND username LIKE :username AND cost LIKE :cost
             AND godot_version <= :max_godot_version AND godot_version >= :min_godot_version
             AND (
@@ -62,7 +62,7 @@ return [
         'search_count' => 'SELECT count(*) as count FROM `as_assets`
             LEFT JOIN `as_users` USING (user_id)
             LEFT JOIN `as_categories` USING (category_id)
-            WHERE searchable = TRUE AND category_id LIKE :category AND category_type LIKE :category_type
+            WHERE (searchable = TRUE OR user_id = :user_id) AND category_id LIKE :category AND category_type LIKE :category_type
             AND support_level RLIKE :support_levels_regex AND username LIKE :username AND cost LIKE :cost
             AND godot_version <= :max_godot_version AND godot_version >= :min_godot_version
             AND (

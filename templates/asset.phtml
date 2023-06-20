@@ -5,15 +5,9 @@
     </div>
     <div class="media-body">
         <h4 class="media-heading">
-            <?php if (!$data['searchable']) { ?><del><?php } ?>
-            <?php echo esc($data['title']) ?>
-            <?php if (!$data['searchable']) { ?></del><?php } ?>
-            <small><?php echo esc($data['version_string']) ?></small>
-
-            <?php if (!$data['searchable']) { ?>
-                <span class="label label-default">Deleted</span>
-            <?php } ?>
-
+           <?php echo esc($data['title']) ?>
+        </h4>
+        <div class="asset-tags" style="margin: 8px 0;">
             <span class="label label-primary"><?php echo esc($data['category']) ?></span>
             <span class="label label-info"><?php echo esc(ucfirst(str_replace('_', ' ', $data['godot_version']))) ?></span>
             <span class="label label-<?php echo raw([
@@ -21,40 +15,99 @@
                 'community' => 'success',
                 'testing' => 'default',
             ][$data['support_level']]) ?>"><?php echo esc(ucfirst($data['support_level'])) ?></span>
-        </h4>
-
+            <span class="label label-default"><?php echo esc($data['cost']) ?></span>
+            <?php if ($data['searchable'] == 0) { ?>
+                <span class="label label-default">Hidden</span>
+            <?php } ?>
+        </div>
         <p class="text-muted">
-            Submitted by user <a href="<?php echo raw($basepath) ?>/asset?user=<?php echo esc($data['author']) ?>" title="Search assets by '<?php echo esc($data['author']) ?>'"><?php echo esc($data['author']) ?></a>;
-            <?php echo esc($data['cost']) ?>;
-            <?php echo esc(explode(" ", $data['modify_date'])[0]) ?>
-        </p>
-        <p>
-            <?php echo nl2br(esc($data['description']), false) ?>
+            <b><?php echo esc($data['version_string']) ?></b> | <?php echo esc(explode(" ", $data['modify_date'])[0]) ?> by
+            <a href="<?php echo raw($basepath) ?>/asset?user=<?php echo esc($data['author']) ?>" title="Search assets by '<?php echo esc($data['author']) ?>'"><?php echo esc($data['author']) ?></a>
         </p>
     </div>
 </div>
 <hr/>
-<p>
-    <a class="btn btn-default" href="<?php echo esc($data['browse_url']) ?>">
-        <i class="glyphicon glyphicon-folder-open"></i> View files
+<p><?php echo nl2br(esc($data['description']), false) ?></p>
+<hr/>
+<div class="asset-links">
+    <a class="btn btn-primary" href="<?php echo esc($data['browse_url']) ?>">
+        <i class="glyphicon glyphicon-folder-open"></i>&nbsp; View files
     </a>
     <a class="btn btn-primary" href="<?php echo esc($data['download_url']) ?>">
         <i class="glyphicon glyphicon-download"></i> Download
     </a>
     <?php if($data['issues_url'] != "") { ?>
-        <a class="btn btn-success" href="<?php echo esc($data['issues_url']) ?>">
+        <a class="btn btn-primary" href="<?php echo esc($data['issues_url']) ?>">
             <i class="glyphicon glyphicon-check"></i> Submit an issue
         </a>
     <?php } ?>
-    <?php if(isset($user) && ($user['user_id'] == $data['author_id'] || $user['type'] >= $constants['user_type']['editor'])) { ?>
-        <a class="btn btn-success" href="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/edit">
-            <i class="glyphicon glyphicon-pencil"></i> Edit
-        </a>
-    <?php } ?>
-    <a class="btn btn-warning" href="<?php echo raw($basepath) ?>/asset/edit?asset=<?php echo url($data['asset_id']) ?>&amp;status=new+in_review+accepted+rejected">
+    <a class="btn btn-default" href="<?php echo raw($basepath) ?>/asset/edit?asset=<?php echo url($data['asset_id']) ?>&amp;status=new+in_review+accepted+rejected">
         <i class="glyphicon glyphicon-list"></i> Recent Edits
     </a>
-</p>
+</div>
+<div class="asset-tools">
+    <?php if (isset($user) && (($user['type'] >= $constants['user_type']['editor']) || $user['user_id'] === $data['author_id'])) : ?>
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                Author tools
+            </div>
+            <div class="panel-body">
+                <?php if ($data['searchable'] == 1) { ?>
+                    <form class="form" action="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/delete" method="post">
+                        <?php include("_csrf.phtml") ?>
+                        <p>The asset is currently <b>visible</b> in the library.</p>
+                        <hr>
+                        <div class="flex-container">
+                            <button type="submit" class="btn btn-danger" onclick="return window.confirm('Do you really want to hide this asset?');">
+                                <i class="glyphicon glyphicon-eye-close"></i> Hide in library
+                            </button>
+                            <a class="btn btn-success" href="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/edit">
+                                <i class="glyphicon glyphicon-pencil"></i> Edit asset
+                            </a>
+                        </div>
+                    </form>
+                <?php } else { ?>
+                    <form class="form" action="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/undelete" method="post">
+                        <?php include("_csrf.phtml") ?>
+                        <p>The asset is currently <b>hidden</b> in the library.</p>
+                        <hr>
+                        <div class="flex-container">
+                            <button type="submit" class="btn btn-warning" onclick="return window.confirm('Do you want to restore this asset?');">
+                                <i class="glyphicon glyphicon-eye-open"></i> Restore to library
+                            </button>
+                            <a class="btn btn-success" href="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/edit">
+                                <i class="glyphicon glyphicon-pencil"></i> Edit asset
+                            </a>
+                        </div>
+                    </form>
+                <?php } ?>
+            </div>
+        </div>
+    <?php endif ?>
+    <?php if(isset($user) && ($user['type'] >= $constants['user_type']['moderator'])) { ?>
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                Admin tools
+            </div>
+            <div class="panel-body">
+                <form class="form" action="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/support_level" method="post">
+                    <?php include("_csrf.phtml") ?>
+                    <p><label for="support_level">Support level</label></p>
+                    <div class="flex-container">
+                        <select id="support_level" name="support_level" class="form-control">
+                            <?php foreach($constants['support_level'] as $id => $name) if(is_int($id)) { ?>
+                                <option value="<?php echo esc($name) ?>" <?php if($name == $data['support_level']) echo 'selected=""'; ?>>
+                                    <?php echo esc(ucfirst($name)) ?>
+                                </option>
+                            <?php } ?>
+                        </select>
+                        <button type="submit" class="btn btn-default">Change</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    <?php } ?>
+</div>
 <hr/>
 <div class="row">
     <?php foreach($data['previews'] as $key => $preview) { ?>
@@ -70,41 +123,6 @@
                 <?php } ?>
             </a>
         </div>
-        <?php } ?>
+    <?php } ?>
 </div>
-<?php if(isset($user) && ($user['type'] >= $constants['user_type']['moderator'])) { ?>
-    <div class="panel panel-danger">
-        <div class="panel-heading">
-            Admin tools
-        </div>
-        <div class="panel-body">
-            <form class="form" style="margin-bottom: 1em;" action="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/support_level" method="post">
-                <?php include("_csrf.phtml") ?>
-                <div class="input-group">
-                    <span class="input-group-btn">
-                        <button type="submit" class="btn btn-default">Change support level</button>
-                    </span>
-                    <select id="support_level" name="support_level" class="form-control">
-                        <?php foreach($constants['support_level'] as $id => $name) if(is_int($id)) { ?>
-                            <option value="<?php echo esc($name) ?>" <?php if($name == $data['support_level']) echo 'selected=""'; ?>>
-                                <?php echo esc(ucfirst($name)) ?>
-                            </option>
-                        <?php } ?>
-                    </select>
-                </div>
-            </form>
-            <?php if ($data['searchable']) { ?>
-                <form class="form" style="margin-bottom: 1em;" action="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/delete" method="post">
-                    <?php include("_csrf.phtml") ?>
-                    <button type="submit" class="btn btn-danger" onclick="javascript:return window.confirm('Do you really want to delete this asset?');">Remove from library</button>
-                </form>
-            <?php } else { ?>
-                <form class="form" style="margin-bottom: 1em;" action="<?php echo raw($basepath) ?>/asset/<?php echo url($data['asset_id']) ?>/undelete" method="post">
-                    <?php include("_csrf.phtml") ?>
-                    <button type="submit" class="btn btn-info" onclick="javascript:return window.confirm('Do you want to restore this asset?');">Restore to library</button>
-                </form>
-            <?php } ?>
-        </div>
-    </div>
-<?php } ?>
 <?php include("_footer.phtml") ?>
