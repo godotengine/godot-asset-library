@@ -13,7 +13,7 @@ return [
         'register' => 'INSERT INTO `as_users` SET username = :username, email = :email, password_hash = :password_hash',
         'promote' => 'UPDATE `as_users` SET type = :type WHERE user_id = :id AND type < :type',
         // 'demote' => 'UPDATE `as_users` SET type = :type WHERE user_id = :id AND type > :type',
-        'list_edit_events' => 'SELECT edit_id, asset_id, COALESCE(`as_asset_edits`.title, `as_assets`.title) AS title, category, COALESCE(`as_asset_edits`.version_string, `as_assets`.version_string) AS version_string, COALESCE(`as_asset_edits`.icon_url, `as_assets`.icon_url) AS icon_url, status, reason FROM `as_asset_edits`
+        'list_edit_events' => 'SELECT edit_id, asset_id, COALESCE(`as_asset_edits`.title, `as_assets`.title) AS title, `as_asset_edits`.submit_date, `as_asset_edits`.modify_date, category, COALESCE(`as_asset_edits`.version_string, `as_assets`.version_string) AS version_string, COALESCE(`as_asset_edits`.icon_url, `as_assets`.icon_url) AS icon_url, status, reason FROM `as_asset_edits`
             LEFT JOIN `as_assets` USING (asset_id)
             LEFT JOIN `as_categories` ON `as_categories`.category_id = COALESCE(`as_asset_edits`.category_id, `as_assets`.category_id)
             WHERE `as_asset_edits`.user_id = :user_id
@@ -126,6 +126,8 @@ return [
 
         'search' => 'SELECT edit_id, asset_id,
         `as_asset_edits`.user_id,
+        `as_asset_edits`.submit_date,
+        `as_asset_edits`.modify_date,
         COALESCE(`as_asset_edits`.title, `as_assets`.title) AS title,
         COALESCE(`as_asset_edits`.description, `as_assets`.description) AS description,
         COALESCE(`as_asset_edits`.godot_version, `as_assets`.godot_version) AS godot_version,
