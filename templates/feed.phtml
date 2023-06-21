@@ -1,25 +1,29 @@
 <?php include("_header.phtml") ?>
-<?php foreach($data['events'] as $i => $event) { ?>
-    <div class="media"> <!-- TODO: Get real feed from @alketii -->
-        <div class="media-left">
-
-            <i class="glyphicon glyphicon-<?php echo raw([
-                'new' => 'unchecked text-default',
-                'in_review' => 'check text-primary',
-                'rejected' => 'remove text-danger',
-                'accepted' => 'ok text-success'][$event['status']])
-            ?>" style="font-size:30px"></i>
-        </div>
-        <div class="media-body">
-            <h4 class="media-heading">
-                <span><?php echo ($event['asset_id'] == -1 ? 'Create ' : 'Edit ') ?></span>
-                <a href="<?php echo raw($basepath) . '/asset/edit/' . url($event['edit_id']) ?>">"<?php echo esc($event['title']) ?>"</a>
-                <span class="label label-<?php
-                echo raw(['new' => 'info', 'in_review' => 'primary', 'rejected' => 'danger', 'accepted' => 'success'][$event['status']])
-                ?>"><?php echo raw(ucfirst(str_replace('_', ' ', $event['status']))) ?></span>
-            </h4>
-            <?php if($event['reason']) echo 'Reason: ' . esc($event['reason']) ?>
-        </div>
-    </div>
-<?php } ?>
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th scope="col">Status</th>
+            <th scope="col">Type</th>
+            <th scope="col">Asset Name</th>
+            <th scope="col">Submit Date</th>
+            <th scope="col">Revision Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach($data['events'] as $i => $event) { ?>
+            <tr>
+                <td class="table-tags">
+                    <span class="label label-<?php
+                    echo raw(['new' => 'info', 'in_review' => 'primary', 'rejected' => 'danger', 'accepted' => 'success'][$event['status']]) ?>">
+                        <?php echo raw(ucfirst(str_replace('_', ' ', $event['status']))) ?>
+                    </span>
+                </td>
+                <td><?php echo ($event['asset_id'] == -1 ? 'Create ' : 'Edit ') ?></td>
+                <td><a href="<?php echo raw($basepath) . '/asset/edit/' . url($event['edit_id']) ?>"><?php echo esc($event['title']) ?></a></td>
+                <td><?php echo raw($event['submit_date']) ?></td>
+                <td><?php echo ($event['status'] === 'new') ? 'Pending' : raw($event['modify_date']) ?></td>
+            </tr>
+        <?php } ?>
+    </tbody>
+</table>
 <?php include("_footer.phtml") ?>
