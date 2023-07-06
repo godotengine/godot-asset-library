@@ -69,6 +69,8 @@ return $constants = [
         '3.4',
         '3.5',
         '4.0',
+        '4.1',
+        '4.2',
         'unknown',
         'custom_build',
     ],
