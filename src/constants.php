@@ -92,6 +92,7 @@ return $constants = [
         'BSD-2-Clause' => 'BSD 2-clause License',
         'BSD-3-Clause' => 'BSD 3-clause License',
         'BSL-1.0' => 'Boost Software License',
+        'ISC' => 'ISC License',
         'Unlicense' => 'The Unlicense License'
     ]
 ];
