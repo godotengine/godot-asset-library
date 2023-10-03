@@ -25,7 +25,7 @@ class Utils
         if ($provider != 'Custom') {
             // Git commits are either 40 (SHA1) or 64 (SHA2) hex characters
             if (sizeof(preg_grep('/^[a-f0-9]{40}([a-f0-9]{24})?$/', [$commit])) == 0) {
-                $warning[] = "Using git tags or branches is no longer supported. Please give a full git commit hash instead.\n";
+                $warning[] = "Using Git tags or branches is no longer supported. Please give a full Git commit hash instead, or use the Custom download provider for GitHub Releases downloads.\n";
             }
         }
         switch ($provider) {
