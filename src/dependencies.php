@@ -50,7 +50,7 @@ $container['queries'] = function ($c) {
 $container['mail'] = function ($c) {
     return function () use ($c) {
         $settings = $c->get('settings')['mail'];
-        $mail = new PHPMailer;
+        $mail = new PHPMailer\PHPMailer\PHPMailer;
         $mail->setFrom($settings['from']);
         if (isset($settings['replyTo'])) {
             $mail->addReplyTo($settings['replyTo']);
