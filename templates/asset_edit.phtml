@@ -77,9 +77,9 @@ $preview_field_names = [
 <?php if(isset($user) && $data['user_id'] == $user['user_id'] && $data['status'] == 'new') { ?>
     <div class="alert alert-info" role="alert">
         <?php if($data['asset_id'] != -1) { ?>
-            This edit you made is currently pending approval by our moderators. <strong>When it is approved, changes would finally go live</strong>. To access this page again later, you can use the "View pending" button on the asset's page, or just use the "Feed" button in the toolbar. <!--You will be notified by email when decision is made.-->
+            This edit you made is currently pending approval by our moderators. <strong>Only once it gets approved, changes will finally go live</strong>. To access this page again later, you can use the "View pending" button on the asset's page, or just use the "Feed" button in the toolbar. <!--You will be notified by email when decision is made.-->
         <?php } else { ?>
-            This new asset is currently pending approval by our moderators. <strong>Only when it is approved, it would be searchable</strong>. To access this page again later, you can use the <em>"View pending"</em> button on the "My assets" page, or just use the "Feed" button in the toolbar. <!--You will be notified by email when decision is made.-->
+            This new asset is currently pending approval by our moderators. <strong>Only once it gets approved, it will be searchable</strong>. To access this page again later, you can use the <em>"View pending"</em> button on the "My assets" page, or just use the "Feed" button in the toolbar. <!--You will be notified by email when decision is made.-->
         <?php } ?>
     </div>
 <?php } ?>
