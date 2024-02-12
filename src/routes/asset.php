@@ -156,7 +156,7 @@ $app->get('/asset', function ($request, $response, $args) {
         'pages' => ceil($total_count / $page_size),
         'page_length' => $page_size,
         'total_items' => (int) $total_count,
-    ], 200);
+    ], 200, JSON_PARTIAL_OUTPUT_ON_ERROR);
 });
 
 // Get information for a single asset
