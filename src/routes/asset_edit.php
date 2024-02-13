@@ -700,7 +700,7 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
     $query_edit->bindValue(':edit_id', (int) $args['id'], PDO::PARAM_INT);
     $query_edit->execute();
 
-    $error = $this->utils->errorResponseIfQueryBad(false, $response, $query_edit);
+    $error = $this->utils->errorResponseIfQueryBad(false, $response, $query_edit, 'Cannot get asset edit data from database.');
     $error = $this->utils->errorResponseIfQueryNoResults($error, $response, $query_edit);
     if ($error) {
         return $response;
@@ -755,7 +755,7 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
     $query_status->bindValue(':reason', '');
 
     $query_status->execute();
-    $error = $this->utils->errorResponseIfQueryBad(false, $response, $query_status);
+    $error = $this->utils->errorResponseIfQueryBad(false, $response, $query_status, 'Unable to update asset status in database');
     $error = $this->utils->errorResponseIfQueryNoResults(false, $response, $query_status); // Important: Ensure that something was actually changed
     if ($error) {
         $this->db->rollback();
@@ -764,7 +764,7 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
 
     // Run
     $query->execute();
-    $error = $this->utils->errorResponseIfQueryBad(false, $response, $query);
+    $error = $this->utils->errorResponseIfQueryBad(false, $response, $query, 'Failed query build process');
     if ($error) {
         $this->db->rollback();
         return $response;
@@ -781,7 +781,7 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
 
         $query_update_id->execute();
 
-        $error = $this->utils->errorResponseIfQueryBad(false, $response, $query_update_id);
+        $error = $this->utils->errorResponseIfQueryBad(false, $response, $query_update_id, 'Failed to update the newly-created asset ID');
         if ($error) {
             $this->db->rollback();
             return $response;
@@ -815,7 +815,7 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
         }
 
         $query_apply_preview->execute();
-        $error = $this->utils->errorResponseIfQueryBad(false, $response, $query_apply_preview);
+        $error = $this->utils->errorResponseIfQueryBad(false, $response, $query_apply_preview, 'Failed to apply preview data for asset');
         if ($error) {
             $this->db->rollback();
             return $response;
@@ -829,7 +829,7 @@ $app->post('/asset/edit/{id:[0-9]+}/accept', function ($request, $response, $arg
     $query_verify->bindValue(':type', (int) $this->constants['user_type']['verified'], PDO::PARAM_INT);
 
     $query_verify->execute();
-    $error = $this->utils->errorResponseIfQueryBad(false, $response, $query_verify);
+    $error = $this->utils->errorResponseIfQueryBad(false, $response, $query_verify, 'Failed to mark user as verified');
     if ($error) {
         $this->db->rollback();
         return $response;
