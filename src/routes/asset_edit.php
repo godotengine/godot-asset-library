@@ -272,7 +272,13 @@ function _add_previews_to_edit($c, $error, &$response, $edit_id, $previews, $ass
 
         foreach ($c->constants['asset_edit_preview_fields'] as $i => $field) {
             if (!$required || $field == 'thumbnail') { // thumb is not required
-                if (isset($preview[$field]) && !(isset($original_preview) && $original_preview[$field] == $preview[$field])) {
+                if ($field == 'type') {
+                    if (isset($preview['type'])){
+                        $query->bindValue(':' . $field, $preview[$field]);    
+                    } else {
+                        $query->bindValue(':' . $field, 'image');
+                    }
+                } elseif (isset($preview[$field]) && !(isset($original_preview) && $original_preview[$field] == $preview[$field])) {
                     $has_changes = true;
                     $query->bindValue(':' . $field, $preview[$field]);
                 } elseif (!isset($original_preview)) {
