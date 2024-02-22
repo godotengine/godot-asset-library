@@ -5,6 +5,7 @@
 $app->get('/asset', function ($request, $response, $args) {
     $params = $request->getQueryParams();
 
+    $user_id = 0;
     $category = '%';
     $filter = '%';
     $username = '%';
@@ -50,6 +51,14 @@ $app->get('/asset', function ($request, $response, $args) {
     }
     if (isset($params['user'])) {
         $username = $params['user'];
+
+        if ($token = $this->tokens->validate($request->getParsedBody()['token'])) {
+            $session_error = $this->utils->getUserFromTokenData(false, $response, $token, $user);
+
+            if (!$session_error && $username === $user['username']) {
+                $user_id = $user['user_id'];
+            }
+        }
     }
     if (isset($params['cost']) && $params['cost'] != "") {
         $cost = $params['cost'];
@@ -104,6 +113,7 @@ $app->get('/asset', function ($request, $response, $args) {
     $support_levels = implode('|', $support_levels);
 
     $query = $this->queries['asset']['search'];
+    $query->bindValue(':user_id', $user_id);
     $query->bindValue(':category', $category);
     $query->bindValue(':category_type', $category_type);
     $query->bindValue(':min_godot_version', $min_godot_version, PDO::PARAM_INT);
@@ -124,6 +134,7 @@ $app->get('/asset', function ($request, $response, $args) {
     }
 
     $query_count = $this->queries['asset']['search_count'];
+    $query_count->bindValue(':user_id', $user_id);
     $query_count->bindValue(':category', $category);
     $query_count->bindValue(':category_type', $category_type);
     $query_count->bindValue(':min_godot_version', $min_godot_version, PDO::PARAM_INT);
@@ -182,6 +193,18 @@ $get_asset = function ($request, $response, $args) {
     $previews = [];
 
     foreach ($output as $row) {
+
+        if (array_key_exists('searchable', $row) && $row['searchable'] == 0) {
+            $error = $this->utils->ensureLoggedIn(false, $response, $request->getParsedBody(), $user);
+            $error = $this->utils->errorResponseIfNotOwnerOrLevel($error, $response, $user, $args['id'], 'moderator');
+            if ($error) {
+                $response = new \Slim\Http\Response();
+                return $response->withJson([
+                    'error' => 'Couldn\'t find asset with id '.$args['id'].'!'
+                ], 404);
+            }
+        }
+
         foreach ($row as $column => $value) {
             if ($value!==null) {
                 if ($column==='preview_id') {
