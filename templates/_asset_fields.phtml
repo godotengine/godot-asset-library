@@ -119,7 +119,7 @@ $_asset_values = array_merge([
 </div>
 
 <div class="form-group">
-    <label class="col-md-4 control-label required_mark" for="godot_version">Godot version</label>
+    <label class="col-md-4 control-label required_mark" for="godot_version">Minimum Godot version</label>
     <div class="col-md-5">
         <select id="godot_version" name="godot_version" class="form-control" required="">
             <?php if(!$_asset_values['godot_version']) { ?>
@@ -137,7 +137,15 @@ $_asset_values = array_merge([
                 </option>
             <?php } ?>
         </select>
-        <!-- <span class="help-block">The version of Godot the asset works with.</span> -->
+        <span class="help-block">
+            The <em>oldest</em> version of Godot the asset works with.<br>
+            In the Godot editor and project manager, the asset will be displayed for all versions that are compatible (within the same major version).<br>
+            For example:
+            <ul>
+                <li>If your asset works with Godot 4.1 and later, use <strong>4.1</strong> as the minimum Godot version.</li>
+                <li>If your asset works with Godot 3.5 but not Godot 4.0 or later, use <strong>3.5</strong> as the minimum Godot version.</li>
+            </ul>
+        </span>
     </div>
 </div>
 
