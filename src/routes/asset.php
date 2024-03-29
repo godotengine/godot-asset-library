@@ -99,7 +99,7 @@ $app->get('/asset', function ($request, $response, $args) {
     }
 
     if (count($support_levels) === 0) {
-        $support_levels = [0, 1, 2]; // Testing + Community + Official
+        $support_levels = [0, 1, 2]; // Testing + Community + Official / Featured
     }
     $support_levels = implode('|', $support_levels);
 

@@ -130,7 +130,7 @@ Get a list of categories (needed for filtering assets) and potentially a login U
 ```http
 ?type=(any|addon|project)
 &category=(category id)
-&support=(official|community|testing)
+&support=(official|featured|community|testing)
 &filter=(search text)
 &user=(submitter username)
 &cost=(license)
@@ -173,7 +173,7 @@ Get a list of assets.
 Some notes:
 * Leading and trailing whitespace in `filter` is trimmed on the server side.
 * For legacy purposes, not supplying godot version would list only 2.1 assets, while not supplying type would list only addons.
-* To specify multiple support levels, join them with `+`, e.g. `support=official+community`.
+* To specify multiple support levels, join them with `+`, e.g. `support=featured+community`.
 * Godot version can be specified as you see fit, for example, `godot_version=3.1` or `godot_version=3.1.5`. Currently, the patch version is disregarded, but may be honored in the future.
 
 <div id="api-get-asset-id"></div>
@@ -267,7 +267,7 @@ Revert a deletion of an asset. Useable by moderators and the owner of the asset.
 ### `POST /asset/{id}/support_level`
 ```json
 {
-  "support_level": "official|community|testing",
+  "support_level": "official|featured|community|testing",
   "token": "…"
 }
 ```

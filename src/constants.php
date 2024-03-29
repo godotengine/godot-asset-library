@@ -30,6 +30,7 @@ return $constants = [
         'testing' => 0,
         'community' => 1,
         'official' => 2,
+        'featured' => 2,
     ]),
     'user_type' => double_map([
         'normal' => 0,
