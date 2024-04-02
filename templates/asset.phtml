@@ -18,6 +18,7 @@
             <span class="label label-info"><?php echo esc(ucfirst(str_replace('_', ' ', $data['godot_version']))) ?></span>
             <span class="label label-<?php echo raw([
                 'official' => 'danger',
+                'featured' => 'danger',
                 'community' => 'success',
                 'testing' => 'default',
             ][$data['support_level']]) ?>"><?php echo esc(ucfirst($data['support_level'])) ?></span>
