@@ -117,7 +117,7 @@
                                         'featured' => 'danger',
                                         'community' => 'success',
                                         'testing' => 'default',
-                                    ][$asset['support_level']]) ?>"><?php echo esc(ucfirst($asset['support_level'])) ?></span>
+                                    ][$asset['support_level']]) ?>"><?php echo esc(str_replace('Official', 'Featured', ucfirst($asset['support_level']))) ?></span>
                                 </div>
                                 <div class="asset-tags">
                                     <span class="label label-default"><?php echo esc($asset['cost']) ?></span>
