@@ -24,6 +24,31 @@ cp src/settings-local-example.php src/settings-local.php
 
 Now you should proceed to update `src/settings-local.php` with your DB password and session secret.
 
+## Container
+
+It is also possible to run the asset library inside a container (e.g. with Docker), therefore go into the `container` directory and adjust user and password inside `docker-compose.yml`.
+
+Create a new settings file for the website.
+```bash
+cp src/settings-local-example.php src/settings-local.php
+```
+
+Now you should proceed to update `src/settings-local.php` with your DB password and session secret.
+
+Now build the container image
+```bash
+cd container
+docker compose build
+```
+
+To run the whole composition
+
+```bash
+docker compose up -d
+```
+
+The website is now available at http://localhost:8080/asset-library.
+
 ## Browser support
 
 When working on new features, keep in mind this website only supports
