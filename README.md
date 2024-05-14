@@ -26,18 +26,28 @@ Now you should proceed to update `src/settings-local.php` with your DB password 
 
 ## Container
 
-It is also possible to run the asset library inside a container (e.g. with Docker), therefore go into the `container` directory and adjust user and password inside `docker-compose.yml`.
+It is also possible to run the asset library inside a container (e.g. with Docker).
 
-Create a new settings file for the website.
+First create a new settings file for the website.
+
 ```bash
 cp src/settings-local-example.php src/settings-local.php
 ```
 
-Now you should proceed to update `src/settings-local.php` with your DB password and session secret.
+Update `src/settings-local.php` with your DB password and session secret.
 
-Now build the container image
+Now continue from the `container` directory and create your own `docker-compose.yml` file.
+
 ```bash
 cd container
+cp docker-compose.example.yml docker-compose.yml
+```
+
+Adjust user and password inside the created `docker-compose.yml`.
+
+Now build the container image
+
+```bash
 docker compose build
 ```
 
