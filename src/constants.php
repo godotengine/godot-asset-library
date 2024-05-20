@@ -85,6 +85,7 @@ return $constants = [
         'LGPLv2.1' => 'LGPL v2.1',
         'LGPLv2' => 'LGPL v2',
         'AGPLv3' => 'AGPL v3',
+        'EUPL-1.2' => 'European Union Public License 1.2',
         'Apache-2.0' => 'Apache 2.0',
         'CC0' => 'CC0 1.0 Universal',
         'CC-BY-4.0' => 'CC BY 4.0 International',
