@@ -98,5 +98,6 @@ return $constants = [
         'ISC' => 'ISC License',
         'Unlicense' => 'The Unlicense License',
         'Proprietary' => 'Proprietary (see LICENSE file)',
+        'ZPL-2.1' => 'Zope Public License 2.1',
     ]
 ];
