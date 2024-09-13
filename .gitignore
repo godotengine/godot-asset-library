@@ -1,3 +1,4 @@
 vendor/**
 logs/**/*.log
 src/settings-local.php
+container/docker-compose.yml
