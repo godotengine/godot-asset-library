@@ -1,0 +1,20 @@
+services:
+  gd-asset-library:
+    build:
+      context: ../
+      dockerfile: ./container/Dockerfile
+    depends_on:
+      - database
+    ports:
+      - 8080:80
+  database:
+    image: mariadb:11.3.2
+    volumes:
+      - ../data:/docker-entrypoint-initdb.d:ro
+    expose:
+      - 3306
+    environment:
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: asset-library
+      MARIADB_ROOT_PASSWORD: root_password
