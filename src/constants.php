@@ -101,6 +101,7 @@ return $constants = [
         'BSL-1.0' => 'Boost Software License',
         'ISC' => 'ISC License',
         'Unlicense' => 'The Unlicense License',
+        'Zlib' => 'zlib License'
         'Proprietary' => 'Proprietary (see LICENSE file)',
     ]
 ];
