@@ -104,5 +104,6 @@ return $constants = [
         'Unlicense' => 'The Unlicense License',
         'Zlib' => 'zlib License',
         'Proprietary' => 'Proprietary (see LICENSE file)',
+        'ZPL-2.1' => 'Zope Public License 2.1',
     ]
 ];
